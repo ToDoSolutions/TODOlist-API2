@@ -4,38 +4,29 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 
-@Table(name="NOTA")
+@Table(name="task")
 @Entity
 public class Task implements Serializable {
 
-    @GeneratedValue
-    @Id
-    @Column(name = "idTask")
+    @GeneratedValue(strategy = GenerationType.IDENTITY) @Id @Column(name = "idTask")
     private long idTask;
-    @Column(name = "title")
-    @Max(value = 50, message = "The title is too long")
+    @Column(name = "title") @Max(value = 50)
     private String title;
-    @Column(name = "description")
-    @Max(value = 200, message = "The description is too long")
+    @Column(name = "description") @Max(value = 200)
     private String description;
-    @Column(name = "annotation")
-    @Max(value = 50, message = "The annotation is too long")
+    @Column(name = "annotation") @Max(value = 50)
     private String annotation;
-    @Column(name = "status")
-    @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED")
+    @Column(name = "status") @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED")
     private String status;
-    @Column(name = "finishedDate")
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finished date is not valid, it should be yyyy-MM-dd format")
+    @Column(name = "finishedDate") @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}")
     private String finishedDate;
-    @Column(name = "startDate")
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The start date is not valid, it should be yyyy-MM-dd format")
+    @Column(name = "startDate") @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}")
     private String startDate;
 
-    @Column(name = "priority")
-    @Size(max=5, message = "The priority of the task is not valid, it must be a number between 0 and 5.")
+    @Column(name = "priority") @Size(max=5)
     private Integer priority;
 
-    @Column(name = "difficulty")
+    @Column(name = "difficulty") @Pattern(regexp = "SLEEP|EASY|MEDIUM|HARD|HARDCORE|I_WANT_TO_DIE")
     private String difficulty;
 
     public Task() {

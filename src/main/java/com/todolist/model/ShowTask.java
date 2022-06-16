@@ -5,6 +5,14 @@ import com.todolist.entity.Task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ShowTask {
 
@@ -23,11 +31,11 @@ public class ShowTask {
         this.title = task.getTitle();
         this.description = task.getDescription();
         this.annotation = task.getAnnotation();
-        this.status = Status.parse(task.getStatus());
-        this.finishedDate = LocalDate.parse(task.getFinishedDate(), DateTimeFormatter.ofPattern("\\d{4}-\\d{2}-\\d{2}"));
-        this.startDate = LocalDate.parse(task.getStartDate(), DateTimeFormatter.ofPattern("\\d{4}-\\d{2}-\\d{2}"));
+        this.status = task.getStatus() != null ? Status.valueOf(task.getStatus().toUpperCase()): null;
+        this.finishedDate = task.getFinishedDate() != null ? LocalDate.parse(task.getFinishedDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")): null;
+        this.startDate = task.getStartDate() != null ? LocalDate.parse(task.getStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")): null;
         this.priority = task.getPriority();
-        this.difficulty = Difficulty.parse(task.getDifficulty());
+        this.difficulty = task.getDifficulty() != null ? Difficulty.valueOf(task.getDifficulty().toUpperCase()): null;
     }
 
     public ShowTask(long idTask, String title, String description, String annotation, Status status, LocalDate finishedDate, LocalDate startDate, Integer priority, Difficulty difficulty) {
@@ -112,5 +120,37 @@ public class ShowTask {
 
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public long getDuration() {
+        return DAYS.between(startDate, finishedDate);
+    }
+
+    public Map<String, Object> getFields(String fields) {
+        List<String> attributes = Stream.of(fields.split(",")).map(String::trim).collect(Collectors.toList());
+        Map<String, Object> map = new TreeMap<>();
+        for (String attribute : attributes) {
+            if (Objects.equals(attribute, "idTask"))
+                map.put(attribute, getIdTask());
+            else if (Objects.equals(attribute, "title"))
+                map.put(attribute, getTitle());
+            else if (Objects.equals(attribute, "description"))
+                map.put(attribute, getDescription());
+            else if (Objects.equals(attribute, "status"))
+                map.put(attribute, getStatus());
+            else if (Objects.equals(attribute, "finishedDate"))
+                map.put(attribute, getFinishedDate());
+            else if (Objects.equals(attribute, "startDate"))
+                map.put(attribute, getStartDate());
+            else if (Objects.equals(attribute, "annotation"))
+                map.put(attribute, getAnnotation());
+            else if (Objects.equals(attribute, "priority"))
+                map.put(attribute, getPriority());
+            else if (Objects.equals(attribute, "difficulty"))
+                map.put(attribute, getDifficulty());
+            else if (Objects.equals(attribute, "duration"))
+                map.put(attribute, getDuration());
+        }
+        return map;
     }
 }

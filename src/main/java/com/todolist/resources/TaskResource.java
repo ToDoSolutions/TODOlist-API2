@@ -1,19 +1,31 @@
 package com.todolist.resources;
 
-import com.todolist.parsers.TaskParser;
 import com.todolist.entity.Task;
+import com.todolist.model.Difficulty;
 import com.todolist.model.ShowTask;
+import com.todolist.model.Status;
+import com.todolist.parsers.TaskParser;
 import com.todolist.repository.TaskRepository;
+import com.todolist.utilities.Filter;
+import com.todolist.utilities.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/api")
+@Validated
 public class TaskResource {
 
     @Autowired
@@ -23,16 +35,47 @@ public class TaskResource {
     @Autowired
     @Qualifier("taskParser")
     private TaskParser taskParser;
-
-    @GetMapping("/notas")
+/*
+    @GetMapping("/tasks")
     public List<ShowTask> getAllTasks() {
 
         return taskParser.parseList(repository.findAll());
     }
 
-    @GetMapping("/nota")
-    public List<ShowTask> getAllTasks(Pageable pageable) {
-        return taskParser.parseList(repository.findAll(pageable).getContent());
+ */
+
+    @GetMapping("/tasks")
+    public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(0) Integer offset,
+                                                 @RequestParam(defaultValue = Integer.MAX_VALUE+"") @Min(0) Integer limit,
+                                                 @RequestParam(defaultValue = "idTask") String order,
+                                                 @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
+                                                 @RequestParam(required = false) String title,
+                                                 @RequestParam(required = false) String description,
+                                                 @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED") String status,
+                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}") String finishedDate,
+                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}") String startDate,
+                                                 @RequestParam(required = false) String annotation,
+                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+") String priority,
+                                                 @RequestParam(required = false) String difficulty,
+                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}") String duration) {
+        List<ShowTask> result = new ArrayList<>(),
+                tasks = taskParser.parseList(repository.findAll(PageRequest.of(offset, limit, Order.sequenceTask(order))).getContent());
+        Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
+        Difficulty auxDifficulty = difficulty != null ? Difficulty.valueOf(difficulty.toUpperCase()) : null;
+        for (ShowTask task : tasks) {
+            if (task != null &&
+                    (title == null || task.getTitle().contains(title)) &&
+                    (auxStatus == null || task.getStatus() == auxStatus) &&
+                    (startDate == null || Filter.isGEL(task.getStartDate(), startDate)) &&
+                    (finishedDate == null || Filter.isGEL(task.getFinishedDate(), finishedDate)) &&
+                    (priority == null || Filter.isGEL((long) task.getPriority(), priority)) &&
+                    (auxDifficulty == null || task.getDifficulty() == auxDifficulty) &&
+                    (duration == null || Filter.isGEL(task.getDuration(), duration)) &&
+                    (annotation == null || task.getAnnotation().contains(annotation)) &&
+                    (description == null || task.getDescription().contains(description)))
+                result.add(task);
+        }
+        return result.stream().map(task -> task.getFields(fields)).collect(Collectors.toList());
     }
 
     @PutMapping("/task")
