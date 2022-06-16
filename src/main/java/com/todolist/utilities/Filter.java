@@ -6,6 +6,9 @@ import java.util.Objects;
 
 public class Filter {
 
+    private Filter() {
+    }
+
     public static boolean isGEL(Long value, String parameter) {
         String restriccion = String.valueOf(parameter.charAt(0));
         String aux = String.valueOf(parameter.charAt(1));
@@ -37,8 +40,5 @@ public class Filter {
         return restriccion.contains("=") && Objects.equals(value, date) ||
                 restriccion.contains("<") && value.isBefore(date) ||
                 restriccion.contains(">") && value.isAfter(date);
-    }
-
-    private Filter() {
     }
 }

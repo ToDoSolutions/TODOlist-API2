@@ -1,7 +1,5 @@
 package com.todolist.utilities.messages;
 
-import java.sql.Date;
-
 public class Checker {
 
     /*

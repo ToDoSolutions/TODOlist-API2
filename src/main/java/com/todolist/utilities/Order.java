@@ -1,44 +1,10 @@
 package com.todolist.utilities;
 
-import com.todolist.model.ShowTask;
 import org.springframework.data.domain.Sort;
-
-import java.util.Comparator;
-import java.util.List;
 
 public class Order {
 
-    public static Sort sequenceTask(String order) {
-        if (order.equals("idTask"))
-            return Sort.by(Sort.Direction.ASC, "idTask");
-        else if (order.equals("-idTask"))
-            return Sort.by(Sort.Direction.DESC, "idTask");
-        else if (order.equals("title"))
-            return Sort.by(Sort.Direction.ASC, "title");
-        else if (order.equals("-title"))
-            return Sort.by(Sort.Direction.DESC, "title");
-        else if (order.equals("status"))
-            return Sort.by(Sort.Direction.ASC, "status");
-        else if (order.equals("-status"))
-            return Sort.by(Sort.Direction.DESC, "status");
-        else if (order.equals("releaseDate"))
-            return Sort.by(Sort.Direction.ASC, "releaseDate");
-        else if (order.equals("-releaseDate"))
-            return Sort.by(Sort.Direction.DESC, "releaseDate");
-        else if (order.equals("finishedDate"))
-            return Sort.by(Sort.Direction.ASC, "finishedDate");
-        else if (order.equals("-finishedDate"))
-            return Sort.by(Sort.Direction.DESC, "finishedDate");
-        else if (order.equals("priority"))
-            return Sort.by(Sort.Direction.ASC, "priority");
-        else if (order.equals("-priority"))
-            return Sort.by(Sort.Direction.DESC, "priority");
-        else if (order.equals("difficulty"))
-            return Sort.by(Sort.Direction.ASC, "difficulty");
-        else if (order.equals("-difficulty"))
-            return Sort.by(Sort.Direction.DESC, "difficulty");
-        else
-            return Sort.by(Sort.Direction.ASC, "idTask");
+    private Order() {
     }
 
     /*
@@ -89,6 +55,44 @@ public class Order {
     }
      */
 
-    private Order() {
+    public static Sort sequenceTask(String order) {
+        if (order.equals("idTask"))
+            return Sort.by(Sort.Direction.ASC, "idTask");
+        else if (order.equals("-idTask"))
+            return Sort.by(Sort.Direction.DESC, "idTask");
+        else if (order.equals("title"))
+            return Sort.by(Sort.Direction.ASC, "title");
+        else if (order.equals("-title"))
+            return Sort.by(Sort.Direction.DESC, "title");
+        else if (order.equals("status"))
+            return Sort.by(Sort.Direction.ASC, "status");
+        else if (order.equals("-status"))
+            return Sort.by(Sort.Direction.DESC, "status");
+        else if (order.equals("releaseDate"))
+            return Sort.by(Sort.Direction.ASC, "releaseDate");
+        else if (order.equals("-releaseDate"))
+            return Sort.by(Sort.Direction.DESC, "releaseDate");
+        else if (order.equals("finishedDate"))
+            return Sort.by(Sort.Direction.ASC, "finishedDate");
+        else if (order.equals("-finishedDate"))
+            return Sort.by(Sort.Direction.DESC, "finishedDate");
+        else if (order.equals("priority"))
+            return Sort.by(Sort.Direction.ASC, "priority");
+        else if (order.equals("-priority"))
+            return Sort.by(Sort.Direction.DESC, "priority");
+        else if (order.equals("difficulty"))
+            return Sort.by(Sort.Direction.ASC, "difficulty");
+        else if (order.equals("-difficulty"))
+            return Sort.by(Sort.Direction.DESC, "difficulty");
+        else if (order.equals("description"))
+            return Sort.by(Sort.Direction.ASC, "description");
+        else if (order.equals("-description"))
+            return Sort.by(Sort.Direction.DESC, "description");
+        else if (order.equals("annotation"))
+            return Sort.by(Sort.Direction.ASC, "annotation");
+        else if (order.equals("-annotation"))
+            return Sort.by(Sort.Direction.DESC, "annotation");
+        else
+            return Sort.by(Sort.Direction.ASC, "idTask");
     }
 }

@@ -1,10 +1,5 @@
 package com.todolist.utilities.messages;
 
-import com.todolist.utilities.Pair;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public class Message {
 
     /*

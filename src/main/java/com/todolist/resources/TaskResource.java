@@ -11,7 +11,6 @@ import com.todolist.utilities.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @Validated
 public class TaskResource {
 
@@ -35,29 +34,22 @@ public class TaskResource {
     @Autowired
     @Qualifier("taskParser")
     private TaskParser taskParser;
-/*
-    @GetMapping("/tasks")
-    public List<ShowTask> getAllTasks() {
-
-        return taskParser.parseList(repository.findAll());
-    }
-
- */
 
     @GetMapping("/tasks")
-    public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(0) Integer offset,
-                                                 @RequestParam(defaultValue = Integer.MAX_VALUE+"") @Min(0) Integer limit,
+    public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
+                                                 @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive") Integer limit,
                                                  @RequestParam(defaultValue = "idTask") String order,
                                                  @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
                                                  @RequestParam(required = false) String title,
                                                  @RequestParam(required = false) String description,
-                                                 @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED") String status,
-                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}") String finishedDate,
-                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}") String startDate,
+                                                 @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
+                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
+                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
                                                  @RequestParam(required = false) String annotation,
-                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+") String priority,
+                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The priority is invalid.") String priority,
                                                  @RequestParam(required = false) String difficulty,
-                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}") String duration) {
+                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The priority is invalid.") String duration) {
+        System.out.println(order);
         List<ShowTask> result = new ArrayList<>(),
                 tasks = taskParser.parseList(repository.findAll(PageRequest.of(offset, limit, Order.sequenceTask(order))).getContent());
         Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
@@ -78,7 +70,7 @@ public class TaskResource {
         return result.stream().map(task -> task.getFields(fields)).collect(Collectors.toList());
     }
 
-    @PutMapping("/task")
+    @PostMapping("/tasks")
     public boolean addTask(@RequestBody @Valid Task task) {
         try {
             if (task.getTitle() == null) throw new IllegalArgumentException("");
@@ -89,8 +81,9 @@ public class TaskResource {
         }
     }
 
-    @PostMapping("/task")
+    @PutMapping("/tasks")
     public boolean updateTask(@RequestBody @Valid Task task) {
+        System.out.println(task.getIdTask());
         try {
             Task oldTask = repository.findByIdTask(task.getIdTask());
             if (task.getTitle() != null)

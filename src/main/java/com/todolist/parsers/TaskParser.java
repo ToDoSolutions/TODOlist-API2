@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 @Component("taskParser")
 public class TaskParser {
-
     public List<ShowTask> parseList(List<Task> tasks) {
         return tasks.stream().map(ShowTask::new).collect(Collectors.toList());
     }

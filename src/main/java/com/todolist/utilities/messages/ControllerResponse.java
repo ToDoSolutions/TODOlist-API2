@@ -1,7 +1,6 @@
 package com.todolist.utilities.messages;
 
 
-
 public class ControllerResponse {
 
     /*

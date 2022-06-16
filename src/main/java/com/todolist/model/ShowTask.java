@@ -31,11 +31,11 @@ public class ShowTask {
         this.title = task.getTitle();
         this.description = task.getDescription();
         this.annotation = task.getAnnotation();
-        this.status = task.getStatus() != null ? Status.valueOf(task.getStatus().toUpperCase()): null;
-        this.finishedDate = task.getFinishedDate() != null ? LocalDate.parse(task.getFinishedDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")): null;
-        this.startDate = task.getStartDate() != null ? LocalDate.parse(task.getStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")): null;
+        this.status = task.getStatus() != null ? Status.valueOf(task.getStatus().toUpperCase()) : null;
+        this.finishedDate = task.getFinishedDate() != null ? LocalDate.parse(task.getFinishedDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null;
+        this.startDate = task.getStartDate() != null ? LocalDate.parse(task.getStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null;
         this.priority = task.getPriority();
-        this.difficulty = task.getDifficulty() != null ? Difficulty.valueOf(task.getDifficulty().toUpperCase()): null;
+        this.difficulty = task.getDifficulty() != null ? Difficulty.valueOf(task.getDifficulty().toUpperCase()) : null;
     }
 
     public ShowTask(long idTask, String title, String description, String annotation, Status status, LocalDate finishedDate, LocalDate startDate, Integer priority, Difficulty difficulty) {

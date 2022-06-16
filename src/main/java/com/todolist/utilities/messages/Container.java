@@ -1,8 +1,5 @@
 package com.todolist.utilities.messages;
 
-import com.todolist.utilities.Pair;
-
-
 public class Container {
 
     /*

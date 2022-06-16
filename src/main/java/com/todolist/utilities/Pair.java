@@ -9,6 +9,9 @@ public class Pair {
         this.b = value;
     }
 
+    private Pair() {
+    }
+
     public static Pair of(String a, String b) {
         return new Pair(a, b);
     }
@@ -27,8 +30,5 @@ public class Pair {
 
     public void setB(String b) {
         this.b = b;
-    }
-
-    private Pair() {
     }
 }

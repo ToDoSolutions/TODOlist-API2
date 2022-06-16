@@ -1,32 +1,46 @@
 package com.todolist.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
-@Table(name="task")
+@Table(name = "task")
 @Entity
 public class Task implements Serializable {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Id @Column(name = "idTask")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "idTask")
     private long idTask;
-    @Column(name = "title") @Max(value = 50)
+    @Column(name = "title")
+    @Size(max = 50, message = "The title is too long.")
     private String title;
-    @Column(name = "description") @Max(value = 200)
+    @Column(name = "description")
+    @Size(max = 200, message = "The description is too long.")
     private String description;
-    @Column(name = "annotation") @Max(value = 50)
+    @Column(name = "annotation")
+    @Size(max = 50, message = "The annotation is too long.")
     private String annotation;
-    @Column(name = "status") @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED")
+    @Column(name = "status")
+    @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.")
     private String status;
-    @Column(name = "finishedDate") @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}")
+    @Column(name = "finishedDate")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")
     private String finishedDate;
-    @Column(name = "startDate") @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}")
+    @Column(name = "startDate")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.")
     private String startDate;
 
-    @Column(name = "priority") @Size(max=5)
+    @Column(name = "priority")
+    @Max(value = 5, message = "The priority must be between 0 and 5.")
+    @Min(value = 0, message = "The priority must be between 0 and 5.")
     private Integer priority;
 
-    @Column(name = "difficulty") @Pattern(regexp = "SLEEP|EASY|MEDIUM|HARD|HARDCORE|I_WANT_TO_DIE")
+    @Column(name = "difficulty")
+    @Pattern(regexp = "SLEEP|EASY|MEDIUM|HARD|HARDCORE|I_WANT_TO_DIE", message = "The difficulty is invalid.")
     private String difficulty;
 
     public Task() {
