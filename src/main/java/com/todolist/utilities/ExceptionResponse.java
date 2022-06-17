@@ -8,11 +8,11 @@ public class ExceptionResponse {
     private final String path;
     private final String status;
 
-    public ExceptionResponse(Date timestamp, String message, String details, String status) {
+    public ExceptionResponse(Date timestamp, String message, String path, String status) {
         super();
         this.timestamp = timestamp;
-        this.msg = message.split(":")[1];
-        this.path = details;
+        this.msg = message != null ? (message.contains(":") ? message.split(":")[1] : message) : message;
+        this.path = path;
         this.status = status;
     }
 
