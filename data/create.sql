@@ -12,7 +12,21 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Volcando datos para la tabla todolist.group: 3 rows
+
+-- Volcando estructura de base de datos para todolist-api2
+CREATE DATABASE IF NOT EXISTS `todolist` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `todolist`;
+
+-- Volcando estructura para tabla todolist-api2.group
+CREATE TABLE IF NOT EXISTS `group` (
+  `id_group` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_date` varchar(255) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id_group`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+-- Volcando datos para la tabla todolist-api2.group: 3 rows
 DELETE FROM `group`;
 /*!40000 ALTER TABLE `group` DISABLE KEYS */;
 INSERT INTO `group` (`id_group`, `created_date`, `description`, `name`) VALUES
@@ -20,6 +34,14 @@ INSERT INTO `group` (`id_group`, `created_date`, `description`, `name`) VALUES
 	(2, '2022-05-06', 'Dicen que su factura del agua es negativa', 'Otakus'),
 	(3, '2000-03-09', 'Se dice que son seres que existen desde el inicio de los multiversos', 'AISS enjoyers');
 /*!40000 ALTER TABLE `group` ENABLE KEYS */;
+
+-- Volcando estructura para tabla todolist-api2.group_user
+CREATE TABLE IF NOT EXISTS `group_user` (
+  `id_group` bigint(20) NOT NULL,
+  `id_user` bigint(20) NOT NULL,
+  KEY `FKknx9oe9a7m5gl5rxuy53eklfq` (`id_user`),
+  KEY `FKgp71sm3cw5s1n4f31f56dalep` (`id_group`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- Volcando datos para la tabla todolist-api2.group_user: 6 rows
 DELETE FROM `group_user`;
@@ -32,6 +54,20 @@ INSERT INTO `group_user` (`id_group`, `id_user`) VALUES
 	(3, 5),
 	(3, 6);
 /*!40000 ALTER TABLE `group_user` ENABLE KEYS */;
+
+-- Volcando estructura para tabla todolist-api2.task
+CREATE TABLE IF NOT EXISTS `task` (
+  `id_task` bigint(20) NOT NULL AUTO_INCREMENT,
+  `annotation` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `difficulty` varchar(255) DEFAULT NULL,
+  `finished_date` varchar(255) DEFAULT NULL,
+  `priority` int(11) DEFAULT NULL,
+  `start_date` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id_task`)
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
 -- Volcando datos para la tabla todolist-api2.task: 8 rows
 DELETE FROM `task`;
@@ -47,6 +83,18 @@ INSERT INTO `task` (`id_task`, `annotation`, `description`, `difficulty`, `finis
 	(8, 'Cuesta 0.2€, devuelveme el cambio.', 'Para comprar el pan, ir al polvillo.', 'EASY', '2020-03-04', 5, '2020-03-03', 'IN_PROGRESS', 'Comprar el pan.');
 /*!40000 ALTER TABLE `task` ENABLE KEYS */;
 
+-- Volcando estructura para tabla todolist-api2.user
+CREATE TABLE IF NOT EXISTS `user` (
+  `id_user` bigint(20) NOT NULL AUTO_INCREMENT,
+  `avatar` varchar(255) DEFAULT NULL,
+  `bio` varchar(500) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `location` varchar(50) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `surname` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id_user`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+
 -- Volcando datos para la tabla todolist-api2.user: 6 rows
 DELETE FROM `user`;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
@@ -58,6 +106,14 @@ INSERT INTO `user` (`id_user`, `avatar`, `bio`, `email`, `location`, `name`, `su
 	(5, 'https://static.wikia.nocookie.net/yugiohenespanol/images/c/c4/Drag%C3%B3n_c%C3%B3smico_blazar.jpg/revision/latest/scale-to-width-down/1200?cb=20200201203300&path-prefix=es', 'El ao shin que nunca salió', 'elForjadorDeLasEstrellas@riot.com', 'En el espacio picha', 'Aurelion', 'Sol'),
 	(6, 'https://pbs.twimg.com/media/FNgG3rCXEAEng6B.jpg', 'Fui sifu de Willy Wonka, el sabe todo gracias a mí', 'kingafrica@us.es', 'ESPAÑA', 'Paquito', 'El Chocolatero');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
+
+-- Volcando estructura para tabla todolist-api2.user_task
+CREATE TABLE IF NOT EXISTS `user_task` (
+  `id_user` bigint(20) NOT NULL,
+  `id_task` bigint(20) NOT NULL,
+  KEY `FK3cp1voq6ityl160qxer45ifmt` (`id_task`),
+  KEY `FK1x8e4dsmtgnk4b10s6i7lwrhg` (`id_user`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- Volcando datos para la tabla todolist-api2.user_task: 7 rows
 DELETE FROM `user_task`;

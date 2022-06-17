@@ -48,7 +48,7 @@ public class SQL {
                 line = bufferedReader.readLine();
             }
         } catch (IOException | SQLException ex) {
-            Logger.getLogger(SQL.class.getName()).log(Level.INFO, "The database was created before.");
+            Logger.getLogger(SQL.class.getName()).log(Level.INFO, ex.getMessage());
         }
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TODOlistApplication {
 
     public static void main(String[] args) {
-        SQL sql = new SQL("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
+        SQL sql = new SQL("jdbc:mariadb://34.175.10.202:3306/todolist", "root", "todolist$root");
         sql.crearBD("data/populate.sql");
         SpringApplication.run(TODOlistApplication.class, args);
     }
