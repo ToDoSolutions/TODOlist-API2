@@ -16,6 +16,8 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ShowTask {
 
+    public static final String ALL_ATTRIBUTES = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration";
+
     private long idTask;
     private String title, description, annotation;
     private Status status;
