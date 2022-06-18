@@ -50,7 +50,7 @@ public class UserResource {
                                                  @RequestParam(required = false) String name,
                                                  @RequestParam(required = false) String surname,
                                                  @RequestParam(required = false) @Email(message = "The email is invalid.") String email,
-                                                 @RequestParam(required = false) @Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", message = "The avatar is invalid.") String avatar,
+                                                 @RequestParam(required = false) @Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z\\d+&@#/%?=~_|!:,.;]*[-a-zA-Z\\d+&@#/%=~_|]", message = "The avatar is invalid.") String avatar,
                                                  @RequestParam(required = false) String bio,
                                                  @RequestParam(required = false) String location,
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The task completed is invalid.") String taskCompleted) {

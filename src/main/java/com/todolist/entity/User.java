@@ -29,7 +29,7 @@ public class User implements Serializable {
     private String email;
 
     @Column(name = "avatar")
-    @Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", message = "The avatar is invalid.")
+    @Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z\\d+&@#/%?=~_|!:,.;]*[-a-zA-Z\\d+&@#/%=~_|]", message = "The avatar is invalid.")
     private String avatar;
 
     @Column(name = "bio")

@@ -23,7 +23,7 @@ public class SQL {
         }
     }
 
-    public void crearBD(String archivo) {
+    public void read(String archivo) {
         FileReader fileReader;
         try {
             File file = new File(archivo);
