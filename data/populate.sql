@@ -4,31 +4,18 @@
 -- SO del servidor:              Win64
 -- HeidiSQL Versión:             11.3.0.6295
 -- --------------------------------------------------------
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT = @@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS = 0 */;
-/*!40101 SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES = @@SQL_NOTES, SQL_NOTES = 0 */;
+SET FOREIGN_KEY_CHECKS=0;
 
 -- Volcando datos para la tabla todolist.group: 3 rows
-DELETE
-FROM `group`;
-/*!40000 ALTER TABLE `group`
-    DISABLE KEYS */;
+DELETE FROM `group`;
 INSERT INTO `group` (`id_group`, `created_date`, `description`, `name`)
 VALUES (1, '2006-10-12', 'Solo quieren ver el mundo arder', 'Pepe'),
        (2, '2022-05-06', 'Dicen que su factura del agua es negativa', 'Otakus'),
        (3, '2000-03-09', 'Se dice que son seres que existen desde el inicio de los multiversos', 'AISS enjoyers');
-/*!40000 ALTER TABLE `group`
-    ENABLE KEYS */;
+-- ALTER TABLE `group` ENABLE KEYS;
 
 -- Volcando datos para la tabla todolist-api2.group_user: 6 rows
-DELETE
-FROM `group_user`;
-/*!40000 ALTER TABLE `group_user`
-    DISABLE KEYS */;
+DELETE FROM `group_user`;
 INSERT INTO `group_user` (`id_group`, `id_user`)
 VALUES (1, 1),
        (1, 2),
@@ -36,14 +23,10 @@ VALUES (1, 1),
        (2, 4),
        (3, 5),
        (3, 6);
-/*!40000 ALTER TABLE `group_user`
-    ENABLE KEYS */;
+-- ALTER TABLE `group_user` ENABLE KEYS;
 
 -- Volcando datos para la tabla todolist-api2.task: 8 rows
-DELETE
-FROM `task`;
-/*!40000 ALTER TABLE `task`
-    DISABLE KEYS */;
+DELETE FROM `task`;
 INSERT INTO `task` (`id_task`, `annotation`, `description`, `difficulty`, `finished_date`, `priority`, `start_date`,
                     `status`, `title`)
 VALUES (1, 'Vacaciones', 'Quiero vacaciones', 'HARDCORE', '2020-01-31', 5, '2020-01-01', 'DRAFT', 'Vacaciones'),
@@ -60,14 +43,10 @@ VALUES (1, 'Vacaciones', 'Quiero vacaciones', 'HARDCORE', '2020-01-31', 5, '2020
         '2020-04-22', 'CANCELLED', '¿Aprender Inglés? Na'),
        (8, 'Cuesta 0.2€, devuelveme el cambio.', 'Para comprar el pan, ir al polvillo.', 'EASY', '2020-03-04', 5,
         '2020-03-03', 'IN_PROGRESS', 'Comprar el pan.');
-/*!40000 ALTER TABLE `task`
-    ENABLE KEYS */;
+-- ALTER TABLE `task` ENABLE KEYS;
 
 -- Volcando datos para la tabla todolist-api2.user: 6 rows
-DELETE
-FROM `user`;
-/*!40000 ALTER TABLE `user`
-    DISABLE KEYS */;
+DELETE FROM `user`;
 INSERT INTO `user` (`id_user`, `avatar`, `bio`, `email`, `location`, `name`, `surname`)
 VALUES (1, 'https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', 'Ser celestial, nacido para ayudar',
         'miscosama@gmail.com', 'mi casa', 'Misco', 'Jones'),
@@ -84,14 +63,10 @@ VALUES (1, 'https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', '
         'El ao shin que nunca salió', 'elForjadorDeLasEstrellas@riot.com', 'En el espacio picha', 'Aurelion', 'Sol'),
        (6, 'https://pbs.twimg.com/media/FNgG3rCXEAEng6B.jpg', 'Fui sifu de Willy Wonka, el sabe todo gracias a mí',
         'kingafrica@us.es', 'ESPAÑA', 'Paquito', 'El Chocolatero');
-/*!40000 ALTER TABLE `user`
-    ENABLE KEYS */;
+ALTER TABLE `user` ENABLE KEYS;
 
 -- Volcando datos para la tabla todolist-api2.user_task: 7 rows
-DELETE
-FROM `user_task`;
-/*!40000 ALTER TABLE `user_task`
-    DISABLE KEYS */;
+DELETE FROM `user_task`;
 INSERT INTO `user_task` (`id_user`, `id_task`)
 VALUES (1, 1),
        (2, 2),
@@ -100,10 +75,5 @@ VALUES (1, 1),
        (5, 5),
        (6, 6),
        (6, 7);
-/*!40000 ALTER TABLE `user_task`
-    ENABLE KEYS */;
 
-/*!40101 SET SQL_MODE = IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS = IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
-/*!40101 SET CHARACTER_SET_CLIENT = @OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES = IFNULL(@OLD_SQL_NOTES, 1) */;
+SET FOREIGN_KEY_CHECKS=1; -- to disable them

@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class TaskResource {
 
     @Autowired
     @Qualifier("taskRepository")
-    private TaskRepository repository;
+    private TaskRepository taskRepository;
 
     @Autowired
     @Qualifier("taskParser")
@@ -50,7 +51,7 @@ public class TaskResource {
                                                  @RequestParam(required = false) String difficulty,
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The priority is invalid.") String duration) {
         List<ShowTask> result = new ArrayList<>(),
-                tasks = taskParser.parseList(repository.findAll(PageRequest.of(offset, limit, Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order))).getContent());
+                tasks = taskParser.parseList(taskRepository.findAll(PageRequest.of(offset, limit, Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order))).getContent());
         Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
         Difficulty auxDifficulty = difficulty != null ? Difficulty.valueOf(difficulty.toUpperCase()) : null;
         for (ShowTask task : tasks) {
@@ -72,9 +73,13 @@ public class TaskResource {
     @GetMapping("/{idTask}")
     public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
-        Task task = repository.findById(idTask).orElse(null);
+        Task task = taskRepository.findById(idTask).orElse(null);
         if (task == null)
             throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
+        System.out.println(!Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())));
+        if (!Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
+            throw new IllegalArgumentException("The fields are invalid.|uri=/api/v1/tasks/" + idTask);
+
         return new ShowTask(task).getFields(fields);
     }
 
@@ -82,13 +87,13 @@ public class TaskResource {
     public Map<String, Object> addTask(@RequestBody @Valid Task task) {
         if (task.getTitle() == null)
             throw new IllegalArgumentException("The task with idTask " + task.getIdTask() + " must have title.|uri=/api/v1/tasks/");
-        repository.save(task);
+        taskRepository.save(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
 
     @PutMapping
     public Map<String, Object> updateTask(@RequestBody @Valid Task task) {
-        Task oldTask = repository.findByIdTask(task.getIdTask());
+        Task oldTask = taskRepository.findByIdTask(task.getIdTask());
         if (oldTask == null)
             throw new NullPointerException("The task with idTask " + task.getIdTask() + " does not exist.|uri=/api/v1/tasks/" + task.getIdTask());
         if (task.getTitle() != null)
@@ -107,17 +112,17 @@ public class TaskResource {
             oldTask.setPriority(task.getPriority());
         if (task.getDifficulty() != null)
             oldTask.setDifficulty(task.getDifficulty());
-        repository.save(oldTask);
+        taskRepository.save(oldTask);
         return new ShowTask(oldTask).getFields(ShowTask.ALL_ATTRIBUTES);
     }
 
 
     @DeleteMapping("/{idTask}")
     public Map<String, Object> deleteTask(@PathVariable("idTask") Long idTask) {
-        Task task = repository.findByIdTask(idTask);
+        Task task = taskRepository.findByIdTask(idTask);
         if (task == null)
             throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
-        repository.delete(task);
+        taskRepository.delete(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
 }

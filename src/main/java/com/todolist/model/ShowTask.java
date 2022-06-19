@@ -132,26 +132,26 @@ public class ShowTask {
         List<String> attributes = Stream.of(fields.split(",")).map(String::trim).collect(Collectors.toList());
         Map<String, Object> map = new TreeMap<>();
         for (String attribute : attributes) {
-            if (Objects.equals(attribute, "idTask"))
-                map.put(attribute, getIdTask());
-            else if (Objects.equals(attribute, "title"))
-                map.put(attribute, getTitle());
-            else if (Objects.equals(attribute, "description"))
-                map.put(attribute, getDescription());
-            else if (Objects.equals(attribute, "status"))
-                map.put(attribute, getStatus());
-            else if (Objects.equals(attribute, "finishedDate"))
-                map.put(attribute, getFinishedDate());
-            else if (Objects.equals(attribute, "startDate"))
-                map.put(attribute, getStartDate());
-            else if (Objects.equals(attribute, "annotation"))
-                map.put(attribute, getAnnotation());
-            else if (Objects.equals(attribute, "priority"))
-                map.put(attribute, getPriority());
-            else if (Objects.equals(attribute, "difficulty"))
-                map.put(attribute, getDifficulty());
-            else if (Objects.equals(attribute, "duration"))
-                map.put(attribute, getDuration());
+            if (Objects.equals(attribute.toLowerCase(), "idtask"))
+                map.put("idTask", getIdTask());
+            else if (Objects.equals(attribute.toLowerCase(), "title"))
+                map.put("title", getTitle());
+            else if (Objects.equals(attribute.toLowerCase(), "description"))
+                map.put("description", getDescription());
+            else if (Objects.equals(attribute.toLowerCase(), "status"))
+                map.put("status", getStatus());
+            else if (Objects.equals(attribute.toLowerCase(), "finisheddate"))
+                map.put("finishedDate", getFinishedDate());
+            else if (Objects.equals(attribute.toLowerCase(), "startdate"))
+                map.put("startDate", getStartDate());
+            else if (Objects.equals(attribute.toLowerCase(), "annotation"))
+                map.put("annotation", getAnnotation());
+            else if (Objects.equals(attribute.toLowerCase(), "priority"))
+                map.put("priority", getPriority());
+            else if (Objects.equals(attribute.toLowerCase(), "difficulty"))
+                map.put("difficulty", getDifficulty());
+            else if (Objects.equals(attribute.toLowerCase(), "duration"))
+                map.put("duration", getDuration());
         }
         return map;
     }

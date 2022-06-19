@@ -40,9 +40,13 @@ public class User implements Serializable {
     @Size(max = 50, message = "The location is too long.")
     private String location;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "user_task", joinColumns = @JoinColumn(name = "idUser"), inverseJoinColumns = @JoinColumn(name = "idTask"))
+    @ManyToMany(mappedBy = "users")
     private List<Task> tasks;
+
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "group_user", joinColumns = @JoinColumn(name = "idGroup"), inverseJoinColumns = @JoinColumn(name = "idUser"))
+    private List<User> groups;
 
     public User() {
     }

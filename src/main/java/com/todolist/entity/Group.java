@@ -26,8 +26,8 @@ public class Group {
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The createdDate is invalid.")
     private String createdDate;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "group_user", joinColumns = @JoinColumn(name = "idGroup"), inverseJoinColumns = @JoinColumn(name = "idUser"))
+
+    @ManyToMany(mappedBy = "groups")
     private List<User> users;
 
     public Group() {

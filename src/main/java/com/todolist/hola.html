@@ -1,0 +1,106 @@
+<table style="width: 100%; text-align: center;">
+    <tr>
+        <td style="width: 33%;"><i><b>HTTP</b></i></td>
+        <td style="width: 33%;"><i><b>URI</b></i></td>
+        <td style="width: 33%;"><i><b>Description</b></i></td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">GET</td>
+        <td style="width: 100%; padding-top: 50px;">/groups</td>
+        <td style="width: 100%; padding-top: 50px;">Vista de todos los grupos que hay en la API.
+            <ul>
+                <li><b>order:</b> Ordena todos los grupos siguiendo el orden: nombre, descripción, fecha de creación,
+                    usuarios, número de tareas.
+                </li>
+                <li><b>limit:</b> Limita el número de los grupos que aparecerán tras una petición.
+                </li>
+                <li><b>offset:</b> Muestra todas los grupos a partir de un número determinado.
+                </li>
+                <li><b>fieldsGroup:</b> Enseña de todos los grupos solamente los campos que se le especifique entre los
+                    siguientes: nombre, descripción, fecha de creación, usuarios, número de tareas.
+                </li>
+                <li><b>fieldsUser:</b> Enseña de todos los usuarios solamente los campos que se le especifique entre los
+                    siguientes: nombre, apellido, email, avatar, biografía, ubicación, tareas completadas.
+                </li>
+                <li><b>fieldsTask:</b> Enseña de todos los usuarios solamente los campos de las tareas que se le
+                    especifique entre los siguientes: título, descripción, anotación, estado, fecha de comienzo, fecha
+                    de finalización, prioridad, dificultad y duración.
+                </li>
+                <li><b>name:</b> Muestra todos los grupos que coincidan con el nombre que se ponga.
+                </li>
+                <li><b>description:</b> Muestra todos los usuarios que coincidan con la descripción que se ponga.
+                </li>
+                <li><b>numTasks:</b> Muestra todos los grupos a partir de los siguientes criterios.
+                    <ol>
+                        <li><b>></b>:Devuelve aquellos que superen el número indicado.</li>
+                        <li><b><</b>:Devuelve aquellos que sean inferiores al número indicado.</li>
+                        <li><b>=</b>:Devuelve aquellos que sean iguales al número indicado.</li>
+                    </ol>
+                    Se pueden combinar hasta dos operaciones de las anteriores dadas.
+                <li><b>createdDate:</b> Enseña todos los grupos a partir de los siguientes criterios.
+                    <ol>
+                        <li><b>></b>:Devuelve aquellas que posteriores a la fecha indicada.</li>
+                        <li><b><</b>:Devuelve aquellas que sean anteriores a la fecha indicada.</li>
+                        <li><b>=</b>:Devuelve aquellas que sean iguales a la fecha indicada.</li>
+                    </ol>
+                </li>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">GET</td>
+        <td style="width: 100%; padding-top: 50px;">/groups/{groupId}</td>
+        <td style="width: 100%; padding-top: 50px;">Muestra el grupo cuya id coincida con la solicitada.
+            <li><b>fieldsGroup:</b> Enseña de todos los grupos solamente los campos que se le especifique entre los
+                siguientes: nombre, descripción, fecha de creación, usuarios, número de tareas.
+            </li>
+            <li><b>fieldsUser:</b> Enseña de todos los usuarios solamente los campos que se le especifique entre los
+                siguientes: nombre, apellido, email, avatar, biografía, ubicación, tareas completadas.
+            </li>
+            <li><b>fieldsTask:</b> Enseña de todos los usuarios solamente los campos de las tareas que se le especifique
+                entre los siguientes: título, descripción, anotación, estado, fecha de comienzo, fecha de finalización,
+                prioridad, dificultad y duración.
+            </li>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">POST</td>
+        <td style="width: 100%; padding-top: 50px;">/groups</td>
+        <td style="width: 100%; padding-top: 50px;">Almacena un nuevo grupo que se guardará en formato JSON junto con
+            los usuarios ya añadidos. (No es necesario poner la id)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">POST</td>
+        <td style="width: 100%; padding-top: 50px;">/groups/{groupId}/user/{userId}</td>
+        <td style="width: 100%; padding-top: 50px;">Añade a un grupo del sistema un nuevo usuario específico.</td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">POST</td>
+        <td style="width: 100%; padding-top: 50px;">/groups/{groupId}/task/{taskId}</td>
+        <td style="width: 100%; padding-top: 50px;">Añade a un grupo del sistema una nueva tarea específica.</td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">PUT</td>
+        <td style="width: 100%; padding-top: 50px;">/groups</td>
+        <td style="width: 100%; padding-top: 50px;">Actualiza los atributos de un grupo específico. (Se debe incluir la
+            id del usuario en JSON)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">DELETE</td>
+        <td style="width: 100%; padding-top: 50px;">/groups/{groupId}</td>
+        <td style="width: 100%; padding-top: 50px;">Elimina el grupo cuya id coincida con la solicitada.</td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">DELETE</td>
+        <td style="width: 100%; padding-top: 50px;">/groups/{groupId}/user/{userId}</td>
+        <td style="width: 100%; padding-top: 50px;">Borra un usuario indicado por su id para un grupo determinado.</td>
+    </tr>
+    <tr>
+        <td style="width: 100%; padding-top: 50px;">DELETE</td>
+        <td style="width: 100%; padding-top: 50px;">/groups/{groupId}/task/{taskId}</td>
+        <td style="width: 100%; padding-top: 50px;">Borra la tarea de todos los usuarios de la organización que tengan
+            esa tarea.
+        </td>
+    </tr>
+</table>

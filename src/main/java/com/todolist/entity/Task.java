@@ -6,6 +6,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.List;
 
 @Table(name = "task")
 @Entity
@@ -14,7 +15,7 @@ public class Task implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "idTask")
-    private long idTask;
+    private Long idTask;
     @Column(name = "title")
     @Size(max = 50, message = "The title is too long.")
     private String title;
@@ -42,6 +43,11 @@ public class Task implements Serializable {
     @Column(name = "difficulty")
     @Pattern(regexp = "SLEEP|EASY|MEDIUM|HARD|HARDCORE|I_WANT_TO_DIE", message = "The difficulty is invalid.")
     private String difficulty;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "user_task", joinColumns = @JoinColumn(name = "idUser"), inverseJoinColumns = @JoinColumn(name = "idTask"))
+    private List<Task> users;
+
 
     public Task() {
     }
