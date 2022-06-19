@@ -48,6 +48,13 @@ public class User implements Serializable {
     @JoinTable(name = "group_user", joinColumns = @JoinColumn(name = "idGroup"), inverseJoinColumns = @JoinColumn(name = "idUser"))
     private List<User> groups;
 
+    @PreRemove
+    public void preRemove() {
+        for (Task task : tasks) {
+            task.getUsers().remove(this);
+        }
+    }
+
     public User() {
     }
 
@@ -123,5 +130,13 @@ public class User implements Serializable {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public List<User> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<User> groups) {
+        this.groups = groups;
     }
 }

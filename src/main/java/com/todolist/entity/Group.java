@@ -30,6 +30,13 @@ public class Group {
     @ManyToMany(mappedBy = "groups")
     private List<User> users;
 
+    @PreRemove
+    public void preRemove() {
+        for (User user : users) {
+            user.getGroups().remove(this);
+        }
+    }
+
     public Group() {
     }
 

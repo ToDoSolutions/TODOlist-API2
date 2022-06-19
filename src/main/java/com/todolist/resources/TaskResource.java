@@ -122,6 +122,7 @@ public class TaskResource {
         Task task = taskRepository.findByIdTask(idTask);
         if (task == null)
             throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
+        System.out.println(task);
         taskRepository.delete(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
