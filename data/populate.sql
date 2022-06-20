@@ -16,13 +16,13 @@ VALUES (1, '2006-10-12', 'Solo quieren ver el mundo arder', 'Pepe'),
 
 -- Volcando datos para la tabla todolist-api2.group_user: 6 rows
 DELETE FROM `group_user`;
-INSERT INTO `group_user` (`id_group`, `id_user`)
-VALUES (1, 1),
-       (1, 2),
-       (2, 3),
-       (2, 4),
-       (3, 5),
-       (3, 6);
+INSERT INTO `group_user` (`id_group`, `id_user`, `id_group_user`)
+VALUES (1, 1, 1),
+       (1, 2, 2),
+       (2, 3, 3),
+       (2, 4, 4),
+       (3, 5, 5),
+       (3, 6, 6);
 -- ALTER TABLE `group_user` ENABLE KEYS;
 
 -- Volcando datos para la tabla todolist-api2.task: 8 rows
@@ -67,13 +67,13 @@ ALTER TABLE `user` ENABLE KEYS;
 
 -- Volcando datos para la tabla todolist-api2.user_task: 7 rows
 DELETE FROM `user_task`;
-INSERT INTO `user_task` (`id_user`, `id_task`)
-VALUES (1, 1),
-       (2, 2),
-       (3, 3),
-       (4, 4),
-       (5, 5),
-       (6, 6),
-       (6, 7);
+INSERT INTO `user_task` (`id_user`, `id_task`, `id_user_task`)
+VALUES (1, 1, 1),
+       (2, 2, 2),
+       (3, 3, 3),
+       (4, 4, 4),
+       (5, 5, 5),
+       (6, 6, 6),
+       (6, 7, 7);
 
 SET FOREIGN_KEY_CHECKS=1; -- to disable them

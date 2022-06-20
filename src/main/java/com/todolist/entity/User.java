@@ -1,5 +1,10 @@
 package com.todolist.entity;
 
+import com.todolist.repository.GroupRepository;
+import com.todolist.repository.GroupUserRepository;
+import com.todolist.repository.TaskRepository;
+import com.todolist.repository.UserTaskRepository;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
@@ -13,7 +18,7 @@ public class User implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "idUser")
+    @Column(name = "id_user")
     private long idUser;
 
     @Column(name = "name")
@@ -40,20 +45,7 @@ public class User implements Serializable {
     @Size(max = 50, message = "The location is too long.")
     private String location;
 
-    @ManyToMany(mappedBy = "users")
-    private List<Task> tasks;
 
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "group_user", joinColumns = @JoinColumn(name = "idGroup"), inverseJoinColumns = @JoinColumn(name = "idUser"))
-    private List<User> groups;
-
-    @PreRemove
-    public void preRemove() {
-        for (Task task : tasks) {
-            task.getUsers().remove(this);
-        }
-    }
 
     public User() {
     }
@@ -122,21 +114,5 @@ public class User implements Serializable {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-    public List<User> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<User> groups) {
-        this.groups = groups;
     }
 }

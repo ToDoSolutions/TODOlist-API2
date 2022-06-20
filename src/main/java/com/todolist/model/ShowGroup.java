@@ -1,6 +1,9 @@
 package com.todolist.model;
 
 import com.todolist.entity.Group;
+import com.todolist.entity.Task;
+import com.todolist.entity.User;
+import com.todolist.repository.Repositories;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,17 +18,18 @@ public class ShowGroup {
     private String name;
     private String description;
     private LocalDate createdDate;
+
     private List<ShowUser> users;
 
     public ShowGroup() {
     }
 
-    public ShowGroup(Group group) {
+    public ShowGroup(Group group, List<ShowUser> users) {
         this.idGroup = group.getIdGroup();
         this.name = group.getName();
         this.description = group.getDescription();
         this.createdDate = group.getCreatedDate() != null ? LocalDate.parse(group.getCreatedDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : LocalDate.now();
-        this.users = group.getUsers() != null ? group.getUsers().stream().map(ShowUser::new).collect(Collectors.toList()) : new ArrayList<>();
+        this.users = users;
     }
 
     public ShowGroup(long idGroup, String name, String description, LocalDate createdDate) {
@@ -34,14 +38,6 @@ public class ShowGroup {
         this.description = description;
         this.createdDate = createdDate;
         this.users = new ArrayList<>();
-    }
-
-    public ShowGroup(long idGroup, String name, String description, LocalDate createdDate, List<ShowUser> users) {
-        this.idGroup = idGroup;
-        this.name = name;
-        this.description = description;
-        this.createdDate = createdDate;
-        this.users = users;
     }
 
     public long getIdGroup() {
@@ -80,12 +76,8 @@ public class ShowGroup {
         return users;
     }
 
-    public void setUsers(List<ShowUser> users) {
-        this.users = users;
-    }
-
     public Integer getNumTasks() {
-        return users == null ? 0 : users.stream()
+        return users.stream()
                 .flatMap(user -> user.getTasks().stream().map(ShowTask::getIdTask))
                 .collect(Collectors.toSet()).size();
     }
@@ -105,7 +97,7 @@ public class ShowGroup {
             else if (Objects.equals(attribute, "numTasks"))
                 map.put(attribute, getNumTasks());
             else if (Objects.equals(attribute, "users"))
-                map.put(attribute, getUsers().stream().map(u -> u.getFields(fieldsUser, fieldsTask)).collect(Collectors.toList()));
+                map.put(attribute, users.stream().map(u -> u.getFields(fieldsUser, fieldsTask)).collect(Collectors.toList()));
         }
         return map;
     }

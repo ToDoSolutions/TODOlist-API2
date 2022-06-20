@@ -5,30 +5,37 @@
 -- HeidiSQL Versión:             11.3.0.6295
 -- --------------------------------------------------------
 
+SET FOREIGN_KEY_CHECKS=0;
+
 -- Volcando estructura de base de datos para todolist-api2
 CREATE DATABASE IF NOT EXISTS `todolist` ;
 USE `todolist`;
+DROP TABLE IF EXISTS `user_task`;
+DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS  `task`;
+DROP TABLE IF EXISTS  `group_user`;
+DROP TABLE IF EXISTS  `user`;
 
 -- Volcando estructura para tabla todolist-api2.group
 CREATE TABLE IF NOT EXISTS `group` (
-    `id_group` bigint(20) NOT NULL AUTO_INCREMENT,
+    `id_group` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `created_date` varchar(255) DEFAULT NULL,
     `description` varchar(500) DEFAULT NULL,
-    `name` varchar(50) DEFAULT NULL,
-    PRIMARY KEY (`id_group`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+    `name` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Volcando estructura para tabla todolist-api2.group_user
 CREATE TABLE IF NOT EXISTS `group_user`(
-    `id_group` bigint(20) NOT NULL,
-    `id_user` bigint(20) NOT NULL,
-    KEY `FKknx9oe9a7m5gl5rxuy53eklfq`(`id_user`),
-    KEY `FKgp71sm3cw5s1n4f31f56dalep`(`id_group`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+    `id_group_user` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `id_group` bigint(20),
+    `id_user` bigint(20),
+    FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE CASCADE,
+    FOREIGN KEY (`id_group`) REFERENCES `group`(`id_group`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Volcando estructura para tabla todolist-api2.task
 CREATE TABLE IF NOT EXISTS `task`(
-    `id_task` bigint(20) NOT NULL AUTO_INCREMENT,
+    `id_task` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `annotation` varchar(255) DEFAULT NULL,
     `description` varchar(255) DEFAULT NULL,
     `difficulty` varchar(255) DEFAULT NULL,
@@ -36,27 +43,27 @@ CREATE TABLE IF NOT EXISTS `task`(
     `priority` int(11) DEFAULT NULL,
     `start_date` varchar(255) DEFAULT NULL,
     `status` varchar(255) DEFAULT NULL,
-    `title` varchar(255) DEFAULT NULL,
-    PRIMARY KEY(`id_task`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+    `title` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Volcando estructura para tabla todolist-api2.user
 CREATE TABLE IF NOT EXISTS `user`(
-    `id_user` bigint(20) NOT NULL AUTO_INCREMENT,
+    `id_user` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `avatar` varchar(255) DEFAULT NULL,
     `bio` varchar(500) DEFAULT NULL,
     `email` varchar(255) DEFAULT NULL,
     `location` varchar(50) DEFAULT NULL,
     `name` varchar(50) DEFAULT NULL,
-    `surname` varchar(50) DEFAULT NULL,
-    PRIMARY KEY(`id_user`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+    `surname` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Volcando estructura para tabla todolist-api2.user_task
 CREATE TABLE IF NOT EXISTS `user_task` (
-  `id_user` bigint(20) NOT NULL,
-  `id_task` bigint(20) NOT NULL,
-  KEY `FK3cp1voq6ityl160qxer45ifmt` (`id_task`),
-  KEY `FK1x8e4dsmtgnk4b10s6i7lwrhg` (`id_user`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+    `id_user_task` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `id_user` bigint(20),
+    `id_task` bigint(20),
+    FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE CASCADE,
+    FOREIGN KEY (`id_task`) REFERENCES `task`(`id_task`) ON DELETE CASCADE	
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+SET FOREIGN_KEY_CHECKS=1; -- to disable them

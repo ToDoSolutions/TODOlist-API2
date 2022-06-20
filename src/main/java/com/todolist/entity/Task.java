@@ -1,5 +1,8 @@
 package com.todolist.entity;
 
+import com.todolist.repository.UserRepository;
+import com.todolist.repository.UserTaskRepository;
+
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -7,6 +10,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Table(name = "task")
 @Entity
@@ -14,7 +18,7 @@ public class Task implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "idTask")
+    @Column(name = "id_task")
     private Long idTask;
     @Column(name = "title")
     @Size(max = 50, message = "The title is too long.")
@@ -28,10 +32,10 @@ public class Task implements Serializable {
     @Column(name = "status")
     @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.")
     private String status;
-    @Column(name = "finishedDate")
+    @Column(name = "finished_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")
     private String finishedDate;
-    @Column(name = "startDate")
+    @Column(name = "start_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.")
     private String startDate;
 
@@ -43,11 +47,6 @@ public class Task implements Serializable {
     @Column(name = "difficulty")
     @Pattern(regexp = "SLEEP|EASY|MEDIUM|HARD|HARDCORE|I_WANT_TO_DIE", message = "The difficulty is invalid.")
     private String difficulty;
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "user_task", joinColumns = @JoinColumn(name = "idUser"), inverseJoinColumns = @JoinColumn(name = "idTask"))
-    private List<User> users;
-
 
     public Task() {
     }
@@ -136,11 +135,9 @@ public class Task implements Serializable {
         this.difficulty = difficulty;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public List<User> getUsers(UserTaskRepository userTaskRepository, UserRepository userRepository) {
+         return userTaskRepository.findByIdTask(this.idTask).stream()
+                 .map(userTask -> userRepository.findById(userTask.getIdUser()).orElse(null))
+                 .collect(Collectors.toList());
     }
 }

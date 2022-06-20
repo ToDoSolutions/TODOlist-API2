@@ -1,9 +1,15 @@
 package com.todolist.entity;
 
+
+import com.todolist.repository.Repositories;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Table(name = "group")
 @Entity
@@ -11,7 +17,7 @@ public class Group {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "idGroup")
+    @Column(name = "id_group")
     private long idGroup;
 
     @Column(name = "name")
@@ -22,20 +28,9 @@ public class Group {
     @Size(max = 500, message = "The description is too long.")
     private String description;
 
-    @Column(name = "createdDate")
+    @Column(name = "created_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The createdDate is invalid.")
     private String createdDate;
-
-
-    @ManyToMany(mappedBy = "groups")
-    private List<User> users;
-
-    @PreRemove
-    public void preRemove() {
-        for (User user : users) {
-            user.getGroups().remove(this);
-        }
-    }
 
     public Group() {
     }
@@ -77,13 +72,5 @@ public class Group {
 
     public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
     }
 }

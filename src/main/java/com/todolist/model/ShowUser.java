@@ -1,6 +1,8 @@
 package com.todolist.model;
 
+import com.todolist.entity.Task;
 import com.todolist.entity.User;
+import com.todolist.repository.Repositories;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,7 +22,7 @@ public class ShowUser {
     public ShowUser() {
     }
 
-    public ShowUser(User user) {
+    public ShowUser(User user, List<ShowTask> tasks) {
         this.idUser = user.getIdUser();
         this.name = user.getName();
         this.surname = user.getSurname();
@@ -28,7 +30,7 @@ public class ShowUser {
         this.avatar = user.getAvatar();
         this.bio = user.getBio();
         this.location = user.getLocation();
-        this.tasks = user.getTasks() != null ? user.getTasks().stream().map(ShowTask::new).collect(Collectors.toList()) : new ArrayList<>();
+        this.tasks = tasks;
     }
 
     public ShowUser(long idUser, String name, String surname, String email, String avatar, String bio, String location) {
@@ -40,17 +42,6 @@ public class ShowUser {
         this.bio = bio;
         this.location = location;
         this.tasks = new ArrayList<>();
-    }
-
-    public ShowUser(long idUser, String name, String surname, String email, String avatar, String bio, String location, List<ShowTask> tasks) {
-        this.idUser = idUser;
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.avatar = avatar;
-        this.bio = bio;
-        this.location = location;
-        this.tasks = tasks;
     }
 
     public long getIdUser() {
@@ -113,13 +104,7 @@ public class ShowUser {
         return tasks;
     }
 
-    public void setTasks(List<ShowTask> tasks) {
-        this.tasks = tasks;
-    }
-
     public Long getTaskCompleted() {
-        if (getTasks() == null)
-            setTasks(new ArrayList<>());
         return getTasks().stream().filter(task -> task.getStatus().equals(Status.DONE)).count();
     }
 
