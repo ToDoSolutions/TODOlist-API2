@@ -16,7 +16,8 @@ public class DeleteTest {
 
     @BeforeEach
     public void setUp() {
-        SQL sql = new SQL("jdbc:mariadb://34.175.10.202:3306/todolist", "root", "todolist$root");
+        SQL sql = new SQL("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
+        // SQL sql = new SQL("jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", "uqiweqtspt5rb4xp", "uWHt8scUWIMHRDzt7HCg");
         sql.read("data/populate.sql");
     }
 
@@ -35,26 +36,5 @@ public class DeleteTest {
         String uri = "http://localhost:8080/api/v1/tasks/0";
         RestTemplate restTemplate = new RestTemplate();
         Throwable exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri, HttpMethod.DELETE, null, ShowTask.class));
-    }
-
-    // Consistency check:
-    @Test
-    public void testDeleteConsistencyWithUser() {
-        String uri1 = "http://localhost:8080/api/v1/tasks/1";
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.exchange(uri1, HttpMethod.DELETE, null, ShowTask.class);
-        String uri2 = "http://localhost:8080/api/v1/users/1";
-        ShowUser response = restTemplate.getForObject(uri2, ShowUser.class);
-        assertEquals(0, response.getTasks().size(), "Tasks are not deleted");
-    }
-
-    @Test
-    void testDeleteConsistencyWithUserInverse() {
-        String uri1 = "http://localhost:8080/api/v1/users/1";
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.exchange(uri1, HttpMethod.DELETE, null, ShowUser.class);
-        String uri2 = "http://localhost:8080/api/v1/tasks/1";
-        ShowTask response = restTemplate.getForObject(uri2, ShowTask.class);
-        assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 }

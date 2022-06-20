@@ -8,8 +8,11 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 -- Volcando estructura de base de datos para todolist-api2
-CREATE DATABASE IF NOT EXISTS `todolist` ;
-USE `todolist`;
+-- En la nube
+-- USE `b8iyr7xai8wk75ismpbt`;
+
+-- En local
+USE `todolist-api2`;
 DROP TABLE IF EXISTS `user_task`;
 DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS  `task`;
@@ -63,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `user_task` (
     `id_user` bigint(20),
     `id_task` bigint(20),
     FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE CASCADE,
-    FOREIGN KEY (`id_task`) REFERENCES `task`(`id_task`) ON DELETE CASCADE	
+    FOREIGN KEY (`id_task`) REFERENCES `task`(`id_task`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 SET FOREIGN_KEY_CHECKS=1; -- to disable them

@@ -14,7 +14,7 @@ public class GetSoloTest {
 
     @BeforeEach
     public void setUp() {
-        SQL sql = new SQL("jdbc:mariadb://34.175.10.202:3306/todolist", "root", "todolist$root");
+        SQL sql = new SQL("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
         sql.read("data/populate.sql");
     }
 
