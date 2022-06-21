@@ -136,8 +136,8 @@ public class Task implements Serializable {
     }
 
     public List<User> getUsers(UserTaskRepository userTaskRepository, UserRepository userRepository) {
-         return userTaskRepository.findByIdTask(this.idTask).stream()
-                 .map(userTask -> userRepository.findById(userTask.getIdUser()).orElse(null))
-                 .collect(Collectors.toList());
+        return userTaskRepository.findByIdTask(this.idTask).stream()
+                .map(userTask -> userRepository.findById(userTask.getIdUser()).orElse(null))
+                .collect(Collectors.toList());
     }
 }

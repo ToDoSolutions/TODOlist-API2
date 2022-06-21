@@ -2,11 +2,10 @@ package com.todolist.resources;
 
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
-import com.todolist.entity.UserTask;
 import com.todolist.model.ShowTask;
 import com.todolist.model.ShowUser;
 import com.todolist.parsers.UserParser;
-import com.todolist.repository.*;
+import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,6 +19,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -73,6 +73,10 @@ public class UserResource {
         User user = repositories.userRepository.findById(idUser).orElse(null);
         if (user == null)
             throw new NullPointerException("The user with idUser " + idUser + " does not exist.|uri=/api/v1/users/" + idUser);
+        if (!Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
+            throw new IllegalArgumentException("The users' fields are invalid.|uri=/api/v1/users/" + idUser);
+        if (!Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
+            throw new IllegalArgumentException("The tasks' fields are invalid.|uri=/api/v1/users/" + idUser);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
     }
 

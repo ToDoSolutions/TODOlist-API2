@@ -40,7 +40,7 @@ public class Repositories {
                 .collect(Collectors.toList());
     }
 
-    public List<ShowTask> getShowTaskFromUser(User user ) {
+    public List<ShowTask> getShowTaskFromUser(User user) {
         return getTasksFromUser(user).stream().map(ShowTask::new).collect(Collectors.toList());
     }
 

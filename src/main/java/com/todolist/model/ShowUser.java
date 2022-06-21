@@ -1,8 +1,6 @@
 package com.todolist.model;
 
-import com.todolist.entity.Task;
 import com.todolist.entity.User;
-import com.todolist.repository.Repositories;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,26 +110,39 @@ public class ShowUser {
         List<String> attributesShown = Stream.of(fieldsUser.split(",")).map(String::trim).collect(Collectors.toList());
         Map<String, Object> map = new TreeMap<>();
         for (String attribute : attributesShown) {
-            if (Objects.equals(attribute, "idUser"))
-                map.put(attribute, getIdUser());
-            else if (Objects.equals(attribute, "name"))
-                map.put(attribute, getName());
-            else if (Objects.equals(attribute, "surname"))
-                map.put(attribute, getSurname());
-            else if (Objects.equals(attribute, "email"))
-                map.put(attribute, getEmail());
-            else if (Objects.equals(attribute, "avatar"))
-                map.put(attribute, getAvatar());
-            else if (Objects.equals(attribute, "bio"))
-                map.put(attribute, getBio());
-            else if (Objects.equals(attribute, "location"))
-                map.put(attribute, getLocation());
-            else if (Objects.equals(attribute, "taskCompleted"))
-                map.put(attribute, getTaskCompleted());
+            if (Objects.equals(attribute.toLowerCase(), "iduser"))
+                map.put("idUser", getIdUser());
+            else if (Objects.equals(attribute.toLowerCase(), "name"))
+                map.put("name", getName());
+            else if (Objects.equals(attribute.toLowerCase(), "surname"))
+                map.put("surname", getSurname());
+            else if (Objects.equals(attribute.toLowerCase(), "email"))
+                map.put("email", getEmail());
+            else if (Objects.equals(attribute.toLowerCase(), "avatar"))
+                map.put("avatar", getAvatar());
+            else if (Objects.equals(attribute.toLowerCase(), "bio"))
+                map.put("bio", getBio());
+            else if (Objects.equals(attribute.toLowerCase(), "location"))
+                map.put("location", getLocation());
+            else if (Objects.equals(attribute.toLowerCase(), "taskCompleted"))
+                map.put("taskcompleted", getTaskCompleted());
             else if (Objects.equals(attribute, "tasks"))
-                map.put(attribute, getTasks().stream().map(task -> task.getFields(fieldsTask)).collect(Collectors.toList()));
+                map.put("tasks", getTasks().stream().map(task -> task.getFields(fieldsTask)).collect(Collectors.toList()));
         }
         return map;
     }
 
+    @Override
+    public String toString() {
+        return "ShowUser{" +
+                "idUser=" + idUser +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", bio='" + bio + '\'' +
+                ", location='" + location + '\'' +
+                ", tasks=" + tasks +
+                '}';
+    }
 }

@@ -155,4 +155,19 @@ public class ShowTask {
         }
         return map;
     }
+
+    @Override
+    public String toString() {
+        return "ShowTask{" +
+                "idTask=" + idTask +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", annotation='" + annotation + '\'' +
+                ", status=" + status +
+                ", finishedDate=" + finishedDate +
+                ", startDate=" + startDate +
+                ", priority=" + priority +
+                ", difficulty=" + difficulty +
+                '}';
+    }
 }

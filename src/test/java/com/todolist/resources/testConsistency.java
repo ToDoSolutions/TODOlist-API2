@@ -12,6 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class testConsistency {
 
+    @BeforeEach
+    public void setUp() {
+        SQL.read("data/populate.sql");
+    }
+
     @Test
     public void testDeleteTaskFromUser() {
         String uri1 = "http://localhost:8080/api/v1/tasks/1";
@@ -30,11 +35,5 @@ public class testConsistency {
         String uri2 = "http://localhost:8080/api/v1/tasks/1";
         ShowTask response = restTemplate.getForObject(uri2, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
-    }
-
-    @BeforeEach
-    public void setUp() {
-        SQL sql = new SQL("jdbc:mariadb://34.175.10.202:3306/todolist", "root", "todolist$root");
-        sql.read("data/populate.sql");
     }
 }

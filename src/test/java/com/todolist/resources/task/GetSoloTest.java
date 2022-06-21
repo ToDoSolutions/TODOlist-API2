@@ -14,8 +14,8 @@ public class GetSoloTest {
 
     @BeforeEach
     public void setUp() {
-        SQL sql = new SQL("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
-        sql.read("data/populate.sql");
+        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
+        SQL.read("data/populate.sql");
     }
 
     @Test
@@ -28,7 +28,7 @@ public class GetSoloTest {
 
     @Test
     public void testGetSoloFields() {
-        String uri = "http://localhost:8080/api/v1/tasks/1?fields=idTask,title,description,annotation";
+        String uri = "http://localhost:8080/api/v1/tasks/1?fields=name,surname,email";
         RestTemplate restTemplate = new RestTemplate();
         ShowTask response = restTemplate.getForObject(uri, ShowTask.class);
         assertEquals("Vacaciones", response.getTitle(), "Title is not correct");

@@ -1,6 +1,5 @@
 package com.todolist.repository;
 
-import com.todolist.entity.Group;
 import com.todolist.entity.GroupUser;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,8 +12,11 @@ import java.util.List;
 public interface GroupUserRepository extends JpaRepository<GroupUser, Serializable>, PagingAndSortingRepository<GroupUser, Serializable> {
 
     List<GroupUser> findAll();
+
     List<GroupUser> findByIdGroup(Long idGroup);
+
     List<GroupUser> findByIdUser(Long idUser);
+
     List<GroupUser> findByIdGroupAndIdUser(Long idGroup, Long idUser);
 
 

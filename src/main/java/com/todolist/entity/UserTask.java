@@ -2,22 +2,19 @@ package com.todolist.entity;
 
 import javax.persistence.*;
 
-@Table(name="user_task")
+@Table(name = "user_task")
 @Entity
 public class UserTask {
 
+    private static long id = 0;
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_user_task")
     private long idUserTask;
-
     @Column(name = "id_task")
     private long idTask;
-
     @Column(name = "id_user")
     private long idUser;
-
-    private static long id = 0;
 
     public UserTask() {
     }
@@ -30,7 +27,7 @@ public class UserTask {
     }
 
     public UserTask(long idTask, long idUser) {
-        id ++;
+        id++;
         this.idUserTask = id;
         this.idTask = idTask;
         this.idUser = idUser;

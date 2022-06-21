@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,6 +70,12 @@ public class GroupResource {
         Group group = repositories.groupRepository.findById(idGroup).orElse(null);
         if (group == null)
             throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|uri=/api/v1/groups/" + idGroup);
+        if (!Arrays.stream(fieldsGroup.split(",")).allMatch(field -> ShowGroup.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
+            throw new IllegalArgumentException("The groups' fields are invalid.|uri=/api/v1/groups/" + idGroup);
+        if (!Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
+            throw new IllegalArgumentException("The users' fields are invalid.|uri=/api/v1/groups/" + idGroup);
+        if (!Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
+            throw new IllegalArgumentException("The tasks' fields are invalid.|uri=/api/v1/groups/" + idGroup);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(fieldsGroup, fieldsUser, fieldsTask);
     }
 

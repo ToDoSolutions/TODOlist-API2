@@ -12,9 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SQL {
-    Connection connection = null;
+    static Connection connection;
 
-    public SQL(String url, String user, String password) {
+    public static void start(String url, String user, String password) {
         try {
             connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException ex) {
@@ -23,7 +23,7 @@ public class SQL {
         }
     }
 
-    public void read(String archivo) {
+    public static void read(String archivo) {
         FileReader fileReader;
         try {
             File file = new File(archivo);
@@ -50,5 +50,6 @@ public class SQL {
         } catch (IOException | SQLException ex) {
             Logger.getLogger(SQL.class.getName()).log(Level.INFO, ex.getMessage());
         }
+
     }
 }

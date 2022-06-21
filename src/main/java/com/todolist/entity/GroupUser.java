@@ -6,18 +6,15 @@ import javax.persistence.*;
 @Entity
 public class GroupUser {
 
+    private static long id = 0;
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_group_user")
     private long idGroupUser;
-
     @Column(name = "id_group")
     private long idGroup;
-
     @Column(name = "id_user")
     private long idUser;
-
-    private static long id = 0;
 
     public GroupUser() {
     }
@@ -30,7 +27,7 @@ public class GroupUser {
     }
 
     public GroupUser(long idGroup, long idUser) {
-        id ++;
+        id++;
         this.idGroupUser = id;
         this.idGroup = idGroup;
         this.idUser = idUser;

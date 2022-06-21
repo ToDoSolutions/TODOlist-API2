@@ -12,8 +12,11 @@ import java.util.List;
 public interface UserTaskRepository extends JpaRepository<UserTask, Serializable>, PagingAndSortingRepository<UserTask, Serializable> {
 
     List<UserTask> findAll();
+
     List<UserTask> findByIdTask(Long idTask);
+
     List<UserTask> findByIdUser(Long idUser);
+
     List<UserTask> findByIdTaskAndIdUser(Long idTask, Long idUser);
 
 }

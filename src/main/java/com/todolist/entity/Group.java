@@ -1,15 +1,9 @@
 package com.todolist.entity;
 
 
-import com.todolist.repository.Repositories;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Table(name = "group")
 @Entity

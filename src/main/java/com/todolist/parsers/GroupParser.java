@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 public class GroupParser {
     public List<ShowGroup> parseList(List<Group> groups, Repositories repositories) {
         return groups.stream().map(group ->
-                new ShowGroup(group, repositories.getUsersFromGroup(group).stream().map(user ->
-                        new ShowUser(user, repositories.getTasksFromUser(user).stream().map(ShowTask::new)
-                                .collect(Collectors.toList()))).collect(Collectors.toList())))
+                        new ShowGroup(group, repositories.getUsersFromGroup(group).stream().map(user ->
+                                new ShowUser(user, repositories.getTasksFromUser(user).stream().map(ShowTask::new)
+                                        .collect(Collectors.toList()))).collect(Collectors.toList())))
                 .collect(Collectors.toList());
     }
 }

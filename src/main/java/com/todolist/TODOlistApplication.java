@@ -9,13 +9,13 @@ public class TODOlistApplication {
 
     public static void main(String[] args) {
         // En la nube
-        //SQL sql = new SQL("jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", "uqiweqtspt5rb4xp", "uWHt8scUWIMHRDzt7HCg");
+        // SQL.start("jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", "uqiweqtspt5rb4xp", "uWHt8scUWIMHRDzt7HCg");
 
         // En local
-        SQL sql = new SQL("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
+        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
 
-        sql.read("data/create.sql");
-        sql.read("data/populate.sql");
+        SQL.read("data/create.sql");
+        SQL.read("data/populate.sql");
         SpringApplication.run(TODOlistApplication.class, args);
     }
 

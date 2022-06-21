@@ -1,7 +1,6 @@
 package com.todolist.resources.task;
 
 import com.todolist.model.ShowTask;
-import com.todolist.model.ShowUser;
 import com.todolist.utilities.SQL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,9 +15,8 @@ public class DeleteTest {
 
     @BeforeEach
     public void setUp() {
-        SQL sql = new SQL("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
-        // SQL sql = new SQL("jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", "uqiweqtspt5rb4xp", "uWHt8scUWIMHRDzt7HCg");
-        sql.read("data/populate.sql");
+        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
+        SQL.read("data/populate.sql");
     }
 
     @Test

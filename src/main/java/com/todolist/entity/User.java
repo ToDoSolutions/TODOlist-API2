@@ -1,16 +1,10 @@
 package com.todolist.entity;
 
-import com.todolist.repository.GroupRepository;
-import com.todolist.repository.GroupUserRepository;
-import com.todolist.repository.TaskRepository;
-import com.todolist.repository.UserTaskRepository;
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.List;
 
 @Table(name = "user")
 @Entity
@@ -44,7 +38,6 @@ public class User implements Serializable {
     @Column(name = "location")
     @Size(max = 50, message = "The location is too long.")
     private String location;
-
 
 
     public User() {

@@ -7,6 +7,11 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 -- Volcando datos para la tabla todolist.group: 3 rows
+-- En la nube
+-- USE `b8iyr7xai8wk75ismpbt`;
+
+-- En local
+USE `todolist-api2`;
 DELETE FROM `group`;
 INSERT INTO `group` (`id_group`, `created_date`, `description`, `name`)
 VALUES (1, '2006-10-12', 'Solo quieren ver el mundo arder', 'Pepe'),
