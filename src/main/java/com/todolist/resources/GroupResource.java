@@ -83,6 +83,7 @@ public class GroupResource {
     public Map<String, Object> addGroup(@RequestBody @Valid Group group) {
         if (group.getName() == null)
             throw new IllegalArgumentException("The group with idGroup " + group.getIdGroup() + " must have name.|uri=/api/v1/groups/");
+        group.setIdGroup(0L);
         repositories.groupRepository.save(group);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }

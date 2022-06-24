@@ -26,16 +26,6 @@ public class Group {
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The createdDate is invalid.")
     private String createdDate;
 
-    public Group() {
-    }
-
-    public Group(long idGroup, String name, String description, String createdDate) {
-        this.idGroup = idGroup;
-        this.name = name;
-        this.description = description;
-        this.createdDate = createdDate;
-    }
-
     public long getIdGroup() {
         return idGroup;
     }

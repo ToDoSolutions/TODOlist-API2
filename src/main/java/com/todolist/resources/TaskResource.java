@@ -7,6 +7,8 @@ import com.todolist.model.Status;
 import com.todolist.parsers.TaskParser;
 import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
+import com.todolist.utilities.Parse;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -85,9 +87,15 @@ public class TaskResource {
 
     @PostMapping
     public Map<String, Object> addTask(@RequestBody @Valid Task task) {
+        System.out.println("Start Date: " + task.getStartDate());
+        System.out.println("Finished Date: " + task.getFinishedDate());
         if (task.getTitle() == null)
             throw new IllegalArgumentException("The task with idTask " + task.getIdTask() + " must have title.|uri=/api/v1/tasks/");
-        repositories.taskRepository.save(task);
+        else if (task.getStartDate() != null && task.getFinishedDate() != null && !Parse.date(task.getStartDate()).isBefore(Parse.date(task.getFinishedDate()))) {
+            throw new IllegalArgumentException("The startDate is must be after the finishedDate.|uri=/api/v1/tasks");
+        }
+        task.setIdTask(0);
+        task = repositories.taskRepository.save(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
 

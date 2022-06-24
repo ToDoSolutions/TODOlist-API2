@@ -9,6 +9,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +20,7 @@ public class Task implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id_task")
+    // @Column(name = "id_task")
     private Long idTask;
     @Column(name = "title")
     @Size(max = 50, message = "The title is too long.")
@@ -48,23 +50,8 @@ public class Task implements Serializable {
     @Pattern(regexp = "SLEEP|EASY|MEDIUM|HARD|HARDCORE|I_WANT_TO_DIE", message = "The difficulty is invalid.")
     private String difficulty;
 
-    public Task() {
-    }
-
-    public Task(long idTask, String title, String description, String annotation, String status, String finishedDate, String startDate, Integer priority, String difficulty) {
-        this.idTask = idTask;
-        this.title = title;
-        this.description = description;
-        this.annotation = annotation;
-        this.status = status;
-        this.finishedDate = finishedDate;
-        this.startDate = startDate;
-        this.priority = priority;
-        this.difficulty = difficulty;
-    }
-
     public long getIdTask() {
-        return idTask;
+        return this.idTask;
     }
 
     public void setIdTask(long idTask) {

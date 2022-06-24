@@ -6,7 +6,6 @@ import javax.persistence.*;
 @Entity
 public class GroupUser {
 
-    private static long id = 0;
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_group_user")
@@ -19,16 +18,7 @@ public class GroupUser {
     public GroupUser() {
     }
 
-    public GroupUser(long idGroupUser, long idGroup, long idUser) {
-        id = idGroupUser;
-        this.idGroupUser = idGroupUser;
-        this.idGroup = idGroup;
-        this.idUser = idUser;
-    }
-
     public GroupUser(long idGroup, long idUser) {
-        id++;
-        this.idGroupUser = id;
         this.idGroup = idGroup;
         this.idUser = idUser;
     }

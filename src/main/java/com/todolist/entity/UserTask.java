@@ -6,7 +6,6 @@ import javax.persistence.*;
 @Entity
 public class UserTask {
 
-    private static long id = 0;
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_user_task")
@@ -19,16 +18,7 @@ public class UserTask {
     public UserTask() {
     }
 
-    public UserTask(long idUserTask, long idTask, long idUser) {
-        id = idUserTask;
-        this.idUserTask = idUserTask;
-        this.idTask = idTask;
-        this.idUser = idUser;
-    }
-
     public UserTask(long idTask, long idUser) {
-        id++;
-        this.idUserTask = id;
         this.idTask = idTask;
         this.idUser = idUser;
     }

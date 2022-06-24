@@ -39,20 +39,6 @@ public class User implements Serializable {
     @Size(max = 50, message = "The location is too long.")
     private String location;
 
-
-    public User() {
-    }
-
-    public User(long idUser, String name, String surname, String email, String avatar, String bio, String location) {
-        this.idUser = idUser;
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.avatar = avatar;
-        this.bio = bio;
-        this.location = location;
-    }
-
     public long getIdUser() {
         return idUser;
     }

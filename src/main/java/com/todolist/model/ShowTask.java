@@ -125,7 +125,7 @@ public class ShowTask {
     }
 
     public long getDuration() {
-        return DAYS.between(startDate, finishedDate);
+        return startDate != null && finishedDate != null ? DAYS.between(startDate, finishedDate) : 0;
     }
 
     public Map<String, Object> getFields(String fields) {

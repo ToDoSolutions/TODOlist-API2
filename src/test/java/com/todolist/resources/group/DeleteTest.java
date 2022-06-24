@@ -15,7 +15,7 @@ public class DeleteTest {
 
     @BeforeEach
     public void setUp() {
-        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "iissi$root");
+        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
         SQL.read("data/populate.sql");
     }
 
