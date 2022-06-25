@@ -2,6 +2,8 @@ package com.todolist.entity;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -16,6 +18,8 @@ public class Group {
 
     @Column(name = "name")
     @Size(max = 50, message = "The name is too long.")
+    @NotNull(message = "The name is required.")
+    @NotBlank(message = "The name is required.")
     private String name;
 
     @Column(name = "description")
@@ -25,6 +29,10 @@ public class Group {
     @Column(name = "created_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The createdDate is invalid.")
     private String createdDate;
+
+    public Group() {
+        this.idGroup = 0L;
+    }
 
     public long getIdGroup() {
         return idGroup;

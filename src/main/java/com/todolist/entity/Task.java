@@ -4,10 +4,7 @@ import com.todolist.repository.UserRepository;
 import com.todolist.repository.UserTaskRepository;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,22 +17,27 @@ public class Task implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    // @Column(name = "id_task")
+    @Column(name = "id_task")
     private Long idTask;
     @Column(name = "title")
     @Size(max = 50, message = "The title is too long.")
+    @NotNull(message = "The title is required.")
+    @NotBlank(message = "The title is required.")
     private String title;
     @Column(name = "description")
     @Size(max = 200, message = "The description is too long.")
+    @NotNull(message = "The description is required.")
+    @NotBlank(message = "The description is required.")
     private String description;
     @Column(name = "annotation")
     @Size(max = 50, message = "The annotation is too long.")
     private String annotation;
     @Column(name = "status")
-    @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.")
+    @Pattern(regexp = "DRAFT|draft|IN_PROGRESS|in_progress/IN PROGRESS|in progress|DONE|IN_REVISION|in_revision|IN REVISION|in revision|CANCELLED", message = "The status is invalid.")
     private String status;
     @Column(name = "finished_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")
+    @NotNull(message = "The finishedDate is required.")
     private String finishedDate;
     @Column(name = "start_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.")
@@ -47,8 +49,12 @@ public class Task implements Serializable {
     private Integer priority;
 
     @Column(name = "difficulty")
-    @Pattern(regexp = "SLEEP|EASY|MEDIUM|HARD|HARDCORE|I_WANT_TO_DIE", message = "The difficulty is invalid.")
+    @Pattern(regexp = "SLEEP|sleep|EASY|easy|MEDIUM|medium|HARD|hard|HARDCORE|hardcore|I_WANT_TO_DIE|i_want_to_die|I WANT TO DIE|i want to die", message = "The difficulty is invalid.")
     private String difficulty;
+
+    public Task() {
+        this.idTask = 0L;
+    }
 
     public long getIdTask() {
         return this.idTask;

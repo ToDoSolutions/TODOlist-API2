@@ -20,8 +20,10 @@ public enum Difficulty {
             return HARD;
         else if (difficultyLowerCase.equals("hardcore"))
             return HARDCORE;
-        else if (difficultyLowerCase.equals("i_want_to_die") || difficulty.equals("i want to die"))
+        else if (difficultyLowerCase.equals("i_want_to_die") || difficulty.equals("i want to die")) {
             return I_WANT_TO_DIE;
+        }
+
         else
             return null;
     }

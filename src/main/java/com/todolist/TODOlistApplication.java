@@ -18,5 +18,4 @@ public class TODOlistApplication {
         SQL.read("data/populate.sql");
         SpringApplication.run(TODOlistApplication.class, args);
     }
-
 }

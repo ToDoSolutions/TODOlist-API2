@@ -19,6 +19,7 @@ public class GroupUser {
     }
 
     public GroupUser(long idGroup, long idUser) {
+        this.idGroupUser = 0L;
         this.idGroup = idGroup;
         this.idUser = idUser;
     }

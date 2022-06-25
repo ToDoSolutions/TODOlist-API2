@@ -1,9 +1,7 @@
 package com.todolist.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 
 @Table(name = "user")
@@ -17,14 +15,19 @@ public class User implements Serializable {
 
     @Column(name = "name")
     @Size(max = 50, message = "The name is too long.")
+    @NotNull(message = "The name is required.")
+    @NotBlank(message = "The name is required.")
     private String name;
 
     @Column(name = "surname")
     @Size(max = 50, message = "The surname is too long.")
+    @NotNull(message = "The surname is required.")
+    @NotBlank(message = "The surname is required.")
     private String surname;
 
     @Column(name = "email")
     @Email(message = "The email is invalid.")
+    @NotNull(message = "The email is required.")
     private String email;
 
     @Column(name = "avatar")
@@ -38,6 +41,10 @@ public class User implements Serializable {
     @Column(name = "location")
     @Size(max = 50, message = "The location is too long.")
     private String location;
+
+    public User() {
+        this.idUser = 0L;
+    }
 
     public long getIdUser() {
         return idUser;

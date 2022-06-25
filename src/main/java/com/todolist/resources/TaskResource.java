@@ -7,8 +7,6 @@ import com.todolist.model.Status;
 import com.todolist.parsers.TaskParser;
 import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
-import com.todolist.utilities.Parse;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -80,6 +78,7 @@ public class TaskResource {
         if (task == null)
             throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
         if (!Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
+
             throw new IllegalArgumentException("The fields are invalid.|uri=/api/v1/tasks/" + idTask);
 
         return new ShowTask(task).getFields(fields);
@@ -87,20 +86,18 @@ public class TaskResource {
 
     @PostMapping
     public Map<String, Object> addTask(@RequestBody @Valid Task task) {
-        System.out.println("Start Date: " + task.getStartDate());
-        System.out.println("Finished Date: " + task.getFinishedDate());
         if (task.getTitle() == null)
             throw new IllegalArgumentException("The task with idTask " + task.getIdTask() + " must have title.|uri=/api/v1/tasks/");
-        else if (task.getStartDate() != null && task.getFinishedDate() != null && !Parse.date(task.getStartDate()).isBefore(Parse.date(task.getFinishedDate()))) {
-            throw new IllegalArgumentException("The startDate is must be after the finishedDate.|uri=/api/v1/tasks");
-        }
-        task.setIdTask(0);
         task = repositories.taskRepository.save(task);
-        return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
+        ShowTask showTask = new ShowTask(task);
+        if (!showTask.getStartDate().isBefore(showTask.getFinishedDate())) {
+            throw new IllegalArgumentException("The startDate is must be before the finishedDate.|uri=/api/v1/tasks");
+        }
+        return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
 
     @PutMapping
-    public Map<String, Object> updateTask(@RequestBody @Valid Task task) {
+    public Map<String, Object> updateTask(@RequestBody Task task) {
         Task oldTask = repositories.taskRepository.findByIdTask(task.getIdTask());
         if (oldTask == null)
             throw new NullPointerException("The task with idTask " + task.getIdTask() + " does not exist.|uri=/api/v1/tasks/" + task.getIdTask());
@@ -120,8 +117,13 @@ public class TaskResource {
             oldTask.setPriority(task.getPriority());
         if (task.getDifficulty() != null)
             oldTask.setDifficulty(task.getDifficulty());
-        repositories.taskRepository.save(oldTask);
-        return new ShowTask(oldTask).getFields(ShowTask.ALL_ATTRIBUTES);
+        @Valid Task  validated = oldTask;
+        oldTask = repositories.taskRepository.save(validated);
+        ShowTask showTask = new ShowTask(oldTask);
+        if (!showTask.getStartDate().isBefore(showTask.getFinishedDate())) {
+            throw new IllegalArgumentException("The startDate is must be before the finishedDate.|uri=/api/v1/tasks");
+        }
+        return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
 
 

@@ -88,7 +88,6 @@ public class UserResource {
             throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have surname.|uri=/api/v1/users/");
         else if (user.getEmail() == null)
             throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have email.|uri=/api/v1/users/");
-        user.setIdUser(0L);
         repositories.userRepository.save(user);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
