@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS  `task`;
 DROP TABLE IF EXISTS  `group_user`;
 DROP TABLE IF EXISTS  `user`;
+DROP EVENT IF EXISTS  `task_expires`;
 
 -- Volcando estructura para tabla todolist-api2.group
 CREATE TABLE IF NOT EXISTS `group` (
@@ -70,5 +71,8 @@ CREATE TABLE IF NOT EXISTS `user_task` (
     FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE CASCADE,
     FOREIGN KEY (`id_task`) REFERENCES `task`(`id_task`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE EVENT task_expires ON SCHEDULE EVERY 1 DAY DO
+    DELETE FROM task WHERE DATEDIFF(CURDATE(),STR_TO_DATE(finished_date, 'yyyy-mm-dd')) <= 0;
 
 SET FOREIGN_KEY_CHECKS=1; -- to disable them

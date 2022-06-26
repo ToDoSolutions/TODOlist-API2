@@ -6,8 +6,6 @@ import com.todolist.repository.UserTaskRepository;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +31,7 @@ public class Task implements Serializable {
     @Size(max = 50, message = "The annotation is too long.")
     private String annotation;
     @Column(name = "status")
-    @Pattern(regexp = "DRAFT|draft|IN_PROGRESS|in_progress/IN PROGRESS|in progress|DONE|IN_REVISION|in_revision|IN REVISION|in revision|CANCELLED", message = "The status is invalid.")
+    @Pattern(regexp = "[Dd][Rr][Aa][Ff][Tt]|[Ii][Nn][_ ][Pp][Rr][Oo][Gg][Rr][Ee][Ss][Ss]|[Dd][Oo][Nn][Ee]|[Ii][Nn][_ ][Rr][Ee][Vv][Ii][Ss][Ii][Oo][Nn]|[Cc][Aa][Nn][Cc][Ee][Ll][Ll][Ee][Dd]", message = "The status is invalid.")
     private String status;
     @Column(name = "finished_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")
@@ -49,7 +47,7 @@ public class Task implements Serializable {
     private Integer priority;
 
     @Column(name = "difficulty")
-    @Pattern(regexp = "SLEEP|sleep|EASY|easy|MEDIUM|medium|HARD|hard|HARDCORE|hardcore|I_WANT_TO_DIE|i_want_to_die|I WANT TO DIE|i want to die", message = "The difficulty is invalid.")
+    @Pattern(regexp = "[Ss][Ll][Ee][Ee][Pp]|[Ee][Aa][Ss][Yy]|[Mm][Ee][Dd][Ii][Uu][Mm]|[Hh][Aa][Rr][Dd]|[Hh][Aa][Rr][Dd][Cc][Oo][Rr][Ee]|[Ii][_ ][Ww][Aa][Nn][Tt][_ ][Tt][Oo][_ ][Dd][Ii][Ee]", message = "The difficulty is invalid.")
     private String difficulty;
 
     public Task() {

@@ -11,16 +11,16 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class GetSoloTest {
+class GetSoloTest {
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
         SQL.read("data/populate.sql");
     }
 
     @Test
-    public void testGetSoloFine() {
+    void testGetSoloFine() {
         String uri = "http://localhost:8080/api/v1/users/1";
         RestTemplate restTemplate = new RestTemplate();
         ShowUser response = restTemplate.getForObject(uri, ShowUser.class);
@@ -28,7 +28,7 @@ public class GetSoloTest {
     }
 
     @Test
-    public void testGetSoloFields() {
+    void testGetSoloFields() {
         String uri = "http://localhost:8080/api/v1/users/1?fieldsUser=idUser,name,surname";
         RestTemplate restTemplate = new RestTemplate();
         ShowUser response = restTemplate.getForObject(uri, ShowUser.class);
@@ -37,14 +37,14 @@ public class GetSoloTest {
     }
 
     @Test
-    public void testGetSoloFieldsWithWrongField() {
+    void testGetSoloFieldsWithWrongField() {
         String uri = "http://localhost:8080/api/v1/users/1?fieldsUser=idUser,wrongField";
         RestTemplate restTemplate = new RestTemplate();
         assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask.class));
     }
 
     @Test
-    public void testGetSoloUpperFields() {
+    void testGetSoloUpperFields() {
         String uri = "http://localhost:8080/api/v1/users/1?fieldsUser=IDUSER,NAME,SURNAME";
         RestTemplate restTemplate = new RestTemplate();
         ShowUser response = restTemplate.getForObject(uri, ShowUser.class);
@@ -54,7 +54,7 @@ public class GetSoloTest {
 
 
     @Test
-    public void testGetSoloNotFound() {
+    void testGetSoloNotFound() {
         String uri = "http://localhost:8080/api/v1/users/99";
         RestTemplate restTemplate = new RestTemplate();
         Throwable exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowUser.class));

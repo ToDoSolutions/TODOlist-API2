@@ -11,16 +11,16 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DeleteTest {
+class DeleteTest {
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
         SQL.read("data/populate.sql");
     }
 
     @Test
-    public void testDeleteFine() {
+    void testDeleteFine() {
         String uri = "http://localhost:8080/api/v1/tasks/1";
         RestTemplate restTemplate = new RestTemplate();
         ShowTask response = restTemplate.exchange(uri, HttpMethod.DELETE, null, ShowTask.class).getBody();

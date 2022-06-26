@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -92,6 +93,8 @@ public class TaskResource {
         ShowTask showTask = new ShowTask(task);
         if (!showTask.getStartDate().isBefore(showTask.getFinishedDate())) {
             throw new IllegalArgumentException("The startDate is must be before the finishedDate.|uri=/api/v1/tasks");
+        } else if (showTask.getFinishedDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("The finishedDate is must be after the current date.|uri=/api/v1/tasks");
         }
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
@@ -117,12 +120,14 @@ public class TaskResource {
             oldTask.setPriority(task.getPriority());
         if (task.getDifficulty() != null)
             oldTask.setDifficulty(task.getDifficulty());
-        @Valid Task  validated = oldTask;
-        oldTask = repositories.taskRepository.save(validated);
+        @Valid Task validated = oldTask;
         ShowTask showTask = new ShowTask(oldTask);
-        if (!showTask.getStartDate().isBefore(showTask.getFinishedDate())) {
+        if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
             throw new IllegalArgumentException("The startDate is must be before the finishedDate.|uri=/api/v1/tasks");
-        }
+        else if (showTask.getFinishedDate().isBefore(LocalDate.now()))
+            throw new IllegalArgumentException("The finishedDate is must be after the current date.|uri=/api/v1/tasks");
+        oldTask = repositories.taskRepository.save(validated);
+        showTask = new ShowTask(oldTask);
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
 

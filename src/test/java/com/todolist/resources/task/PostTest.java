@@ -16,12 +16,12 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class PostTest {
+class PostTest {
 
     Task task;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
         SQL.read("data/create.sql");
         task = new Task();
@@ -38,7 +38,7 @@ public class PostTest {
 
     // Correct
     @Test
-    public void testPostFine() {
+    void testPostFine() {
         String uri1 = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
         ShowTask response = restTemplate.postForObject(uri1, task, ShowTask.class);
@@ -50,7 +50,7 @@ public class PostTest {
 
     // Title
     @Test
-    public void testPostWithNullOrEmptyTitle() {
+    void testPostWithNullOrEmptyTitle() {
         task.setTitle(null);
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -60,7 +60,7 @@ public class PostTest {
     }
 
     @Test
-    public void testPostWithTitleGreaterThan50() {
+    void testPostWithTitleGreaterThan50() {
         task.setTitle("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -69,7 +69,7 @@ public class PostTest {
 
     // Description
     @Test
-    public void testPostWithNullOrEmptyDescription() {
+    void testPostWithNullOrEmptyDescription() {
         task.setDescription(null);
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -79,7 +79,7 @@ public class PostTest {
     }
 
     @Test
-    public void testPostWithDescriptionGreaterThan200() {
+    void testPostWithDescriptionGreaterThan200() {
         task.setDescription("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -88,7 +88,7 @@ public class PostTest {
 
     // Annotation
     @Test
-    public void testPostWithAnnotationGreaterThan50() {
+    void testPostWithAnnotationGreaterThan50() {
         task.setAnnotation("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -97,7 +97,7 @@ public class PostTest {
 
     // Status
     @Test
-    public void testPostWithWrongStatus() {
+    void testPostWithWrongStatus() {
         task.setStatus("WRONG");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -105,7 +105,7 @@ public class PostTest {
     }
 
     @Test
-    public void testPostWithLowerStatus() {
+    void testPostWithLowerStatus() {
         task.setStatus("in progress");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -116,7 +116,7 @@ public class PostTest {
 
     // Relation between StartDate and FinishedDate
     @Test
-    public void testPostWithStartDateIsAfterFinishedDate() {
+    void testPostWithStartDateIsAfterFinishedDate() {
         task.setStartDate("3001-01-30");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -125,7 +125,7 @@ public class PostTest {
 
     // StartDate
     @Test
-    public void testPostWithWrongPatternInStartDate() {
+    void testPostWithWrongPatternInStartDate() {
         task.setStartDate("2015/01/30");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -134,7 +134,7 @@ public class PostTest {
 
 
     @Test
-    public void testPostWithNullStartDate() {
+    void testPostWithNullStartDate() {
         task.setStartDate(null);
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -145,7 +145,7 @@ public class PostTest {
 
     // FinishedDate
     @Test
-    public void testPostWithWrongPatternInFinishedDate() {
+    void testPostWithWrongPatternInFinishedDate() {
         task.setFinishedDate("2015/01/30");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -153,8 +153,16 @@ public class PostTest {
     }
 
     @Test
-    public void testPostWithNullFinishedDate() {
+    void testPostWithNullFinishedDate() {
         task.setFinishedDate(null);
+        String uri = "http://localhost:8080/api/v1/tasks";
+        RestTemplate restTemplate = new RestTemplate();
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+    }
+
+    @Test
+    void testPostWithFinishedDateIsBeforeCurrentDate() {
+        task.setFinishedDate(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
         assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
@@ -162,7 +170,7 @@ public class PostTest {
 
     // Priority
     @Test
-    public void testPostWithPriorityEqualToZero() {
+    void testPostWithPriorityEqualToZero() {
         task.setPriority(0);
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -171,7 +179,7 @@ public class PostTest {
     }
 
     @Test
-    public void testPostWithPriorityEqualToFive() {
+    void testPostWithPriorityEqualToFive() {
         task.setPriority(5);
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -180,7 +188,7 @@ public class PostTest {
     }
 
     @Test
-    public void testPostWithPriorityLowerThanZero() {
+    void testPostWithPriorityLowerThanZero() {
         task.setPriority(-1);
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -188,7 +196,7 @@ public class PostTest {
     }
 
     @Test
-    public void testPostWithPriorityGreaterThanFive() {
+    void testPostWithPriorityGreaterThanFive() {
         task.setPriority(6);
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -197,7 +205,7 @@ public class PostTest {
 
     // Dificulty
     @Test
-    public void testPostWithWrongDifficulty() {
+    void testPostWithWrongDifficulty() {
         task.setDifficulty("WRONG");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
@@ -205,7 +213,7 @@ public class PostTest {
     }
 
     @Test
-    public void testPostWithLowerDifficulty() {
+    void testPostWithLowerDifficulty() {
         task.setDifficulty("i want to die");
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();

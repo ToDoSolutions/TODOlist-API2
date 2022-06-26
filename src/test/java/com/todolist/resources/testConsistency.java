@@ -10,15 +10,15 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class testConsistency {
+class testConsistency {
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         SQL.read("data/populate.sql");
     }
 
     @Test
-    public void testDeleteTaskFromUser() {
+    void testDeleteTaskFromUser() {
         String uri1 = "http://localhost:8080/api/v1/tasks/1";
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.exchange(uri1, HttpMethod.DELETE, null, ShowTask.class);

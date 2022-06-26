@@ -1,5 +1,7 @@
 package com.todolist.model;
 
+import java.util.regex.Pattern;
+
 public enum Difficulty {
     SLEEP,
     EASY,
@@ -20,10 +22,8 @@ public enum Difficulty {
             return HARD;
         else if (difficultyLowerCase.equals("hardcore"))
             return HARDCORE;
-        else if (difficultyLowerCase.equals("i_want_to_die") || difficulty.equals("i want to die")) {
+        else if (Pattern.compile("i[_ ]want[_ ]to[_ ]die").matcher(difficultyLowerCase).matches())
             return I_WANT_TO_DIE;
-        }
-
         else
             return null;
     }
