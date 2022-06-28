@@ -24,15 +24,25 @@ public class CustomErrorHandler {
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ExceptionResponse> handleNullPointerException(NullPointerException exception) {
-
-        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage().split("\\|")[0], exception.getMessage().split("\\|")[1], HttpStatus.NOT_FOUND.getReasonPhrase());
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+        try {
+            ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage().split("\\|")[0], exception.getMessage().split("\\|")[1], HttpStatus.NOT_FOUND.getReasonPhrase());
+            return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage(), exception.getMessage(), HttpStatus.NOT_FOUND.getReasonPhrase());
+            return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+        }
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage().split("\\|")[0], exception.getMessage().split("\\|")[1], HttpStatus.BAD_REQUEST.getReasonPhrase());
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        try {
+            ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage().split("\\|")[0], exception.getMessage().split("\\|")[1], HttpStatus.BAD_REQUEST.getReasonPhrase());
+            return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(exception.getMessage());
+            //ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage(), exception.getMessage(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+            //return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
