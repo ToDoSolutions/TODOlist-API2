@@ -41,7 +41,7 @@ class PutTest {
 
     // Correct
     @Test
-    void testPutFinet() {
+    void testPutFine() {
         String uri1 = "http://localhost:8080/api/v1/tasks/";
         RestTemplate restTemplate = new RestTemplate();
         task.setTitle("Task 2");
@@ -62,7 +62,7 @@ class PutTest {
 
     // Not exist
     @Test
-    void testOutNotExists() {
+    void testPutNotExists() {
         String uri = "http://localhost:8080/api/v1/tasks/";
         RestTemplate restTemplate = new RestTemplate();
         task.setIdTask(99L);
@@ -88,7 +88,7 @@ class PutTest {
 
     @Test
     void testPostWithTitleGreaterThan50() {
-        task.setTitle("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        task.setTitle(new String(new char[51]).replace("\0", "a"));
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
         assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri, HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class));
@@ -105,7 +105,7 @@ class PutTest {
 
     @Test
     void testPostWithDescriptionGreaterThan200() {
-        task.setDescription("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        task.setDescription(new String(new char[201]).replace("\0", "a"));
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
         assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri, HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class));
@@ -114,7 +114,7 @@ class PutTest {
     // Annotation
     @Test
     void testPostWithAnnotationGreaterThan50() {
-        task.setAnnotation("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        task.setAnnotation(new String(new char[51]).replace("\0", "a"));
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
         assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri, HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class));

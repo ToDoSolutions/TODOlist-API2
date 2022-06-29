@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
@@ -53,17 +54,17 @@ public class TaskResource {
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The priority is invalid.") String duration) {
         System.out.println(order);
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        if (Arrays.asList(ShowTask.ALL_ATTRIBUTES).stream().anyMatch(prop -> prop.equals(propertyOrder)))
+        if (Stream.of(ShowTask.ALL_ATTRIBUTES).anyMatch(prop -> prop.equals(propertyOrder)))
             throw new IllegalArgumentException("The order is invalid.|uri=/api/v1/tasks");
         List<ShowTask> result = new ArrayList<>(),
                 tasks = taskParser.parseList(
                         repositories
                                 .taskRepository
                                 .findAll(
-                                PageRequest.of(offset, limit,
-                                        Sort.by(order.charAt(0) == '-' ?
-                                                Sort.Direction.DESC : Sort.Direction.ASC,
-                                        propertyOrder)))
+                                        PageRequest.of(offset, limit,
+                                                Sort.by(order.charAt(0) == '-' ?
+                                                                Sort.Direction.DESC : Sort.Direction.ASC,
+                                                        propertyOrder)))
                                 .getContent());
         Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
         Difficulty auxDifficulty = difficulty != null ? Difficulty.valueOf(difficulty.toUpperCase()) : null;

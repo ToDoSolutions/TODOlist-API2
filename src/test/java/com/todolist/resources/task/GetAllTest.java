@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class GetAllTest {
@@ -46,14 +44,14 @@ class GetAllTest {
     void testGetAllWithIncorrectOffset() {
         String uri = "http://localhost:8080/api/v1/tasks?offset=a";
         RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () ->restTemplate.getForObject(uri, ShowTask[].class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask[].class));
     }
 
     @Test
     void testGetAllWithNegativeOffset() {
         String uri = "http://localhost:8080/api/v1/tasks?offset=-1";
         RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () ->restTemplate.getForObject(uri, ShowTask[].class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask[].class));
     }
 
     // Limit
@@ -70,14 +68,14 @@ class GetAllTest {
     void testGetAllWithIncorrectLimit() {
         String uri = "http://localhost:8080/api/v1/tasks?limit=a";
         RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () ->restTemplate.getForObject(uri, ShowTask[].class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask[].class));
     }
 
     @Test
     void testGetAllWithNegativeLimit() {
         String uri = "http://localhost:8080/api/v1/tasks?limit=-1";
         RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () ->restTemplate.getForObject(uri, ShowTask[].class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask[].class));
     }
 
     // Offset + Limit
@@ -106,7 +104,7 @@ class GetAllTest {
     void testGetAllWithIncorrectOrder() {
         String uri = "http://localhost:8080/api/v1/tasks?order=a";
         RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () ->restTemplate.getForObject(uri, ShowTask[].class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask[].class));
     }
 
     @Test
@@ -154,8 +152,6 @@ class GetAllTest {
         assertNotNull(response, "Response is null");
         assertEquals(8, response.length, "Length is not correct");
     }
-
-
 
 
 }

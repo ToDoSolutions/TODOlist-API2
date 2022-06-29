@@ -61,7 +61,7 @@ class PostTest {
 
     @Test
     void testPostWithTitleGreaterThan50() {
-        task.setTitle("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        task.setTitle(new String(new char[51]).replace("\0", "a"));
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
         assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
@@ -80,7 +80,7 @@ class PostTest {
 
     @Test
     void testPostWithDescriptionGreaterThan200() {
-        task.setDescription("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        task.setDescription(new String(new char[201]).replace("\0", "a"));
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
         assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
@@ -89,7 +89,7 @@ class PostTest {
     // Annotation
     @Test
     void testPostWithAnnotationGreaterThan50() {
-        task.setAnnotation("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        task.setAnnotation(new String(new char[51]).replace("\0", "a"));
         String uri = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();
         assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));

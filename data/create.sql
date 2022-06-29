@@ -19,6 +19,7 @@ DROP TABLE IF EXISTS `user_task`;
 DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS  `task`;
 DROP TABLE IF EXISTS  `group_user`;
+DROP TABLE IF EXISTS  `group`;
 DROP TABLE IF EXISTS  `user`;
 DROP EVENT IF EXISTS  `task_expires`;
 
