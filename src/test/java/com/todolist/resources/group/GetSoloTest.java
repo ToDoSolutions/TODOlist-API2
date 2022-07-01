@@ -15,6 +15,7 @@ class GetSoloTest {
     @BeforeEach
     void setUp() {
         SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
+        SQL.read("data/create.sql");
         SQL.read("data/populate.sql");
     }
 
@@ -39,7 +40,8 @@ class GetSoloTest {
     void testGetSoloFieldsWithWrongField() {
         String uri = "http://localhost:8080/api/v1/groups/1?fieldsGroup=idGroup,wrongField";
         RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowGroup.class));
+        HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowGroup.class));
+        assertEquals("404", exception.getMessage().split(":")[0].trim(), "Status code is not correct");
     }
 
     @Test

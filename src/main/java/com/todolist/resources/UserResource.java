@@ -72,22 +72,22 @@ public class UserResource {
                                        @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
         User user = repositories.userRepository.findById(idUser).orElse(null);
         if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|uri=/api/v1/users/" + idUser);
+            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         if (!Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The users' fields are invalid.|uri=/api/v1/users/" + idUser);
+            throw new IllegalArgumentException("The users' fields are invalid.|/api/v1/users/" + idUser);
         if (!Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The tasks' fields are invalid.|uri=/api/v1/users/" + idUser);
+            throw new IllegalArgumentException("The tasks' fields are invalid.|/api/v1/users/" + idUser);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
     }
 
     @PostMapping
     public Map<String, Object> addUser(@RequestBody @Valid User user) {
         if (user.getName() == null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have name.|uri=/api/v1/users/");
+            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have name.|/api/v1/users/");
         else if (user.getSurname() == null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have surname.|uri=/api/v1/users/");
+            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have surname.|/api/v1/users/");
         else if (user.getEmail() == null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have email.|uri=/api/v1/users/");
+            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have email.|/api/v1/users/");
         repositories.userRepository.save(user);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -96,7 +96,7 @@ public class UserResource {
     public Map<String, Object> updateUser(@RequestBody @Valid User user) {
         User oldUser = repositories.userRepository.findByIdUser(user.getIdUser());
         if (oldUser == null)
-            throw new NullPointerException("The user with idUser " + user.getIdUser() + " does not exist.|uri=/api/v1/users/" + user.getIdUser());
+            throw new NullPointerException("The user with idUser " + user.getIdUser() + " does not exist.|/api/v1/users/" + user.getIdUser());
         if (user.getName() != null)
             oldUser.setName(user.getName());
         if (user.getSurname() != null)
@@ -117,7 +117,7 @@ public class UserResource {
     public Map<String, Object> deleteUser(@PathVariable("idUser") @Min(value = 0, message = "The idGroup must be positive.") Long idUser) {
         User user = repositories.userRepository.findByIdUser(idUser);
         if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|uri=/api/v1/users/" + idUser);
+            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         repositories.userRepository.delete(user);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -126,10 +126,10 @@ public class UserResource {
     public Map<String, Object> addTaskToUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = repositories.userRepository.findByIdUser(idUser);
         if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|uri=/api/v1/users/" + idUser);
+            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         Task task = repositories.taskRepository.findByIdTask(idTask);
         if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
+            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
         repositories.addTaskToUser(user, task);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -138,10 +138,10 @@ public class UserResource {
     public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = repositories.userRepository.findByIdUser(idUser);
         if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|uri=/api/v1/users/" + idUser);
+            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         Task task = repositories.taskRepository.findByIdTask(idTask);
         if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
+            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
         repositories.removeTaskFromUser(user, task);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -150,7 +150,7 @@ public class UserResource {
     public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Long idUser) {
         User user = repositories.userRepository.findByIdUser(idUser);
         if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|uri=/api/v1/users/" + idUser);
+            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         repositories.removeAllTasksFromUser(user);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }

@@ -1,14 +1,15 @@
 package com.todolist.utilities;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class ExceptionResponse {
-    private final Date timestamp;
+    private final LocalDate timestamp;
     private final String msg;
     private final String path;
     private final String status;
 
-    public ExceptionResponse(Date timestamp, String message, String path, String status) {
+    public ExceptionResponse(LocalDate timestamp, String message, String path, String status) {
         super();
         this.timestamp = timestamp;
         this.msg = message != null ? (message.contains(":") ? message.split(":")[1] : message) : message;
@@ -20,7 +21,7 @@ public class ExceptionResponse {
         return status;
     }
 
-    public Date getTimestamp() {
+    public LocalDate getTimestamp() {
         return timestamp;
     }
 

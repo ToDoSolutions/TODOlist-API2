@@ -69,20 +69,20 @@ public class GroupResource {
                                         @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
         Group group = repositories.groupRepository.findById(idGroup).orElse(null);
         if (group == null)
-            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|uri=/api/v1/groups/" + idGroup);
+            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|/api/v1/groups/" + idGroup);
         if (!Arrays.stream(fieldsGroup.split(",")).allMatch(field -> ShowGroup.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The groups' fields are invalid.|uri=/api/v1/groups/" + idGroup);
+            throw new IllegalArgumentException("The groups' fields are invalid.|/api/v1/groups/" + idGroup);
         if (!Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The users' fields are invalid.|uri=/api/v1/groups/" + idGroup);
+            throw new IllegalArgumentException("The users' fields are invalid.|/api/v1/groups/" + idGroup);
         if (!Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The tasks' fields are invalid.|uri=/api/v1/groups/" + idGroup);
+            throw new IllegalArgumentException("The tasks' fields are invalid.|/api/v1/groups/" + idGroup);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(fieldsGroup, fieldsUser, fieldsTask);
     }
 
     @PostMapping
     public Map<String, Object> addGroup(@RequestBody @Valid Group group) {
         if (group.getName() == null)
-            throw new IllegalArgumentException("The group with idGroup " + group.getIdGroup() + " must have name.|uri=/api/v1/groups/");
+            throw new IllegalArgumentException("The group with idGroup " + group.getIdGroup() + " must have name.|/api/v1/groups/");
         repositories.groupRepository.save(group);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -91,7 +91,7 @@ public class GroupResource {
     public Map<String, Object> updateGroup(@RequestBody @Valid Group group) {
         Group oldGroup = repositories.groupRepository.findById(group.getIdGroup()).orElse(null);
         if (oldGroup == null)
-            throw new NullPointerException("The group with idGroup " + group.getIdGroup() + " does not exist.|uri=/api/v1/groups/" + group.getIdGroup());
+            throw new NullPointerException("The group with idGroup " + group.getIdGroup() + " does not exist.|/api/v1/groups/" + group.getIdGroup());
         if (group.getName() != null)
             oldGroup.setName(group.getName());
         if (group.getDescription() != null)
@@ -106,7 +106,7 @@ public class GroupResource {
     public Map<String, Object> deleteGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
         Group group = repositories.groupRepository.findByIdGroup(idGroup);
         if (group == null)
-            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|uri=/api/v1/groups/" + idGroup);
+            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|/api/v1/groups/" + idGroup);
         repositories.groupRepository.delete(group);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -116,10 +116,10 @@ public class GroupResource {
                                                 @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
         Group group = repositories.groupRepository.findByIdGroup(idGroup);
         if (group == null)
-            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|uri=/api/v1/groups/" + idGroup);
+            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|/api/v1/groups/" + idGroup);
         User user = repositories.userRepository.findByIdUser(idUser);
         if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|uri=/api/v1/users/" + idUser);
+            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         repositories.addUserToGroup(group, user);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -129,10 +129,10 @@ public class GroupResource {
                                                    @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
         Group group = repositories.groupRepository.findByIdGroup(idGroup);
         if (group == null)
-            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|uri=/api/v1/groups/" + idGroup);
+            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|/api/v1/groups/" + idGroup);
         User user = repositories.userRepository.findByIdUser(idUser);
         if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|uri=/api/v1/users/" + idUser);
+            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         repositories.removeUserFromGroup(group, user);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -142,10 +142,10 @@ public class GroupResource {
                                                 @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
         Group group = repositories.groupRepository.findByIdGroup(idGroup);
         if (group == null)
-            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|uri=/api/v1/groups/" + idGroup);
+            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|/api/v1/groups/" + idGroup);
         Task task = repositories.taskRepository.findByIdTask(idTask);
         if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
+            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
         repositories.addTaskToGroup(group, task);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -155,10 +155,10 @@ public class GroupResource {
                                                    @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
         Group group = repositories.groupRepository.findByIdGroup(idGroup);
         if (group == null)
-            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|uri=/api/v1/groups/" + idGroup);
+            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|/api/v1/groups/" + idGroup);
         Task task = repositories.taskRepository.findByIdTask(idTask);
         if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
+            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
         repositories.removeTaskFromGroup(group, task);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -167,7 +167,7 @@ public class GroupResource {
     public Map<String, Object> deleteAllUsersFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
         Group group = repositories.groupRepository.findByIdGroup(idGroup);
         if (group == null)
-            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|uri=/api/v1/groups/" + idGroup);
+            throw new NullPointerException("The group with idGroup " + idGroup + " does not exist.|/api/v1/groups/" + idGroup);
         repositories.removeAllUsersFromGroup(group);
         return new ShowGroup(group, repositories.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDate;
 import java.util.Date;
 
 @RestControllerAdvice
@@ -16,27 +17,29 @@ public class CustomErrorHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> handleConstraintViolationException(ConstraintViolationException exception,
                                                                                 ServletWebRequest webRequest) {
-
-        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage(),
-                webRequest.getDescription(false), HttpStatus.BAD_REQUEST.getReasonPhrase());
+        System.out.println("ConstraintViolationException");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage(),
+                webRequest.getDescription(false).replace("uri=",""), HttpStatus.BAD_REQUEST.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ExceptionResponse> handleNullPointerException(NullPointerException exception) {
+        System.out.println("NullPointerException");
         try {
-            ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage().split("\\|")[0], exception.getMessage().split("\\|")[1], HttpStatus.NOT_FOUND.getReasonPhrase());
+            ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage().split("\\|")[0], exception.getMessage().split("\\|")[1], HttpStatus.NOT_FOUND.getReasonPhrase());
             return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage(), exception.getMessage(), HttpStatus.NOT_FOUND.getReasonPhrase());
+            ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage(), exception.getMessage(), HttpStatus.NOT_FOUND.getReasonPhrase());
             return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
         }
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
+        System.out.println("IllegalArgumentException");
         try {
-            ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage().split("\\|")[0], exception.getMessage().split("\\|")[1], HttpStatus.BAD_REQUEST.getReasonPhrase());
+            ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage().split("\\|")[0], exception.getMessage().split("\\|")[1], HttpStatus.BAD_REQUEST.getReasonPhrase());
             return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             throw new IllegalArgumentException(exception.getMessage());
@@ -47,7 +50,8 @@ public class CustomErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getBindingResult().getFieldError() != null ? exception.getBindingResult().getFieldError().getDefaultMessage() : "No info.", "When creating or updating an entity.", HttpStatus.BAD_REQUEST.getReasonPhrase());
+        System.out.println("MethodArgumentNotValidException");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getBindingResult().getFieldError() != null ? exception.getBindingResult().getFieldError().getDefaultMessage() : "No info.", "When creating or updating an entity.", HttpStatus.BAD_REQUEST.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 

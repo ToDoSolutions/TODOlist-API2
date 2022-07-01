@@ -52,10 +52,11 @@ public class TaskResource {
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The priority is invalid.") String priority,
                                                  @RequestParam(required = false) String difficulty,
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The priority is invalid.") String duration) {
-        System.out.println(order);
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        if (Stream.of(ShowTask.ALL_ATTRIBUTES).anyMatch(prop -> prop.equals(propertyOrder)))
-            throw new IllegalArgumentException("The order is invalid.|uri=/api/v1/tasks");
+        if (Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
+            throw new IllegalArgumentException("The order is invalid.|/api/v1/tasks");
+        if (!Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
+            throw new IllegalArgumentException("The fields are invalid.|/api/v1/tasks");
         List<ShowTask> result = new ArrayList<>(),
                 tasks = taskParser.parseList(
                         repositories
@@ -68,6 +69,7 @@ public class TaskResource {
                                 .getContent());
         Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
         Difficulty auxDifficulty = difficulty != null ? Difficulty.valueOf(difficulty.toUpperCase()) : null;
+
         for (ShowTask task : tasks) {
             if (task != null &&
                     (title == null || task.getTitle().contains(title)) &&
@@ -90,10 +92,9 @@ public class TaskResource {
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         Task task = repositories.taskRepository.findById(idTask).orElse(null);
         if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
+            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
         if (!Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-
-            throw new IllegalArgumentException("The fields are invalid.|uri=/api/v1/tasks/" + idTask);
+            throw new IllegalArgumentException("The fields are invalid.|/api/v1/tasks/" + idTask);
 
         return new ShowTask(task).getFields(fields);
     }
@@ -101,13 +102,13 @@ public class TaskResource {
     @PostMapping
     public Map<String, Object> addTask(@RequestBody @Valid Task task) {
         if (task.getTitle() == null)
-            throw new IllegalArgumentException("The task with idTask " + task.getIdTask() + " must have title.|uri=/api/v1/tasks/");
+            throw new IllegalArgumentException("The task with idTask " + task.getIdTask() + " must have title.|/api/v1/tasks/");
         task = repositories.taskRepository.save(task);
         ShowTask showTask = new ShowTask(task);
         if (!showTask.getStartDate().isBefore(showTask.getFinishedDate())) {
-            throw new IllegalArgumentException("The startDate is must be before the finishedDate.|uri=/api/v1/tasks");
+            throw new IllegalArgumentException("The startDate is must be before the finishedDate.|/api/v1/tasks");
         } else if (showTask.getFinishedDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("The finishedDate is must be after the current date.|uri=/api/v1/tasks");
+            throw new IllegalArgumentException("The finishedDate is must be after the current date.|/api/v1/tasks");
         }
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
@@ -116,7 +117,7 @@ public class TaskResource {
     public Map<String, Object> updateTask(@RequestBody Task task) {
         Task oldTask = repositories.taskRepository.findByIdTask(task.getIdTask());
         if (oldTask == null)
-            throw new NullPointerException("The task with idTask " + task.getIdTask() + " does not exist.|uri=/api/v1/tasks/" + task.getIdTask());
+            throw new NullPointerException("The task with idTask " + task.getIdTask() + " does not exist.|/api/v1/tasks/" + task.getIdTask());
         if (task.getTitle() != null)
             oldTask.setTitle(task.getTitle());
         if (task.getDescription() != null)
@@ -136,9 +137,9 @@ public class TaskResource {
         @Valid Task validated = oldTask;
         ShowTask showTask = new ShowTask(oldTask);
         if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
-            throw new IllegalArgumentException("The startDate is must be before the finishedDate.|uri=/api/v1/tasks");
+            throw new IllegalArgumentException("The startDate is must be before the finishedDate.|/api/v1/tasks");
         else if (showTask.getFinishedDate().isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("The finishedDate is must be after the current date.|uri=/api/v1/tasks");
+            throw new IllegalArgumentException("The finishedDate is must be after the current date.|/api/v1/tasks");
         oldTask = repositories.taskRepository.save(validated);
         showTask = new ShowTask(oldTask);
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
@@ -149,7 +150,7 @@ public class TaskResource {
     public Map<String, Object> deleteTask(@PathVariable("idTask") Long idTask) {
         Task task = repositories.taskRepository.findByIdTask(idTask);
         if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|uri=/api/v1/tasks/" + idTask);
+            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
         repositories.taskRepository.delete(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
