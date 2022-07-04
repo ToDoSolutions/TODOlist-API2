@@ -2,7 +2,6 @@ package com.todolist.resources.group;
 
 import com.todolist.entity.Group;
 import com.todolist.model.ShowGroup;
-import com.todolist.model.ShowTask;
 import com.todolist.utilities.SQL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

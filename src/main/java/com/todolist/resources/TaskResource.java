@@ -9,8 +9,6 @@ import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,22 +19,19 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
 @Validated
 public class TaskResource {
 
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     @Autowired
     @Qualifier("repositories")
     private Repositories repositories;
-
     @Autowired
     @Qualifier("taskParser")
     private TaskParser taskParser;
-
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @GetMapping
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
@@ -61,9 +56,9 @@ public class TaskResource {
                 tasks = taskParser.parseList(repositories.taskRepository.findAll(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder)));
         Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
         Difficulty auxDifficulty = difficulty != null ? Difficulty.valueOf(difficulty.toUpperCase()) : null;
-        if (limit == -1) limit = tasks.size()-1;
+        if (limit == -1) limit = tasks.size() - 1;
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > tasks.size() ? tasks.size()-1 : start + limit; // Donde va a terminar.
+        int end = limit > tasks.size() ? tasks.size() - 1 : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
             ShowTask task = tasks.get(i);
             if (task != null &&

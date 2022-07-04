@@ -9,7 +9,6 @@ import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +25,13 @@ import java.util.stream.Collectors;
 @Validated
 public class UserResource {
 
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     @Autowired
     @Qualifier("repositories")
     private Repositories repositories;
-
     @Autowired
     @Qualifier("userParser")
     private UserParser userParser;
-
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @GetMapping
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,

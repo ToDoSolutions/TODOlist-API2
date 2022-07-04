@@ -11,7 +11,6 @@ import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,15 +26,13 @@ import java.util.stream.Collectors;
 @Validated
 public class GroupResource {
 
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     @Autowired
     @Qualifier("repositories")
     private Repositories repositories;
-
     @Autowired
     @Qualifier("groupParser")
     private GroupParser groupParser;
-
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @GetMapping
     public List<Map<String, Object>> getAllGroups(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
@@ -50,7 +47,7 @@ public class GroupResource {
                                                   @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The createdDate is invalid.") String createdDate) {
         List<ShowGroup> result = new ArrayList<>(),
                 groups = groupParser.parseList(repositories.groupRepository.findAll(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order)), repositories);
-        int start = offset == null || offset < 1? 0 : offset - 1; // Donde va a comenzar.
+        int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
         int end = limit == null || limit > groups.size() ? groups.size() : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
             ShowGroup group = groups.get(i);

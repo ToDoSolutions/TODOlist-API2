@@ -9,7 +9,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
-import java.util.Date;
 
 @RestControllerAdvice
 public class CustomErrorHandler {

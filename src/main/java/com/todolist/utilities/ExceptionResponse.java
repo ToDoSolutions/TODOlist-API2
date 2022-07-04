@@ -1,7 +1,6 @@
 package com.todolist.utilities;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class ExceptionResponse {
     private final LocalDate timestamp;
