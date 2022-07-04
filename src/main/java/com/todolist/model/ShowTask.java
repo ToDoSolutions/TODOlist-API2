@@ -2,7 +2,9 @@ package com.todolist.model;
 
 
 import com.todolist.entity.Task;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GetAllTest {
@@ -15,6 +17,7 @@ class GetAllTest {
     @BeforeEach
     void setUp() {
         SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
+        SQL.read("data/create.sql");
         SQL.read("data/populate.sql");
     }
 
@@ -25,21 +28,18 @@ class GetAllTest {
         RestTemplate restTemplate = new RestTemplate();
         ShowTask[] response = restTemplate.getForObject(uri, ShowTask[].class);
         assertNotNull(response, "Response is null");
-        assertEquals(8, response.length, "Length is not correct");
+        assertEquals(7, response.length, "Length is not correct");
     }
 
     // Offset
-    /*
     @Test
     void testGetAllWithCorrectOffset() {
         String uri = "http://localhost:8080/api/v1/tasks?offset=2";
         RestTemplate restTemplate = new RestTemplate();
         ShowTask[] response = restTemplate.getForObject(uri, ShowTask[].class);
         assertNotNull(response, "Response is null");
-        System.out.println(Arrays.asList(response));
-        assertEquals(6, response.length, "Length is not correct");
+        assertEquals(7, response.length, "Length is not correct");
     }
-    */
 
     @Test
     void testGetAllWithIncorrectOffset() {
@@ -83,7 +83,7 @@ class GetAllTest {
 
     @Test
     void testGetAllWithNegativeLimit() {
-        String uri = "http://localhost:8080/api/v1/tasks?limit=-1";
+        String uri = "http://localhost:8080/api/v1/tasks?limit=-2";
         RestTemplate restTemplate = new RestTemplate();
         ManagerException exception = new ManagerException(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask[].class)));
         assertEquals("Bad Request", exception.getStatus(), "Status code is not correct");
@@ -92,7 +92,6 @@ class GetAllTest {
     }
 
     // Offset + Limit
-    /*
     @Test
     void testGetAllWithCorrectOffsetAndLimit() {
         String uri = "http://localhost:8080/api/v1/tasks?offset=2&limit=2";
@@ -101,7 +100,6 @@ class GetAllTest {
         assertNotNull(response, "Response is null");
         assertEquals(2, response.length, "Length is not correct");
     }
-    */
 
     // Order
     @Test
@@ -110,7 +108,7 @@ class GetAllTest {
         RestTemplate restTemplate = new RestTemplate();
         ShowTask[] response = restTemplate.getForObject(uri, ShowTask[].class);
         assertNotNull(response, "Response is null");
-        assertEquals(8, response.length, "Length is not correct");
+        assertEquals(7, response.length, "Length is not correct");
     }
 
     @Test
@@ -123,16 +121,14 @@ class GetAllTest {
         assertEquals("/api/v1/tasks", exception.getPath(), "Path is not correct");
     }
 
-    /*
     @Test
     void testGetAllWithOrderAndOffset() {
         String uri = "http://localhost:8080/api/v1/tasks?order=title&offset=2";
         RestTemplate restTemplate = new RestTemplate();
         ShowTask[] response = restTemplate.getForObject(uri, ShowTask[].class);
         assertNotNull(response, "Response is null");
-        assertEquals(6, response.length, "Length is not correct");
+        assertEquals(7, response.length, "Length is not correct");
     }
-     */
 
     @Test
     void testGetAllWithOrderAndLimit() {
@@ -159,7 +155,7 @@ class GetAllTest {
         RestTemplate restTemplate = new RestTemplate();
         ShowTask[] response = restTemplate.getForObject(uri, ShowTask[].class);
         assertNotNull(response, "Response is null");
-        assertEquals(8, response.length, "Length is not correct");
+        assertEquals(7, response.length, "Length is not correct");
     }
 
     @Test
@@ -168,8 +164,6 @@ class GetAllTest {
         RestTemplate restTemplate = new RestTemplate();
         ShowTask[] response = restTemplate.getForObject(uri, ShowTask[].class);
         assertNotNull(response, "Response is null");
-        assertEquals(8, response.length, "Length is not correct");
+        assertEquals(7, response.length, "Length is not correct");
     }
-
-
 }

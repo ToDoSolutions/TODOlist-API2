@@ -14,14 +14,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,6 +33,8 @@ public class UserResource {
     @Autowired
     @Qualifier("userParser")
     private UserParser userParser;
+
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @GetMapping
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
@@ -112,7 +111,10 @@ public class UserResource {
             oldUser.setBio(user.getBio());
         if (user.getLocation() != null)
             oldUser.setLocation(user.getLocation());
-        repositories.userRepository.save(oldUser);
+        Set<ConstraintViolation<User>> errors = validator.validate(oldUser);
+        if (!errors.isEmpty())
+            throw new ConstraintViolationException(errors);
+        oldUser = repositories.userRepository.save(oldUser);
         return new ShowUser(oldUser, repositories.getShowTaskFromUser(oldUser)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 

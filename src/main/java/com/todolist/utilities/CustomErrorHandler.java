@@ -17,10 +17,16 @@ public class CustomErrorHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> handleConstraintViolationException(ConstraintViolationException exception,
                                                                                 ServletWebRequest webRequest) {
-        System.out.println("ConstraintViolationException");
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage(),
-                webRequest.getDescription(false).replace("uri=",""), HttpStatus.BAD_REQUEST.getReasonPhrase());
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        if (!exception.getMessage().contains("ConstraintViolationImpl")) {
+            ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage(),
+                    webRequest.getDescription(false).replace("uri=", ""), HttpStatus.BAD_REQUEST.getReasonPhrase());
+            return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        } else {
+            ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage().split("'")[1],
+                    webRequest.getDescription(false).replace("uri=", ""), HttpStatus.BAD_REQUEST.getReasonPhrase());
+            return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @ExceptionHandler(NullPointerException.class)

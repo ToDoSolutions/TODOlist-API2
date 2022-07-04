@@ -16,13 +16,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -37,6 +34,8 @@ public class GroupResource {
     @Autowired
     @Qualifier("groupParser")
     private GroupParser groupParser;
+
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @GetMapping
     public List<Map<String, Object>> getAllGroups(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
@@ -101,7 +100,10 @@ public class GroupResource {
             oldGroup.setDescription(group.getDescription());
         if (group.getCreatedDate() != null)
             oldGroup.setCreatedDate(group.getCreatedDate());
-        repositories.groupRepository.save(oldGroup);
+        Set<ConstraintViolation<Group>> errors = validator.validate(oldGroup);
+        if (!errors.isEmpty())
+            throw new ConstraintViolationException(errors);
+        oldGroup = repositories.groupRepository.save(oldGroup);
         return new ShowGroup(oldGroup, repositories.getShowUserFromGroup(oldGroup)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 

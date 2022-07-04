@@ -15,14 +15,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,9 +36,11 @@ public class TaskResource {
     @Qualifier("taskParser")
     private TaskParser taskParser;
 
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     @GetMapping
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
-                                                 @RequestParam(defaultValue = "0") @Min(value = 0, message = "The limit must be positive") Integer limit,
+                                                 @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive") Integer limit,
                                                  @RequestParam(defaultValue = "idTask") String order,
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fields,
                                                  @RequestParam(required = false) String title,
@@ -62,8 +61,9 @@ public class TaskResource {
                 tasks = taskParser.parseList(repositories.taskRepository.findAll(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder)));
         Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
         Difficulty auxDifficulty = difficulty != null ? Difficulty.valueOf(difficulty.toUpperCase()) : null;
+        if (limit == -1) limit = tasks.size()-1;
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit == null || limit > tasks.size() ? tasks.size() : start + limit; // Donde va a terminar.
+        int end = limit > tasks.size() ? tasks.size()-1 : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
             ShowTask task = tasks.get(i);
             if (task != null &&
@@ -129,13 +129,15 @@ public class TaskResource {
             oldTask.setPriority(task.getPriority());
         if (task.getDifficulty() != null)
             oldTask.setDifficulty(task.getDifficulty());
-        @Valid Task validated = oldTask;
+        Set<ConstraintViolation<Task>> errors = validator.validate(oldTask);
+        if (!errors.isEmpty())
+            throw new ConstraintViolationException(errors);
         ShowTask showTask = new ShowTask(oldTask);
         if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
             throw new IllegalArgumentException("The startDate is must be before the finishedDate.|/api/v1/tasks");
         else if (showTask.getFinishedDate().isBefore(LocalDate.now()))
             throw new IllegalArgumentException("The finishedDate is must be after the current date.|/api/v1/tasks");
-        oldTask = repositories.taskRepository.save(validated);
+        oldTask = repositories.taskRepository.save(oldTask);
         showTask = new ShowTask(oldTask);
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
