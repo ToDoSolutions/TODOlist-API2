@@ -53,8 +53,11 @@ public class UserResource {
 
         List<ShowUser> result = new ArrayList<>(),
                 users = userParser.parseList(
-                        repositories.userRepository.findAll(PageRequest.of(offset, limit, Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order))).getContent(), repositories);
-        for (ShowUser user : users) {
+                        repositories.userRepository.findAll(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order)), repositories);
+        int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
+        int end = limit == null || limit > users.size() ? users.size() : start + limit; // Donde va a terminar.
+        for (int i = start; i < end; i++) {
+            ShowUser user = users.get(i);
             if (user != null &&
                     (name == null || user.getName().equals(name)) &&
                     (surname == null || user.getSurname().equals(surname)) &&

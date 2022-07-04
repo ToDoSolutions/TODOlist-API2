@@ -50,8 +50,11 @@ public class GroupResource {
                                                   @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The tasks' number is invalid.") String numTasks,
                                                   @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The createdDate is invalid.") String createdDate) {
         List<ShowGroup> result = new ArrayList<>(),
-                groups = groupParser.parseList(repositories.groupRepository.findAll(PageRequest.of(offset, limit, Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order))).getContent(), repositories);
-        for (ShowGroup group : groups) {
+                groups = groupParser.parseList(repositories.groupRepository.findAll(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order)), repositories);
+        int start = offset == null || offset < 1? 0 : offset - 1; // Donde va a comenzar.
+        int end = limit == null || limit > groups.size() ? groups.size() : start + limit; // Donde va a terminar.
+        for (int i = start; i < end; i++) {
+            ShowGroup group = groups.get(i);
             if (group != null &&
                     (name == null || group.getName().equals(name)) &&
                     (description == null || group.getDescription().equals(description)) &&

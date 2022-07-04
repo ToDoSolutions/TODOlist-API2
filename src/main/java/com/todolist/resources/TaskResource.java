@@ -10,6 +10,7 @@ import com.todolist.utilities.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class TaskResource {
 
     @GetMapping
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
-                                                 @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive") Integer limit,
+                                                 @RequestParam(defaultValue = "0") @Min(value = 0, message = "The limit must be positive") Integer limit,
                                                  @RequestParam(defaultValue = "idTask") String order,
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fields,
                                                  @RequestParam(required = false) String title,
@@ -58,19 +59,13 @@ public class TaskResource {
         if (!Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
             throw new IllegalArgumentException("The fields are invalid.|/api/v1/tasks");
         List<ShowTask> result = new ArrayList<>(),
-                tasks = taskParser.parseList(
-                        repositories
-                                .taskRepository
-                                .findAll(
-                                        PageRequest.of(offset, limit,
-                                                Sort.by(order.charAt(0) == '-' ?
-                                                                Sort.Direction.DESC : Sort.Direction.ASC,
-                                                        propertyOrder)))
-                                .getContent());
+                tasks = taskParser.parseList(repositories.taskRepository.findAll(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder)));
         Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
         Difficulty auxDifficulty = difficulty != null ? Difficulty.valueOf(difficulty.toUpperCase()) : null;
-
-        for (ShowTask task : tasks) {
+        int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
+        int end = limit == null || limit > tasks.size() ? tasks.size() : start + limit; // Donde va a terminar.
+        for (int i = start; i < end; i++) {
+            ShowTask task = tasks.get(i);
             if (task != null &&
                     (title == null || task.getTitle().contains(title)) &&
                     (auxStatus == null || task.getStatus() == auxStatus) &&
