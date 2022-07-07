@@ -1,8 +1,8 @@
 package com.todolist.repository;
 
 import com.todolist.entity.*;
-import com.todolist.model.ShowTask;
-import com.todolist.model.ShowUser;
+import com.todolist.dtos.ShowTask;
+import com.todolist.dtos.ShowUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;

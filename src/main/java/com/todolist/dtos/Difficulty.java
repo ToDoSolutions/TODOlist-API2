@@ -1,4 +1,4 @@
-package com.todolist.model;
+package com.todolist.dtos;
 
 import java.util.regex.Pattern;
 

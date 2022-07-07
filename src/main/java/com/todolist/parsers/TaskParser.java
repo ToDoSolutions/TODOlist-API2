@@ -2,7 +2,7 @@ package com.todolist.parsers;
 
 
 import com.todolist.entity.Task;
-import com.todolist.model.ShowTask;
+import com.todolist.dtos.ShowTask;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

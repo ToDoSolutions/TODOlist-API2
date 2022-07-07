@@ -1,8 +1,8 @@
 package com.todolist.parsers;
 
 import com.todolist.entity.User;
-import com.todolist.model.ShowTask;
-import com.todolist.model.ShowUser;
+import com.todolist.dtos.ShowTask;
+import com.todolist.dtos.ShowUser;
 import com.todolist.repository.Repositories;
 import org.springframework.stereotype.Component;
 

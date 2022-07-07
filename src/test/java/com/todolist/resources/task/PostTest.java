@@ -1,9 +1,9 @@
 package com.todolist.resources.task;
 
 import com.todolist.entity.Task;
-import com.todolist.model.Difficulty;
-import com.todolist.model.ShowTask;
-import com.todolist.model.Status;
+import com.todolist.dtos.Difficulty;
+import com.todolist.dtos.ShowTask;
+import com.todolist.dtos.Status;
 import com.todolist.utilities.SQL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

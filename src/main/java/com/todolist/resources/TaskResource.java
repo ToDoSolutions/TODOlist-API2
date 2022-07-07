@@ -1,9 +1,9 @@
 package com.todolist.resources;
 
 import com.todolist.entity.Task;
-import com.todolist.model.Difficulty;
-import com.todolist.model.ShowTask;
-import com.todolist.model.Status;
+import com.todolist.dtos.Difficulty;
+import com.todolist.dtos.ShowTask;
+import com.todolist.dtos.Status;
 import com.todolist.parsers.TaskParser;
 import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;

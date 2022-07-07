@@ -1,6 +1,6 @@
 package com.todolist.resources.user;
 
-import com.todolist.model.ShowUser;
+import com.todolist.dtos.ShowUser;
 import com.todolist.utilities.SQL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
