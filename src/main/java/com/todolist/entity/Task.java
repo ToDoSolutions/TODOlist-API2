@@ -19,12 +19,12 @@ public class Task implements Serializable {
     private Long idTask;
     @Column(name = "title")
     @Size(max = 50, message = "The title is too long.")
-    @NotNull(message = "The title is required.")
+    // @NotNull(message = "The title is required.")
     @NotBlank(message = "The title is required.")
     private String title;
     @Column(name = "description")
     @Size(max = 200, message = "The description is too long.")
-    @NotNull(message = "The description is required.")
+    // @NotNull(message = "The description is required.")
     @NotBlank(message = "The description is required.")
     private String description;
     @Column(name = "annotation")
@@ -35,7 +35,7 @@ public class Task implements Serializable {
     private String status;
     @Column(name = "finished_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")
-    @NotNull(message = "The finishedDate is required.")
+    // @NotNull(message = "The finishedDate is required.")
     private String finishedDate;
     @Column(name = "start_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.")

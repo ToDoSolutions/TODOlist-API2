@@ -11,6 +11,7 @@ public class ShowUser {
     private long idUser;
     private String name;
     private String surname;
+    private String username;
     private String email;
     private String avatar;
     private String bio;
@@ -28,13 +29,15 @@ public class ShowUser {
         this.avatar = user.getAvatar();
         this.bio = user.getBio();
         this.location = user.getLocation();
+        this.username = user.getUsername();
         this.tasks = tasks;
     }
 
-    public ShowUser(long idUser, String name, String surname, String email, String avatar, String bio, String location) {
+    public ShowUser(long idUser, String name, String surname, String username ,String email, String avatar, String bio, String location) {
         this.idUser = idUser;
         this.name = name;
         this.surname = surname;
+        this.username = username;
         this.email = email;
         this.avatar = avatar;
         this.bio = bio;
@@ -64,6 +67,14 @@ public class ShowUser {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {

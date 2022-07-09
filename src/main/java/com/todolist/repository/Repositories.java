@@ -1,5 +1,6 @@
 package com.todolist.repository;
 
+import com.todolist.dtos.ShowGroup;
 import com.todolist.entity.*;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
@@ -9,31 +10,72 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.todolist.entity.Task;
+import org.springframework.data.domain.Sort;
 
 @Component("repositories")
 public class Repositories {
 
     @Autowired
     @Qualifier("groupRepository")
-    public GroupRepository groupRepository;
+    private GroupRepository groupRepository;
 
     @Autowired
     @Qualifier("userRepository")
-    public UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     @Qualifier("taskRepository")
-    public TaskRepository taskRepository;
+    private TaskRepository taskRepository;
 
     @Autowired
     @Qualifier("userTaskRepository")
-    public UserTaskRepository userTaskRepository;
+    private UserTaskRepository userTaskRepository;
 
     @Autowired
     @Qualifier("groupUserRepository")
     private GroupUserRepository groupUserRepository;
 
+    private String path;
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    // Task
+    public List<ShowTask> findAllShowTasks(Sort sort) {
+        return taskRepository.findAll(sort).stream().map(ShowTask::new).collect(Collectors.toList());
+    }
+
+    public Task findTaskById(Long idTask) {
+        return taskRepository.findById(idTask).orElse(null);
+    }
+
+    public Task saveTask(Task task) {
+        return taskRepository.save(task);
+    }
+
+    public void deleteTask(Task task) {
+        taskRepository.deleteById(task);
+    }
+
     // User
+    public List<ShowUser> findAllShowUsers(Sort sort) {
+        return userRepository.findAll(sort).stream().map(user -> new ShowUser(user, getShowTaskFromUser(user))).collect(Collectors.toList());
+    }
+
+    public User findUserById(Long idUser) {
+        return userRepository.findById(idUser).orElse(null);
+    }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public void deleteUser(User user) {
+        userRepository.deleteById(user);
+    }
+
     public List<Task> getTasksFromUser(User user) {
         return userTaskRepository.findByIdUser(user.getIdUser()).stream()
                 .map(userTask -> taskRepository.findById(userTask.getIdTask()).orElse(null))
@@ -48,6 +90,10 @@ public class Repositories {
         return groupUserRepository.findByIdUser(user.getIdUser()).stream()
                 .map(groupUser -> groupRepository.findById(groupUser.getIdGroup()).orElse(null))
                 .collect(Collectors.toList());
+    }
+
+    public List<ShowGroup> getShowGroupsFromUser(User user) {
+        return getGroupsFromUser(user).stream().map(group -> new ShowGroup(group, getShowUserFromGroup(group))).collect(Collectors.toList());
     }
 
     public void addTaskToUser(User user, Task task) {
@@ -66,7 +112,28 @@ public class Repositories {
         userTaskRepository.deleteAll(userTask);
     }
 
+    public void removeUserFromAllGroups(User user) {
+        List<GroupUser> groupUser = groupUserRepository.findByIdUser(user.getIdUser());
+        groupUserRepository.deleteAll(groupUser);
+    }
+
     // Group
+    public List<ShowGroup> findAllShowGroups(Sort sort) {
+        return groupRepository.findAll(sort).stream().map(group -> new ShowGroup(group, getShowUserFromGroup(group))).collect(Collectors.toList());
+    }
+
+    public Group findGroupById(Long idGroup) {
+        return groupRepository.findById(idGroup).orElse(null);
+    }
+
+    public Group saveGroup(Group group) {
+        return groupRepository.save(group);
+    }
+
+    public void deleteGroup(Group group) {
+        groupRepository.delete(group);
+    }
+
     public List<User> getUsersFromGroup(Group group) {
         return groupUserRepository.findByIdGroup(group.getIdGroup()).stream()
                 .map(groupUser -> userRepository.findByIdUser(groupUser.getIdUser()))

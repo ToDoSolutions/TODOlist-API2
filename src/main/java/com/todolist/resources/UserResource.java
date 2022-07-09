@@ -4,7 +4,6 @@ import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
-import com.todolist.parsers.UserParser;
 import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,6 @@ public class UserResource {
     @Autowired
     @Qualifier("repositories")
     private Repositories repositories;
-    @Autowired
-    @Qualifier("userParser")
-    private UserParser userParser;
 
     @GetMapping
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
@@ -48,8 +44,7 @@ public class UserResource {
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The task completed is invalid.") String taskCompleted) {
 
         List<ShowUser> result = new ArrayList<>(),
-                users = userParser.parseList(
-                        repositories.userRepository.findAll(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order)), repositories);
+                users = repositories.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order));
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
         int end = limit == null || limit > users.size() ? users.size() : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
@@ -69,7 +64,7 @@ public class UserResource {
     public Map<String, Object> getUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser,
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
                                        @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
-        User user = repositories.userRepository.findById(idUser).orElse(null);
+        User user = repositories.findUserById(idUser);
         if (user == null)
             throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         if (!Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
@@ -87,13 +82,17 @@ public class UserResource {
             throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have surname.|/api/v1/users/");
         else if (user.getEmail() == null)
             throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have email.|/api/v1/users/");
-        repositories.userRepository.save(user);
+        else if (user.getPassword() == null)
+            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have password.|/api/v1/users/");
+        else if (user.getToken() != null)
+            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must not have token.|/api/v1/users/");
+        repositories.saveUser(user);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
     @PutMapping
     public Map<String, Object> updateUser(@RequestBody @Valid User user) {
-        User oldUser = repositories.userRepository.findByIdUser(user.getIdUser());
+        User oldUser = repositories.findUserById(user.getIdUser());
         if (oldUser == null)
             throw new NullPointerException("The user with idUser " + user.getIdUser() + " does not exist.|/api/v1/users/" + user.getIdUser());
         if (user.getName() != null)
@@ -108,28 +107,32 @@ public class UserResource {
             oldUser.setBio(user.getBio());
         if (user.getLocation() != null)
             oldUser.setLocation(user.getLocation());
+        if (!Objects.equals(user.getPassword(), oldUser.getPassword()))
+            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have password.|/api/v1/users/" + user.getIdUser());
+        if (user.getToken() != null)
+            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must not have token.|/api/v1/users/" + user.getIdUser());
         Set<ConstraintViolation<User>> errors = validator.validate(oldUser);
         if (!errors.isEmpty())
             throw new ConstraintViolationException(errors);
-        oldUser = repositories.userRepository.save(oldUser);
+        oldUser = repositories.saveUser(oldUser);
         return new ShowUser(oldUser, repositories.getShowTaskFromUser(oldUser)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
     @DeleteMapping("/{idUser}")
     public Map<String, Object> deleteUser(@PathVariable("idUser") @Min(value = 0, message = "The idGroup must be positive.") Long idUser) {
-        User user = repositories.userRepository.findByIdUser(idUser);
+        User user = repositories.findUserById(idUser);
         if (user == null)
             throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
-        repositories.userRepository.delete(user);
+        repositories.deleteUser(user);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
     @PostMapping("/{idUser}/tasks/{idTask}")
     public Map<String, Object> addTaskToUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
-        User user = repositories.userRepository.findByIdUser(idUser);
+        User user = repositories.findUserById(idUser);
         if (user == null)
             throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
-        Task task = repositories.taskRepository.findByIdTask(idTask);
+        Task task = repositories.findTaskById(idTask);
         if (task == null)
             throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
         repositories.addTaskToUser(user, task);
@@ -138,10 +141,10 @@ public class UserResource {
 
     @DeleteMapping("/{idUser}/tasks/{idTask}")
     public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
-        User user = repositories.userRepository.findByIdUser(idUser);
+        User user = repositories.findUserById(idUser);
         if (user == null)
             throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
-        Task task = repositories.taskRepository.findByIdTask(idTask);
+        Task task = repositories.findTaskById(idTask);
         if (task == null)
             throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
         repositories.removeTaskFromUser(user, task);
@@ -150,10 +153,20 @@ public class UserResource {
 
     @DeleteMapping("/{idUser}/tasks")
     public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Long idUser) {
-        User user = repositories.userRepository.findByIdUser(idUser);
+        User user = repositories.findUserById(idUser);
         if (user == null)
             throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
         repositories.removeAllTasksFromUser(user);
+        return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+    }
+
+    @PutMapping("/{idUser}/token/{token}")
+    public Map<String, Object> updateToken(@PathVariable("idUser") Long idUser, @PathVariable("token") String token) {
+        User user = repositories.findUserById(idUser);
+        if (user == null)
+            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
+        user.setToken(token);
+        repositories.saveUser(user);
         return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 }

@@ -1,4 +1,4 @@
-package com.todolist.resources;
+package com.todolist.resources.pokemon;
 
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
@@ -25,10 +25,6 @@ public class PokemonResources {
     @Autowired
     @Qualifier("repositories")
     private Repositories repositories;
-
-    @Autowired
-    @Qualifier("taskParser")
-    private TaskParser taskParser;
 
     @GetMapping("/{name}")
     public Map<String, Object> getPokemon(@PathVariable String name,

@@ -16,6 +16,8 @@ public class ShowGroup {
     private String description;
     private LocalDate createdDate;
 
+    private String owner;
+
     private List<ShowUser> users;
 
     public ShowGroup() {
