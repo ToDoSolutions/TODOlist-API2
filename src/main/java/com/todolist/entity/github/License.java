@@ -17,6 +17,8 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class License {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("key")
     private String key;
     @JsonProperty("name")
@@ -27,8 +29,6 @@ public class License {
     private String url;
     @JsonProperty("node_id")
     private String nodeId;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("key")
     public String getKey() {

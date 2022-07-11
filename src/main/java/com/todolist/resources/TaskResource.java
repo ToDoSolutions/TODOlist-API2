@@ -1,9 +1,9 @@
 package com.todolist.resources;
 
-import com.todolist.entity.Task;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
+import com.todolist.entity.Task;
 import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
 import org.springframework.beans.factory.annotation.Autowired;

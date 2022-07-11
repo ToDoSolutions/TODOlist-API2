@@ -95,6 +95,8 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class TaskGitHub {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("node_id")
@@ -259,8 +261,6 @@ public class TaskGitHub {
     private Integer networkCount;
     @JsonProperty("subscribers_count")
     private Integer subscribersCount;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("id")
     public Integer getId() {

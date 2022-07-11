@@ -1,4 +1,4 @@
-package com.todolist.utilities;
+package com.todolist.config.errors;
 
 import java.time.LocalDate;
 

@@ -30,6 +30,8 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class Owner {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("login")
     private String login;
     @JsonProperty("id")
@@ -66,8 +68,6 @@ public class Owner {
     private String type;
     @JsonProperty("site_admin")
     private Boolean siteAdmin;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("login")
     public String getLogin() {

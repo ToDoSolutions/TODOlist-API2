@@ -1,11 +1,11 @@
 package com.todolist.resources;
 
-import com.todolist.entity.Group;
-import com.todolist.entity.Task;
-import com.todolist.entity.User;
 import com.todolist.dtos.ShowGroup;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
+import com.todolist.entity.Group;
+import com.todolist.entity.Task;
+import com.todolist.entity.User;
 import com.todolist.repository.Repositories;
 import com.todolist.utilities.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class GroupResource {
                                                   @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The tasks' number is invalid.") String numTasks,
                                                   @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The createdDate is invalid.") String createdDate) {
         List<ShowGroup> result = new ArrayList<>(),
-                groups =repositories.findAllShowGroups(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order));
+                groups = repositories.findAllShowGroups(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order));
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
         int end = limit == null || limit > groups.size() ? groups.size() : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {

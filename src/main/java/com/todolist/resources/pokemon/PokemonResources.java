@@ -5,7 +5,6 @@ import com.todolist.dtos.ShowTask;
 import com.todolist.entity.Task;
 import com.todolist.entity.pokemon.Pokemon;
 import com.todolist.entity.pokemon.Stat;
-import com.todolist.parsers.TaskParser;
 import com.todolist.repository.Repositories;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,29 +24,6 @@ public class PokemonResources {
     @Autowired
     @Qualifier("repositories")
     private Repositories repositories;
-
-    @GetMapping("/{name}")
-    public Map<String, Object> getPokemon(@PathVariable String name,
-                                          @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
-                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
-                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
-                                          @RequestParam(required = false) @Max(value = 5, message="The priority must be between 0 and 5") Integer priority,
-                                          @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
-                                          @RequestParam(required = false) Integer days
-                              ) {
-        return new ShowTask(parsePokemon(name, status, finishedDate, startDate, priority, days)).getFields(fields);
-    }
-
-    @PostMapping("/{name}")
-    public Map<String, Object> addPokemon(@PathVariable String name,
-                                          @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
-                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
-                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
-                                          @RequestParam(required = false) @Max(value = 5, message="The priority must be between 0 and 5") Integer priority,
-                                          @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
-                                          @RequestParam(required = false) Integer days) {
-        return new ShowTask(repositories.taskRepository.save(parsePokemon(name, status, finishedDate, startDate, priority, days))).getFields(fields);
-    }
 
     public static Task parsePokemon(String name, String status, String finishedDate, String startDate, Integer priority, Integer days) {
         String uri = "https://pokeapi.co/api/v2/pokemon/" + name;
@@ -80,8 +56,6 @@ public class PokemonResources {
         return task;
     }
 
-
-
     private static String getPokemonAnnotation(Pokemon pokemon) {
         if (getAvgStats(pokemon) < 50) {
             return "easy peasy lemon squeezy, take one pokeball";
@@ -111,5 +85,28 @@ public class PokemonResources {
 
     private static Double getAvgStats(Pokemon pokemon) {
         return pokemon.getStats().stream().mapToInt(Stat::getBaseStat).average().orElse(0);
+    }
+
+    @GetMapping("/{name}")
+    public Map<String, Object> getPokemon(@PathVariable String name,
+                                          @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
+                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
+                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
+                                          @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Integer priority,
+                                          @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
+                                          @RequestParam(required = false) Integer days
+    ) {
+        return new ShowTask(parsePokemon(name, status, finishedDate, startDate, priority, days)).getFields(fields);
+    }
+
+    @PostMapping("/{name}")
+    public Map<String, Object> addPokemon(@PathVariable String name,
+                                          @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
+                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
+                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
+                                          @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Integer priority,
+                                          @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
+                                          @RequestParam(required = false) Integer days) {
+        return new ShowTask(repositories.saveTask(parsePokemon(name, status, finishedDate, startDate, priority, days))).getFields(fields);
     }
 }

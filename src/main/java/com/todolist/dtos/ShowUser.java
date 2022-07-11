@@ -33,7 +33,7 @@ public class ShowUser {
         this.tasks = tasks;
     }
 
-    public ShowUser(long idUser, String name, String surname, String username ,String email, String avatar, String bio, String location) {
+    public ShowUser(long idUser, String name, String surname, String username, String email, String avatar, String bio, String location) {
         this.idUser = idUser;
         this.name = name;
         this.surname = surname;

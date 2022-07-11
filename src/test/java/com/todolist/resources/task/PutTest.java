@@ -1,10 +1,9 @@
 package com.todolist.resources.task;
 
-import com.todolist.entity.Task;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
-import com.todolist.utilities.SQL;
+import com.todolist.entity.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -22,8 +21,6 @@ class PutTest {
 
     @BeforeEach
     public void setUp() {
-        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
-        SQL.read("data/create.sql");
         task = new Task();
         task.setTitle("Task 1");
         task.setDescription("Task 1 description");

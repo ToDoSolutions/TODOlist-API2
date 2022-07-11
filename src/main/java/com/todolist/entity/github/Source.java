@@ -90,6 +90,8 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class Source {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("node_id")
@@ -244,8 +246,6 @@ public class Source {
     private Integer watchers;
     @JsonProperty("default_branch")
     private String defaultBranch;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("id")
     public Integer getId() {

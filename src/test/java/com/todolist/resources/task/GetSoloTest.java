@@ -1,9 +1,7 @@
 package com.todolist.resources.task;
 
 import com.todolist.dtos.ShowTask;
-import com.todolist.utilities.ManagerException;
-import com.todolist.utilities.SQL;
-import org.junit.jupiter.api.BeforeEach;
+import com.todolist.config.errors.ManagerException;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -11,13 +9,6 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GetSoloTest {
-
-    @BeforeEach
-    void setUp() {
-        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
-        SQL.read("data/create.sql");
-        SQL.read("data/populate.sql");
-    }
 
     @Test
     void testGetSoloFine() {

@@ -1,8 +1,7 @@
 package com.todolist.resources.group;
 
-import com.todolist.entity.Group;
 import com.todolist.dtos.ShowGroup;
-import com.todolist.utilities.SQL;
+import com.todolist.entity.Group;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -20,8 +19,6 @@ class PutTest {
 
     @BeforeEach
     void setUp() {
-        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
-        SQL.read("data/create.sql");
         group = new Group();
         group.setName("Group 1");
         group.setDescription("Group 1 description");

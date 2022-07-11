@@ -1,17 +1,16 @@
 package com.todolist.repository;
 
 import com.todolist.dtos.ShowGroup;
-import com.todolist.entity.*;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
+import com.todolist.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import com.todolist.entity.Task;
-import org.springframework.data.domain.Sort;
 
 @Component("repositories")
 public class Repositories {

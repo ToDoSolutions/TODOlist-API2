@@ -1,4 +1,4 @@
-package com.todolist.utilities;
+package com.todolist.config.errors;
 
 import com.google.common.base.Splitter;
 import org.springframework.web.client.HttpClientErrorException;

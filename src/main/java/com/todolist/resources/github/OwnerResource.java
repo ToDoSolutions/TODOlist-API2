@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,11 @@ public class OwnerResource {
     @Autowired
     @Qualifier("repositories")
     private Repositories repositories;
+
+    private static String getAdditional(Map<String, Object> additional, String key) {
+        Object aux = additional.get(key);
+        return aux == null ? null : aux.toString();
+    }
 
     @GetMapping("user/{idUser}")
     public Map<String, Object> getOwner(
@@ -78,7 +82,7 @@ public class OwnerResource {
     public Map<String, Object> addTask(@PathVariable long idUser,
                                        @PathVariable String repoName,
                                        @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
-                                       @RequestParam(required = false) @Max(value=5, message = "The priority must be between 0 and 5.") Integer priority,
+                                       @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5.") Integer priority,
                                        @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
                                        @RequestParam(required = false) String annotation,
                                        @RequestParam(required = false) String difficulty) {
@@ -108,14 +112,6 @@ public class OwnerResource {
         task = repositories.saveTask(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
-
-
-    private static String getAdditional(Map<String, Object> additional, String key) {
-        Object aux = additional.get(key);
-        return aux == null ? null : aux.toString();
-    }
-
-
 
 
 }

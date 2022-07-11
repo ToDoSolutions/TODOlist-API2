@@ -20,14 +20,14 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class Repo {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("name")
     @Size(max = 100, message = "The name is too long.")
     private String name;
-
     @JsonProperty("description")
     @Size(max = 255, message = "The description is too long.")
     private String description;
-
     @JsonProperty("auto_init")
     @Pattern(regexp = "^(true|false)$", message = "The auto_init is invalid.")
     private String isAutoInit;
@@ -37,17 +37,12 @@ public class Repo {
     @JsonProperty("gitignore_template")
     @Size(max = 100, message = "The gitignore_template is too long.")
     private String gitignoreTemplate;
-
     @JsonProperty("is_template")
     @Pattern(regexp = "^(true|false)$", message = "The is_template is invalid.")
     private String isTemplate;
-
     @JsonProperty("homepage")
     @Size(max = 255, message = "The homepage is too long.")
     private String homepage;
-
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("name")
     @NotNull()

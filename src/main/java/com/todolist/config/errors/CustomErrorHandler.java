@@ -1,4 +1,4 @@
-package com.todolist.utilities;
+package com.todolist.config.errors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

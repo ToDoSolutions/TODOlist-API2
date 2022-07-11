@@ -1,7 +1,6 @@
 package com.todolist.resources.user;
 
 import com.todolist.dtos.ShowUser;
-import com.todolist.utilities.SQL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
@@ -16,7 +15,7 @@ class DeleteTest {
     @BeforeEach
     void setUp() {
         SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
-        SQL.read("data/populate.sql");
+        SQL.read("data/V2__populate_db.sql");
     }
 
     @Test

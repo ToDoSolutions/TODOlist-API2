@@ -2,8 +2,6 @@ package com.todolist.resources;
 
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
-import com.todolist.utilities.SQL;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
@@ -11,11 +9,6 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class testConsistency {
-
-    @BeforeEach
-    void setUp() {
-        SQL.read("data/populate.sql");
-    }
 
     @Test
     void testDeleteTaskFromUser() {

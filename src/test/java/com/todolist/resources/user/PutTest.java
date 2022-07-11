@@ -1,8 +1,7 @@
 package com.todolist.resources.user;
 
-import com.todolist.entity.User;
 import com.todolist.dtos.ShowUser;
-import com.todolist.utilities.SQL;
+import com.todolist.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -20,7 +19,7 @@ class PutTest {
     @BeforeEach
     void setUp() {
         SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
-        SQL.read("data/create.sql");
+        SQL.read("data/V1__create_db.sql");
         user = new User();
         user.setName("User 1");
         user.setSurname("User 1 surname");
