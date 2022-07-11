@@ -1,5 +1,7 @@
 package com.todolist.resources.user;
 
+import com.radcortez.flyway.test.annotation.DataSource;
+import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.config.errors.ManagerException;
@@ -11,14 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 class GetSoloTest {
-
-    @BeforeEach
-    void setUp() {
-        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
-        SQL.read("data/V1__create_db.sql");
-        SQL.read("data/V2__populate_db.sql");
-    }
 
     @Test
     void testGetSoloFine() {

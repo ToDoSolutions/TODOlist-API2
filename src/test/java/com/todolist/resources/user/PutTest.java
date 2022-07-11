@@ -1,5 +1,7 @@
 package com.todolist.resources.user;
 
+import com.radcortez.flyway.test.annotation.DataSource;
+import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 class PutTest {
 
     User user;
@@ -18,8 +21,6 @@ class PutTest {
 
     @BeforeEach
     void setUp() {
-        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
-        SQL.read("data/V1__create_db.sql");
         user = new User();
         user.setName("User 1");
         user.setSurname("User 1 surname");

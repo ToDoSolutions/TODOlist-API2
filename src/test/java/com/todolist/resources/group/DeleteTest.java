@@ -1,5 +1,7 @@
 package com.todolist.resources.group;
 
+import com.radcortez.flyway.test.annotation.DataSource;
+import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.dtos.ShowGroup;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
@@ -9,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 class DeleteTest {
 
     @Test

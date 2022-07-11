@@ -1,16 +1,13 @@
 package com.todolist.resources.user;
 
+import com.radcortez.flyway.test.annotation.DataSource;
+import com.radcortez.flyway.test.annotation.FlywayTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
+@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 class GetAllTest {
-
-    @BeforeEach
-    void setUp() {
-        SQL.start("jdbc:mariadb://localhost:3306/todolist-api2", "root", "mazetosan$root");
-        SQL.read("data/V2__populate_db.sql");
-    }
 
     @Test
     void testGetAllFine() {

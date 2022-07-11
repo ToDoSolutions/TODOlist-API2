@@ -1,5 +1,7 @@
 package com.todolist.resources;
 
+import com.radcortez.flyway.test.annotation.DataSource;
+import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import org.junit.jupiter.api.Test;
@@ -8,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 class testConsistency {
 
     @Test

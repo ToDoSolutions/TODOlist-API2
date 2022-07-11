@@ -1,26 +1,16 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Versión del servidor:         10.6.7-MariaDB - mariadb.org binary distribution
--- SO del servidor:              Win64
--- HeidiSQL Versión:             11.3.0.6295
--- --------------------------------------------------------
 SET FOREIGN_KEY_CHECKS=0;
 
--- Volcando datos para la tabla todolist.group: 3 rows
 -- En la nube
 -- USE `b8iyr7xai8wk75ismpbt`;
 
 -- En local
 USE `todolist-api2`;
-DELETE FROM `group`;
+
 INSERT INTO `group` (`created_date`, `description`, `name`)
 VALUES ('2006-10-12', 'Solo quieren ver el mundo arder', 'Pepe'),
        ('2022-05-06', 'Dicen que su factura del agua es negativa', 'Otakus'),
        ('2000-03-09', 'Se dice que son seres que existen desde el inicio de los multiversos', 'AISS enjoyers');
--- ALTER TABLE `group` ENABLE KEYS;
 
--- Volcando datos para la tabla todolist-api2.group_user: 6 rows
-DELETE FROM `group_user`;
 INSERT INTO `group_user` (`id_group`, `id_user`)
 VALUES (1, 1),
        (1, 2),
@@ -28,10 +18,7 @@ VALUES (1, 1),
        (2, 4),
        (3, 5),
        (3, 6);
--- ALTER TABLE `group_user` ENABLE KEYS;
 
--- Volcando datos para la tabla todolist-api2.task: 8 rows
-DELETE FROM `task`;
 INSERT INTO `task` (`annotation`, `description`, `difficulty`, `finished_date`, `priority`, `start_date`,
                     `status`, `title`)
 VALUES ('Vacaciones', 'Quiero vacaciones', 'HARDCORE', '2020-01-31', 5, '2020-01-01', 'DRAFT', 'Vacaciones'),
@@ -48,10 +35,7 @@ VALUES ('Vacaciones', 'Quiero vacaciones', 'HARDCORE', '2020-01-31', 5, '2020-01
         '2020-04-22', 'CANCELLED', '¿Aprender Inglés? Na'),
        ('Cuesta 0.2€, devuelveme el cambio.', 'Para comprar el pan, ir al polvillo.', 'EASY', '2020-03-04', 5,
         '2020-03-03', 'IN_PROGRESS', 'Comprar el pan.');
--- ALTER TABLE `task` ENABLE KEYS;
 
--- Volcando datos para la tabla todolist-api2.user: 6 rows
-DELETE FROM `user`;
 INSERT INTO `user` (`avatar`, `bio`, `email`, `location`, `name`, `surname`)
 VALUES ('https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', 'Ser celestial, nacido para ayudar',
         'miscosama@gmail.com', 'mi casa', 'Misco', 'Jones'),
@@ -67,10 +51,7 @@ VALUES ('https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', 'Ser
         'El ao shin que nunca salió', 'elForjadorDeLasEstrellas@riot.com', 'En el espacio picha', 'Aurelion', 'Sol'),
        ('https://pbs.twimg.com/media/FNgG3rCXEAEng6B.jpg', 'Fui sifu de Willy Wonka, el sabe todo gracias a mí',
         'kingafrica@us.es', 'ESPAÑA', 'Paquito', 'El Chocolatero');
-ALTER TABLE `user` ENABLE KEYS;
 
--- Volcando datos para la tabla todolist-api2.user_task: 7 rows
-DELETE FROM `user_task`;
 INSERT INTO `user_task` (`id_user`, `id_task`)
 VALUES (1, 1),
        (2, 2),
@@ -80,4 +61,4 @@ VALUES (1, 1),
        (6, 6),
        (6, 7);
 
-SET FOREIGN_KEY_CHECKS=1; -- to disable them
+SET FOREIGN_KEY_CHECKS=1;
