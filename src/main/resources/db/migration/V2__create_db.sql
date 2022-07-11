@@ -6,10 +6,9 @@ SET FOREIGN_KEY_CHECKS=0;
 -- En local
 USE `todolist-api2`;
 
-
 CREATE TABLE IF NOT EXISTS `group` (
     `id_group` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `created_date` varchar(255) DEFAULT STR_TO_DATE(CURRENT_DATE, 'yyyy-mm-dd'),
+    `created_date` varchar(255) NOT NULL,
     `description` varchar(500) DEFAULT NULL,
     `name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -29,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `task`(
     `difficulty` varchar(255) DEFAULT NULL,
     `finished_date` varchar(255) NOT NULL,
     `priority` int(11) DEFAULT NULL,
-    `start_date` varchar(255) DEFAULT STR_TO_DATE(CURRENT_DATE, 'yyyy-mm-dd'),
+    `start_date` varchar(255) NOT NULL,
     `status` varchar(255) DEFAULT 'DRAFT',
     `title` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
