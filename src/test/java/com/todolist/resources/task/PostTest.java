@@ -8,6 +8,7 @@ import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SpringBootTest
 @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 class PostTest {
 
@@ -38,6 +40,7 @@ class PostTest {
 
     // Correct
     @Test
+    @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
     void testPostFine() {
         String uri1 = "http://localhost:8080/api/v1/tasks";
         RestTemplate restTemplate = new RestTemplate();

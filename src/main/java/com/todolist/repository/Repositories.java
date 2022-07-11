@@ -55,7 +55,7 @@ public class Repositories {
     }
 
     public void deleteTask(Task task) {
-        taskRepository.deleteById(task);
+        taskRepository.delete(task);
     }
 
     // User
