@@ -2,7 +2,7 @@
 <font size="8" face="italiana">TODOlist-API2</font>
 </div>
 <div align="center">
-<img src="src/main/resources/static/images/logo.png" alt="TODOlist-API2" width="200" height="200" align="center">
+<img src="src/main/resources/static/images/icon.png" alt="TODOlist-API2" width="200" height="200" align="center">
 </div>
 
 # Index
