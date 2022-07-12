@@ -1,4 +1,4 @@
-SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- En la nube
 -- USE `b8iyr7xai8wk75ismpbt`;
@@ -61,4 +61,4 @@ VALUES (1, 1),
        (6, 6),
        (6, 7);
 
-SET FOREIGN_KEY_CHECKS=1;
+SET FOREIGN_KEY_CHECKS = 1;

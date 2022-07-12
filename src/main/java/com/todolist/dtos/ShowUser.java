@@ -1,11 +1,20 @@
 package com.todolist.dtos;
 
 import com.todolist.entity.User;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Getter
+@Setter
+@ToString
 public class ShowUser {
     public static final String ALL_ATTRIBUTES = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks";
     private long idUser;
@@ -18,8 +27,6 @@ public class ShowUser {
     private String location;
     private List<ShowTask> tasks;
 
-    public ShowUser() {
-    }
 
     public ShowUser(User user, List<ShowTask> tasks) {
         this.idUser = user.getIdUser();
@@ -31,86 +38,6 @@ public class ShowUser {
         this.location = user.getLocation();
         this.username = user.getUsername();
         this.tasks = tasks;
-    }
-
-    public ShowUser(long idUser, String name, String surname, String username, String email, String avatar, String bio, String location) {
-        this.idUser = idUser;
-        this.name = name;
-        this.surname = surname;
-        this.username = username;
-        this.email = email;
-        this.avatar = avatar;
-        this.bio = bio;
-        this.location = location;
-        this.tasks = new ArrayList<>();
-    }
-
-    public long getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(long idUser) {
-        this.idUser = idUser;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public List<ShowTask> getTasks() {
-        return tasks;
     }
 
     public Long getTaskCompleted() {
@@ -141,19 +68,5 @@ public class ShowUser {
                 map.put("tasks", getTasks().stream().map(task -> task.getFields(fieldsTask)).collect(Collectors.toList()));
         }
         return map;
-    }
-
-    @Override
-    public String toString() {
-        return "ShowUser{" +
-                "idUser=" + idUser +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", email='" + email + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", bio='" + bio + '\'' +
-                ", location='" + location + '\'' +
-                ", tasks=" + tasks +
-                '}';
     }
 }

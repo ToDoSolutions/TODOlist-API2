@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.io.Serializable;
 import java.util.List;
 
-@Repository("taskRepository")
+@Repository
 public interface TaskRepository extends JpaRepository<Task, Serializable>, PagingAndSortingRepository<Task, Serializable> {
 
     List<Task> findAll();

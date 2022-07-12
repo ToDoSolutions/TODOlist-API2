@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.io.Serializable;
 import java.util.List;
 
-@Repository("groupRepository")
+@Repository
 public interface GroupRepository extends JpaRepository<Group, Serializable>, PagingAndSortingRepository<Group, Serializable> {
     List<Group> findAll();
 

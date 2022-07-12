@@ -6,9 +6,9 @@ import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.entity.github.Owner;
 import com.todolist.entity.github.TaskGitHub;
-import com.todolist.repository.Repositories;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.todolist.services.TaskService;
+import com.todolist.services.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -21,11 +21,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/github")
+@AllArgsConstructor
 public class OwnerController {
 
-    @Autowired
-    @Qualifier("repositories")
-    private Repositories repositories;
+    private TaskService taskService;
+
+    private UserService userService;
 
     private static String getAdditional(Map<String, Object> additional, String key) {
         Object aux = additional.get(key);
@@ -37,7 +38,7 @@ public class OwnerController {
             @PathVariable long idUser,
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
             @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
-        User oldUser = repositories.findUserById(idUser);
+        User oldUser = userService.findUserById(idUser);
         if (oldUser == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -51,7 +52,6 @@ public class OwnerController {
         } else {
             owner = restTemplate.getForObject(uri, Owner.class);
         }
-        User user = new User();
         Map<String, Object> additional = owner.getAdditionalProperties();
         Object auxName = additional.get("name");
         List<String> fullName;
@@ -62,20 +62,8 @@ public class OwnerController {
             name = fullName.get(0);
             surname = fullName.size() == 1 ? null : fullName.stream().skip(1).reduce("", (ac, nx) -> ac + " " + nx);
         }
-        String email = getAdditional(additional, "email");
-        String bio = getAdditional(additional, "bio");
-        String location = getAdditional(additional, "location");
-        String avatar = getAdditional(additional, "avatar_url");
-        String username = getAdditional(additional, "login");
-        user.setAvatar(avatar);
-        user.setBio(bio);
-        user.setEmail(email);
-        user.setIdUser(idUser);
-        user.setLocation(location);
-        user.setName(name);
-        user.setSurname(surname);
-        user.setUsername(username);
-        return new ShowUser(user, repositories.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
+        User user = User.of(name, surname, getAdditional(additional, "login"), getAdditional(additional, "avatar_url"), getAdditional(additional, "email"), getAdditional(additional, "bio"), getAdditional(additional, "location"), "pwd", "token");
+        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
     }
 
     @PostMapping("user/{idUser}/task/{repoName}")
@@ -86,7 +74,7 @@ public class OwnerController {
                                        @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
                                        @RequestParam(required = false) String annotation,
                                        @RequestParam(required = false) String difficulty) {
-        User user = repositories.findUserById(idUser);
+        User user = userService.findUserById(idUser);
         if (user == null)
             throw new IllegalArgumentException("User not found");
         String uri = "https://api.github.com/users/" + user.getUsername() + "/repos/" + repoName;
@@ -99,17 +87,8 @@ public class OwnerController {
         } else {
             repo = restTemplate.getForObject(uri, TaskGitHub.class);
         }
-        Task task = new Task();
-        task.setTitle(repo.getName());
-        task.setDescription(repo.getDescription());
-        task.setStatus(status);
-        task.setFinishedDate(finishedDate);
-        task.setStartDate(repo.getCreatedAt().split("T")[0]);
-        task.setPriority(priority);
-        task.setAnnotation(annotation);
-        task.setDifficulty(difficulty);
-        task.setIdTask(-1);
-        task = repositories.saveTask(task);
+        Task task = Task.of(repo.getName(), repo.getDescription(), annotation, status, finishedDate, repo.getCreatedAt().split("T")[0], priority, difficulty);
+        task = taskService.saveTask(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
 

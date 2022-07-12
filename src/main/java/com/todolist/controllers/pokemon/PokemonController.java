@@ -5,9 +5,8 @@ import com.todolist.dtos.ShowTask;
 import com.todolist.entity.Task;
 import com.todolist.entity.pokemon.Pokemon;
 import com.todolist.entity.pokemon.Stat;
-import com.todolist.repository.Repositories;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.todolist.services.TaskService;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,11 +18,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/tasks/pokemon")
+@AllArgsConstructor
 public class PokemonController {
 
-    @Autowired
-    @Qualifier("repositories")
-    private Repositories repositories;
+    private TaskService taskService;
 
     public static Task parsePokemon(String name, String status, String finishedDate, String startDate, Integer priority, Integer days) {
         String uri = "https://pokeapi.co/api/v2/pokemon/" + name;
@@ -39,20 +37,14 @@ public class PokemonController {
             if (i != response.getTypes().size() - 1)
                 types.append(" - ");
         }
-        Task task = new Task();
-        task.setTitle("Catch: " + response.getName());
-        task.setDescription("Type pokemon: " + types);
-        task.setStatus(status);
-        task.setFinishedDate(finishedDate == null ?
-                startDate == null ?
-                        LocalDate.now().plusDays(days).toString() :
-                        LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE).plusDays(days).toString() :
-                finishedDate);
-        task.setStartDate(startDate == null ? LocalDate.now().toString() : startDate);
-        task.setPriority(priority);
-        task.setAnnotation(getPokemonAnnotation(response));
-        task.setDifficulty(getPokemonDifficulty(response).toString());
-        task.setIdTask(-1);
+        Task task = Task.of("Catch: " + response.getName(), "Type pokemon: " + types, getPokemonAnnotation(response), status,
+                finishedDate == null ?
+                        startDate == null ?
+                                LocalDate.now().plusDays(days).toString() :
+                                LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE).plusDays(days).toString() :
+                        finishedDate,
+                startDate == null ? LocalDate.now().toString() : startDate, priority,
+                getPokemonDifficulty(response).toString());
         return task;
     }
 
@@ -107,6 +99,6 @@ public class PokemonController {
                                           @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Integer priority,
                                           @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
                                           @RequestParam(required = false) Integer days) {
-        return new ShowTask(repositories.saveTask(parsePokemon(name, status, finishedDate, startDate, priority, days))).getFields(fields);
+        return new ShowTask(taskService.saveTask(parsePokemon(name, status, finishedDate, startDate, priority, days))).getFields(fields);
     }
 }

@@ -1,9 +1,14 @@
 package com.todolist.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Table(name = "user_task")
 @Entity
+@Getter
+@Setter
 public class UserTask {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,34 +26,6 @@ public class UserTask {
     public UserTask(long idTask, long idUser) {
         this.idUserTask = 0L;
         this.idTask = idTask;
-        this.idUser = idUser;
-    }
-
-    public UserTask(User user, Task task) {
-        new UserTask(task.getIdTask(), user.getIdUser());
-    }
-
-    public long getIdUserTask() {
-        return idUserTask;
-    }
-
-    public void setIdUserTask(long idUserTask) {
-        this.idUserTask = idUserTask;
-    }
-
-    public long getIdTask() {
-        return idTask;
-    }
-
-    public void setIdTask(long idTask) {
-        this.idTask = idTask;
-    }
-
-    public long getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(long idUser) {
         this.idUser = idUser;
     }
 }

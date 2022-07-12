@@ -1,42 +1,48 @@
 package com.todolist.entity;
 
-import com.todolist.repository.UserRepository;
-import com.todolist.repository.UserTaskRepository;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Table(name = "task")
 @Entity
+@Getter
+@Setter
 public class Task implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_task")
     private Long idTask;
+
     @Column(name = "title")
     @Size(max = 50, message = "The title is too long.")
     // @NotNull(message = "The title is required.")
     @NotBlank(message = "The title is required.")
     private String title;
+
     @Column(name = "description")
     @Size(max = 200, message = "The description is too long.")
     // @NotNull(message = "The description is required.")
     @NotBlank(message = "The description is required.")
     private String description;
+
     @Column(name = "annotation")
     @Size(max = 50, message = "The annotation is too long.")
     private String annotation;
+
     @Column(name = "status")
     @Pattern(regexp = "[Dd][Rr][Aa][Ff][Tt]|[Ii][Nn][_ ][Pp][Rr][Oo][Gg][Rr][Ee][Ss][Ss]|[Dd][Oo][Nn][Ee]|[Ii][Nn][_ ][Rr][Ee][Vv][Ii][Ss][Ii][Oo][Nn]|[Cc][Aa][Nn][Cc][Ee][Ll][Ll][Ee][Dd]", message = "The status is invalid.")
     private String status;
+
     @Column(name = "finished_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")
     // @NotNull(message = "The finishedDate is required.")
     private String finishedDate;
+
     @Column(name = "start_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.")
     private String startDate;
@@ -54,81 +60,16 @@ public class Task implements Serializable {
         this.idTask = 0L;
     }
 
-    public long getIdTask() {
-        return this.idTask;
-    }
-
-    public void setIdTask(long idTask) {
-        this.idTask = idTask;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getAnnotation() {
-        return annotation;
-    }
-
-    public void setAnnotation(String annotation) {
-        this.annotation = annotation;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getFinishedDate() {
-        return finishedDate;
-    }
-
-    public void setFinishedDate(String finishedDate) {
-        this.finishedDate = finishedDate;
-    }
-
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
-    public String getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(String difficulty) {
-        this.difficulty = difficulty;
-    }
-
-    public List<User> getUsers(UserTaskRepository userTaskRepository, UserRepository userRepository) {
-        return userTaskRepository.findByIdTask(this.idTask).stream()
-                .map(userTask -> userRepository.findById(userTask.getIdUser()).orElse(null))
-                .collect(Collectors.toList());
+    public static Task of(String title, String description, String annotation, String status, String finishedDate, String startDate, Integer priority, String difficulty) {
+        Task task = new Task();
+        task.setTitle(title);
+        task.setDescription(description);
+        task.setAnnotation(annotation);
+        task.setStatus(status);
+        task.setFinishedDate(finishedDate);
+        task.setStartDate(startDate);
+        task.setPriority(priority);
+        task.setDifficulty(difficulty);
+        return task;
     }
 }

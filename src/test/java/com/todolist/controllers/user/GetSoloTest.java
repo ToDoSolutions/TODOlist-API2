@@ -2,9 +2,9 @@ package com.todolist.controllers.user;
 
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
+import com.todolist.config.errors.ManagerException;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
-import com.todolist.config.errors.ManagerException;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 class GetSoloTest {
 
     @Test

@@ -1,5 +1,8 @@
 package com.todolist.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -9,6 +12,8 @@ import java.io.Serializable;
 
 @Table(name = "user")
 @Entity
+@Getter
+@Setter
 public class User implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,83 +70,17 @@ public class User implements Serializable {
         this.idUser = 0L;
     }
 
-    public long getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(long idUser) {
-        this.idUser = idUser;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public static User of(String name, String surname, String username, String email, String avatar, String bio, String location, String password, String token) {
+        User user = new User();
+        user.setName(name);
+        user.setSurname(surname);
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setAvatar(avatar);
+        user.setBio(bio);
+        user.setLocation(location);
+        user.setPassword(password);
+        user.setToken(token);
+        return user;
     }
 }

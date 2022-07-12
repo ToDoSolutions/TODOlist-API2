@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.io.Serializable;
 import java.util.List;
 
-@Repository("userRepository")
+
+@Repository
 public interface UserRepository extends JpaRepository<User, Serializable>, PagingAndSortingRepository<User, Serializable> {
 
     List<User> findAll();

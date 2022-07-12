@@ -1,6 +1,9 @@
 package com.todolist.entity;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,6 +12,8 @@ import javax.validation.constraints.Size;
 
 @Table(name = "group")
 @Entity
+@Getter
+@Setter
 public class Group {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,35 +39,11 @@ public class Group {
         this.idGroup = 0L;
     }
 
-    public long getIdGroup() {
-        return idGroup;
-    }
-
-    public void setIdGroup(long idGroup) {
-        this.idGroup = idGroup;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(String createdDate) {
-        this.createdDate = createdDate;
+    public static Group of(String name, String description, String createdDate) {
+        Group group = new Group();
+        group.setName(name);
+        group.setDescription(description);
+        group.setCreatedDate(createdDate);
+        return group;
     }
 }

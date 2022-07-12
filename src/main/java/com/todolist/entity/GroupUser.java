@@ -1,9 +1,14 @@
 package com.todolist.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Table(name = "group_user")
 @Entity
+@Getter
+@Setter
 public class GroupUser {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,39 +21,6 @@ public class GroupUser {
     private long idUser;
 
     public GroupUser() {
-    }
 
-    public GroupUser(long idGroup, long idUser) {
-        this.idGroupUser = 0L;
-        this.idGroup = idGroup;
-        this.idUser = idUser;
-    }
-
-    public GroupUser(Group group, User user) {
-        new GroupUser(group.getIdGroup(), user.getIdUser());
-    }
-
-    public long getIdGroupUser() {
-        return idGroupUser;
-    }
-
-    public void setIdGroupUser(long idGroupUser) {
-        this.idGroupUser = idGroupUser;
-    }
-
-    public long getIdGroup() {
-        return idGroup;
-    }
-
-    public void setIdGroup(long idGroup) {
-        this.idGroup = idGroup;
-    }
-
-    public long getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(long idUser) {
-        this.idUser = idUser;
     }
 }

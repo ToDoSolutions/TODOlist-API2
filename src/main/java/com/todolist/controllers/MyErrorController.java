@@ -20,9 +20,9 @@ public class MyErrorController implements ErrorController {
                 return "error-403";
             else if (statusCode == HttpStatus.REQUEST_TIMEOUT.value())
                 return "error-408";
-            else if(statusCode == HttpStatus.NOT_FOUND.value())
+            else if (statusCode == HttpStatus.NOT_FOUND.value())
                 return "error-404";
-            else if(statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value())
+            else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value())
                 return "error-500";
         }
         return "error-404";

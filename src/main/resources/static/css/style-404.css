@@ -46,7 +46,7 @@ div.text a {
 
 div.text a:hover {
     color: red;
-    text-decoration: underline; 
+    text-decoration: underline;
 }
 
 @media only screen and (max-width: 768px) {
@@ -54,18 +54,22 @@ div.text a:hover {
         flex-direction: column;
         justify-content: space-around;
     }
+
     section.notFound div.img img {
         width: 70vw;
         height: auto;
     }
+
     section.notFound h1 {
         font-size: 50px;
     }
+
     section.notFound h2 {
         font-size: 25px;
     }
+
     div.text a:active {
-    color: red;
-    text-decoration: underline; 
-  }
+        color: red;
+        text-decoration: underline;
+    }
 }

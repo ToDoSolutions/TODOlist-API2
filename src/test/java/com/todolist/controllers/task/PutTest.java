@@ -16,12 +16,13 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url ="jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 class PutTest {
 
     Task task;
     ShowTask showTask;
     String uri = "http://localhost:8080/api/v1/tasks";
+
     @BeforeEach
     public void setUp() {
         task = new Task();
