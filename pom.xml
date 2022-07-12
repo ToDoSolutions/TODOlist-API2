@@ -53,19 +53,17 @@
             <artifactId>guava</artifactId>
             <version>31.1-jre</version>
         </dependency>
-
         <!-- En la nube -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-
-        <!-- En local -->
+        <!-- En local
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
         </dependency>
-
+        -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
