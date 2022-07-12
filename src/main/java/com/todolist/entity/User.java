@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
-public class User implements Serializable {
+public class User extends Group implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

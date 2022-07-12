@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
-public class Task implements Serializable {
+public class Task extends User implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

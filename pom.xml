@@ -54,6 +54,11 @@
             <version>31.1-jre</version>
         </dependency>
 
+        <!-- En la nube -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
 
         <!-- En local -->
         <dependency>
