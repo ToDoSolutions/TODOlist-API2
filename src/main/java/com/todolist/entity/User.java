@@ -19,7 +19,7 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_user")
-    private long idUser;
+    private Long idUser;
 
     @Column(name = "name")
     @Size(max = 50, message = "The name is too long.")

@@ -35,7 +35,7 @@ class PostTest {
         task.setStartDate("2015-01-01");
         task.setDifficulty("EASY");
         task.setPriority(1);
-        task.setIdTask(0);
+        task.setIdTask(0L);
     }
 
     // Correct

@@ -14,11 +14,11 @@ public class GroupUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_group_user")
-    private long idGroupUser;
+    private Long idGroupUser;
     @Column(name = "id_group")
-    private long idGroup;
+    private Long idGroup;
     @Column(name = "id_user")
-    private long idUser;
+    private Long idUser;
 
     public GroupUser() {
 

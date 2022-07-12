@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 public class ShowGroup {
 
     public static final String ALL_ATTRIBUTES = "idGroup,name,description,createdDate,users,numTasks";
-    private long idGroup;
+    private Long idGroup;
     private String name;
     private String description;
     private LocalDate createdDate;

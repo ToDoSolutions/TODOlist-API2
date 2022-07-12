@@ -22,7 +22,7 @@ public class PostTest {
         group = new Group();
         group.setName("Group 1");
         group.setDescription("Group 1 description");
-        group.setIdGroup(0);
+        group.setIdGroup(0L);
     }
 
     // Correct

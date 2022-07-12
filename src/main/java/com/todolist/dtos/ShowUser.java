@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 @ToString
 public class ShowUser {
     public static final String ALL_ATTRIBUTES = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks";
-    private long idUser;
+    private Long idUser;
     private String name;
     private String surname;
     private String username;

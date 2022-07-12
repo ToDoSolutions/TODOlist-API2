@@ -34,7 +34,7 @@ class PutTest {
         task.setStartDate("2015-01-01");
         task.setDifficulty("EASY");
         task.setPriority(1);
-        task.setIdTask(1);
+        task.setIdTask(1L);
         RestTemplate restTemplate = new RestTemplate();
         showTask = restTemplate.postForObject(uri, task, ShowTask.class);
     }

@@ -19,7 +19,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_group")
-    private long idGroup;
+    private Long idGroup;
 
     @Column(name = "name")
     @Size(max = 50, message = "The name is too long.")
