@@ -18,11 +18,14 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
-@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+// @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
 class PostTest {
 
     Task task;
+    // String uri = "http://localhost:8080/api/v1";
+    String uri = "https://todolist-api2.herokuapp.com/api/v1";
+    RestTemplate restTemplate;
 
     @BeforeEach
     void setUp() {
@@ -36,18 +39,15 @@ class PostTest {
         task.setDifficulty("EASY");
         task.setPriority(1);
         task.setIdTask(0L);
+        restTemplate = new RestTemplate();
     }
 
     // Correct
     @Test
-    @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
     void testPostFine() {
-        String uri1 = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.postForObject(uri1, task, ShowTask.class);
+        ShowTask response = restTemplate.postForObject(uri + "/tasks", task, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
-        String uri2 = "http://localhost:8080/api/v1/tasks/1";
-        response = restTemplate.getForObject(uri2, ShowTask.class);
+        response = restTemplate.getForObject(uri + "/tasks/1", ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
@@ -55,28 +55,22 @@ class PostTest {
     @Test
     void testPostWithNullOrEmptyTitle() {
         task.setTitle(null);
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
         task.setTitle("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     @Test
     void testPostWithTitleGreaterThan50() {
         task.setTitle(new String(new char[51]).replace("\0", "a"));
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     // Description
     @Test
     void testPostWithNullOrEmptyDescription() {
         task.setDescription(null);
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
         task.setDescription("");
         assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
     }
@@ -84,35 +78,27 @@ class PostTest {
     @Test
     void testPostWithDescriptionGreaterThan200() {
         task.setDescription(new String(new char[201]).replace("\0", "a"));
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     // Annotation
     @Test
     void testPostWithAnnotationGreaterThan50() {
         task.setAnnotation(new String(new char[51]).replace("\0", "a"));
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     // Status
     @Test
     void testPostWithWrongStatus() {
         task.setStatus("WRONG");
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     @Test
     void testPostWithLowerStatus() {
         task.setStatus("in progress");
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.postForObject(uri, task, ShowTask.class);
+        ShowTask response = restTemplate.postForObject(uri + "/tasks", task, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
         assertEquals(Status.IN_PROGRESS, response.getStatus(), "Status is not correct");
     }
@@ -121,27 +107,21 @@ class PostTest {
     @Test
     void testPostWithStartDateIsAfterFinishedDate() {
         task.setStartDate("3001-01-30");
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     // StartDate
     @Test
     void testPostWithWrongPatternInStartDate() {
         task.setStartDate("2015/01/30");
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
 
     @Test
     void testPostWithNullStartDate() {
         task.setStartDate(null);
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.postForObject(uri, task, ShowTask.class);
+        ShowTask response = restTemplate.postForObject(uri + "/tasks", task, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
         assertEquals(LocalDate.now(), response.getStartDate(), "StartDate is not correct");
     }
@@ -150,77 +130,59 @@ class PostTest {
     @Test
     void testPostWithWrongPatternInFinishedDate() {
         task.setFinishedDate("2015/01/30");
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri +"/tasks", task, ShowTask.class));
     }
 
     @Test
     void testPostWithNullFinishedDate() {
         task.setFinishedDate(null);
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     @Test
     void testPostWithFinishedDateIsBeforeCurrentDate() {
         task.setFinishedDate(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     // Priority
     @Test
     void testPostWithPriorityEqualToZero() {
         task.setPriority(0);
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.postForObject(uri, task, ShowTask.class);
+        ShowTask response = restTemplate.postForObject(uri + "/tasks", task, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
     @Test
     void testPostWithPriorityEqualToFive() {
         task.setPriority(5);
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.postForObject(uri, task, ShowTask.class);
+        ShowTask response = restTemplate.postForObject(uri + "/tasks", task, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
     @Test
     void testPostWithPriorityLowerThanZero() {
         task.setPriority(-1);
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     @Test
     void testPostWithPriorityGreaterThanFive() {
         task.setPriority(6);
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     // Dificulty
     @Test
     void testPostWithWrongDifficulty() {
         task.setDifficulty("WRONG");
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     @Test
     void testPostWithLowerDifficulty() {
         task.setDifficulty("i want to die");
-        String uri = "http://localhost:8080/api/v1/tasks";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.postForObject(uri, task, ShowTask.class);
+        ShowTask response = restTemplate.postForObject(uri + "/tasks", task, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
         assertEquals(Difficulty.I_WANT_TO_DIE, response.getDifficulty(), "Difficulty is not correct");
     }

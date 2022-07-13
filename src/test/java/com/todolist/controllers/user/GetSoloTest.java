@@ -5,6 +5,7 @@ import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.config.errors.ManagerException;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -12,31 +13,35 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+// @FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
 class GetSoloTest {
+
+    // String uri = "http://localhost:8080/api/v1";
+    String uri = "https://todolist-api2.herokuapp.com/api/v1";
+    RestTemplate restTemplate;
+
+    @BeforeEach
+    void setUp() {
+        restTemplate = new RestTemplate();
+    }
 
     @Test
     void testGetSoloFine() {
-        String uri = "http://localhost:8080/api/v1/users/1";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowUser response = restTemplate.getForObject(uri, ShowUser.class);
+        ShowUser response = restTemplate.getForObject(uri + "/users/1", ShowUser.class);
         assertEquals(1, response.getIdUser(), "IdUser is not correct");
     }
 
     @Test
     void testGetSoloFields() {
-        String uri = "http://localhost:8080/api/v1/users/1?fieldsUser=idUser,name,surname";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowUser response = restTemplate.getForObject(uri, ShowUser.class);
+        ShowUser response = restTemplate.getForObject(uri + "/users/1?fieldsUser=idUser,name,surname", ShowUser.class);
         assertEquals(1, response.getIdUser(), "IdUser is not correct");
         assertEquals(null, response.getTasks(), "Tasks is not correct");
     }
 
     @Test
     void testGetSoloFieldsWithWrongField() {
-        String uri = "http://localhost:8080/api/v1/users/1?fieldsUser=idUser,wrongField";
-        RestTemplate restTemplate = new RestTemplate();
-        ManagerException exception = new ManagerException(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask.class)));
+        ManagerException exception = new ManagerException(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/users/1?fieldsUser=idUser,wrongField", ShowTask.class)));
         assertEquals("Bad Request", exception.getStatus(), "Status is not correct");
         assertEquals("The users' fields are invalid.", exception.getMsg(), "Message is not correct");
         assertEquals("/api/v1/users/1", exception.getPath(), "Code is not correct");
@@ -45,9 +50,7 @@ class GetSoloTest {
 
     @Test
     void testGetSoloUpperFields() {
-        String uri = "http://localhost:8080/api/v1/users/1?fieldsUser=IDUSER,NAME,SURNAME";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowUser response = restTemplate.getForObject(uri, ShowUser.class);
+        ShowUser response = restTemplate.getForObject(uri + "/users/1?fieldsUser=IDUSER,NAME,SURNAME", ShowUser.class);
         assertEquals(1, response.getIdUser(), "IdUser is not correct");
         assertEquals(null, response.getTasks(), "Tasks is not correct");
     }
@@ -55,9 +58,7 @@ class GetSoloTest {
 
     @Test
     void testGetSoloNotFound() {
-        String uri = "http://localhost:8080/api/v1/users/99";
-        RestTemplate restTemplate = new RestTemplate();
-        ManagerException exception = new ManagerException(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowUser.class)));
+        ManagerException exception = new ManagerException(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/users/99", ShowUser.class)));
         assertEquals("Not Found", exception.getStatus(), "Status code is not correct");
         assertEquals("The user with idUser 99 does not exist.", exception.getMsg(), "Message is not correct");
     }

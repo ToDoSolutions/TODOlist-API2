@@ -1,10 +1,10 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- En la nube
-USE `b8iyr7xai8wk75ismpbt`;
+-- USE `b8iyr7xai8wk75ismpbt`;
 
 -- En local
--- USE `todolist-api2`;
+USE `todolist-api2`;
 
 INSERT INTO `group` (`created_date`, `description`, `name`)
 VALUES ('2006-10-12', 'Solo quieren ver el mundo arder', 'Pepe'),

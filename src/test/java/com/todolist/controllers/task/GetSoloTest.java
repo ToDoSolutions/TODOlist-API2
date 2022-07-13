@@ -10,22 +10,23 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+// @FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
 class GetSoloTest {
+
+    // String uri = "http://localhost:8080/api/v1";
+    String uri = "https://todolist-api2.herokuapp.com/api/v1";
+    RestTemplate restTemplate;
 
     @Test
     void testGetSoloFine() {
-        String uri = "http://localhost:8080/api/v1/tasks/1";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.getForObject(uri, ShowTask.class);
+        ShowTask response = restTemplate.getForObject(uri + "/tasks/1", ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
     @Test
     void testGetSoloFields() {
-        String uri = "http://localhost:8080/api/v1/tasks/1?fields=title,description,annotation,idTask";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.getForObject(uri, ShowTask.class);
+        ShowTask response = restTemplate.getForObject(uri + "/tasks/1?fields=title,description,annotation,idTask", ShowTask.class);
         assertEquals("Vacaciones", response.getTitle(), "Title is not correct");
         assertEquals("Quiero vacaciones", response.getDescription(), "Description is not correct");
         assertEquals("Vacaciones", response.getAnnotation(), "Annotation is not correct");
@@ -39,9 +40,7 @@ class GetSoloTest {
 
     @Test
     void testGetSoloFieldsWithWrongField() {
-        String uri = "http://localhost:8080/api/v1/tasks/1?fields=idTask,title,description,annotation,wrongField";
-        RestTemplate restTemplate = new RestTemplate();
-        ManagerException exception = new ManagerException(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask.class)));
+        ManagerException exception = new ManagerException(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks/1?fields=idTask,title,description,annotation,wrongField", ShowTask.class)));
         assertEquals("Bad Request", exception.getStatus(), "Status code is not correct");
         assertEquals("The fields are invalid.", exception.getMsg(), "Response body is not correct");
         assertEquals("/api/v1/tasks/1", exception.getPath(), "Path is not correct");
@@ -49,9 +48,7 @@ class GetSoloTest {
 
     @Test
     void testGetSoloUpperFields() {
-        String uri = "http://localhost:8080/api/v1/tasks/1?fields=IDTASK,TITLE,DESCRIPTION,ANNOTATION";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowTask response = restTemplate.getForObject(uri, ShowTask.class);
+        ShowTask response = restTemplate.getForObject(uri + "/tasks/1?fields=IDTASK,TITLE,DESCRIPTION,ANNOTATION", ShowTask.class);
         assertEquals("Vacaciones", response.getTitle(), "Title is not correct");
         assertEquals("Quiero vacaciones", response.getDescription(), "Description is not correct");
         assertEquals("Vacaciones", response.getAnnotation(), "Annotation is not correct");
@@ -65,9 +62,7 @@ class GetSoloTest {
 
     @Test
     void testGetSoloNotFound() {
-        String uri = "http://localhost:8080/api/v1/tasks/99";
-        RestTemplate restTemplate = new RestTemplate();
-        Throwable exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri, ShowTask.class));
+        Throwable exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks/99", ShowTask.class));
         assertEquals("404", exception.getMessage().split(":")[0].trim(), "Status code is not correct");
     }
 }

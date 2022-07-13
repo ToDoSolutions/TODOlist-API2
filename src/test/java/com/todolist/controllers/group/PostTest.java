@@ -12,10 +12,14 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+// @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
 public class PostTest {
 
     Group group;
+    // String uri = "http://localhost:8080/api/v1";
+    String uri = "https://todolist-api2.herokuapp.com/api/v1";
+    RestTemplate restTemplate;
 
     @BeforeEach
     void setUp() {
@@ -23,17 +27,15 @@ public class PostTest {
         group.setName("Group 1");
         group.setDescription("Group 1 description");
         group.setIdGroup(0L);
+        restTemplate = new RestTemplate();
     }
 
     // Correct
     @Test
     void testPostFine() {
-        String uri1 = "http://localhost:8080/api/v1/groups";
-        RestTemplate restTemplate = new RestTemplate();
-        ShowGroup response = restTemplate.postForObject(uri1, group, ShowGroup.class);
+        ShowGroup response = restTemplate.postForObject(uri + "/groups", group, ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
-        String uri2 = "http://localhost:8080/api/v1/groups/1";
-        response = restTemplate.getForObject(uri2, ShowGroup.class);
+        response = restTemplate.getForObject(uri + "/groups/1", ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
     }
 
@@ -41,46 +43,36 @@ public class PostTest {
     @Test
     void testPostWithNullOrEmptyName() {
         group.setName(null);
-        String uri = "http://localhost:8080/api/v1/groups";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
         group.setName("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
     }
 
     @Test
     void testPostWithNameGreaterThan50() {
         group.setName(new String(new char[51]).replace("\0", "a"));
-        String uri = "http://localhost:8080/api/v1/groups";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
     }
 
     // Description
     @Test
     void testPostWithNullOrEmptyDescription() {
         group.setDescription(null);
-        String uri = "http://localhost:8080/api/v1/groups";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
         group.setDescription("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
     }
 
     @Test
     void testPostWithDescriptionGreaterThan500() {
         group.setDescription(new String(new char[501]).replace("\0", "a"));
-        String uri = "http://localhost:8080/api/v1/groups";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri  + "/groups", group, ShowGroup.class));
     }
 
     // CreatedDate
     @Test
     void testPostWithInvalidCreatedDate() {
         group.setCreatedDate("ayer");
-        String uri = "http://localhost:8080/api/v1/groups";
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
     }
 }

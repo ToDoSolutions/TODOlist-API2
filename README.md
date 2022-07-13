@@ -1,8 +1,8 @@
 <div align="center">
-<font size="8" face="italiana">TODOlist-API2</font>
+<h1>TODOlist-API2</h1>
 </div>
 <div align="center">
-<img src="src/main/resources/static/images/logo.png" alt="TODOlist-API2" width="200" height="200" align="center">
+<img src="src/main/resources/static/images/logo.gif" alt="TODOlist-API2" width="200" height="200" align="center">
 </div>
 
 # Index
