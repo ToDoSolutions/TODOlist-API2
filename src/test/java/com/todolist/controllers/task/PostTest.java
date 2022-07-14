@@ -8,7 +8,6 @@ import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -130,7 +129,7 @@ class PostTest {
     @Test
     void testPostWithWrongPatternInFinishedDate() {
         task.setFinishedDate("2015/01/30");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri +"/tasks", task, ShowTask.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
     }
 
     @Test

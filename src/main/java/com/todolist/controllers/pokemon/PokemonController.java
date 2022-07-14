@@ -1,5 +1,6 @@
 package com.todolist.controllers.pokemon;
 
+import com.google.common.base.Preconditions;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.entity.Task;
@@ -28,10 +29,8 @@ public class PokemonController {
         RestTemplate restTemplate = new RestTemplate();
         Pokemon response = restTemplate.getForObject(uri, Pokemon.class);
         StringBuilder types = new StringBuilder();
-        if (finishedDate != null && days != null)
-            throw new IllegalArgumentException("You can't set both finishedDate and days");
-        else if (finishedDate == null && days == null)
-            throw new IllegalArgumentException("You must set either finishedDate or days");
+        Preconditions.checkArgument(!(finishedDate != null && days != null), "You can't set both finishedDate and days");
+        Preconditions.checkArgument(!(finishedDate == null && days == null), "You must set either finishedDate or days");
         for (int i = 0; i < response.getTypes().size(); i++) {
             types.append(response.getTypes().get(i).getType().getName());
             if (i != response.getTypes().size() - 1)

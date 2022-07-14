@@ -35,7 +35,7 @@ public class Task implements Serializable {
     private String annotation;
 
     @Column(name = "status")
-    @Pattern(regexp = "[Dd][Rr][Aa][Ff][Tt]|[Ii][Nn][_ ][Pp][Rr][Oo][Gg][Rr][Ee][Ss][Ss]|[Dd][Oo][Nn][Ee]|[Ii][Nn][_ ][Rr][Ee][Vv][Ii][Ss][Ii][Oo][Nn]|[Cc][Aa][Nn][Cc][Ee][Ll][Ll][Ee][Dd]", message = "The status is invalid.")
+    // @Pattern(regexp = "[Dd][Rr][Aa][Ff][Tt]|[Ii][Nn][_ ][Pp][Rr][Oo][Gg][Rr][Ee][Ss][Ss]|[Dd][Oo][Nn][Ee]|[Ii][Nn][_ ][Rr][Ee][Vv][Ii][Ss][Ii][Oo][Nn]|[Cc][Aa][Nn][Cc][Ee][Ll][Ll][Ee][Dd]", message = "The status is invalid.")
     private String status;
 
     @Column(name = "finished_date")
@@ -53,7 +53,7 @@ public class Task implements Serializable {
     private Integer priority;
 
     @Column(name = "difficulty")
-    @Pattern(regexp = "[Ss][Ll][Ee][Ee][Pp]|[Ee][Aa][Ss][Yy]|[Mm][Ee][Dd][Ii][Uu][Mm]|[Hh][Aa][Rr][Dd]|[Hh][Aa][Rr][Dd][Cc][Oo][Rr][Ee]|[Ii][_ ][Ww][Aa][Nn][Tt][_ ][Tt][Oo][_ ][Dd][Ii][Ee]", message = "The difficulty is invalid.")
+    // @Pattern(regexp = "[Ss][Ll][Ee][Ee][Pp]|[Ee][Aa][Ss][Yy]|[Mm][Ee][Dd][Ii][Uu][Mm]|[Hh][Aa][Rr][Dd]|[Hh][Aa][Rr][Dd][Cc][Oo][Rr][Ee]|[Ii][_ ][Ww][Aa][Nn][Tt][_ ][Tt][Oo][_ ][Dd][Ii][Ee]", message = "The difficulty is invalid.")
     private String difficulty;
 
     public Task() {

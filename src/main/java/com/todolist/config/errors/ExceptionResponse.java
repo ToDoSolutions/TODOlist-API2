@@ -1,7 +1,10 @@
 package com.todolist.config.errors;
 
+import lombok.Getter;
+
 import java.time.LocalDate;
 
+@Getter
 public class ExceptionResponse {
     private final LocalDate timestamp;
     private final String msg;
@@ -14,22 +17,6 @@ public class ExceptionResponse {
         this.msg = message != null ? (message.contains(":") ? message.split(":")[1] : message) : message;
         this.path = path;
         this.status = status;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public LocalDate getTimestamp() {
-        return timestamp;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public String getPath() {
-        return path;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.todolist.controllers.github;
 
+import com.google.common.base.Preconditions;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Task;
@@ -39,9 +40,7 @@ public class OwnerController {
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
             @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
         User oldUser = userService.findUserById(idUser);
-        if (oldUser == null) {
-            throw new IllegalArgumentException("User not found");
-        }
+        Preconditions.checkNotNull(oldUser, "User not found");
         String uri = "https://api.github.com/users/" + oldUser.getUsername();
         RestTemplate restTemplate = new RestTemplate();
         Owner owner;
@@ -75,8 +74,7 @@ public class OwnerController {
                                        @RequestParam(required = false) String annotation,
                                        @RequestParam(required = false) String difficulty) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new IllegalArgumentException("User not found");
+        Preconditions.checkNotNull(user, "User not found");
         String uri = "https://api.github.com/users/" + user.getUsername() + "/repos/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
         TaskGitHub repo;
@@ -91,6 +89,4 @@ public class OwnerController {
         task = taskService.saveTask(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
-
-
 }

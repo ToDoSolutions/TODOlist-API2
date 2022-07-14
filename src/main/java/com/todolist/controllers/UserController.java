@@ -1,5 +1,6 @@
 package com.todolist.controllers;
 
+import com.google.common.base.Preconditions;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Task;
@@ -17,7 +18,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -45,11 +45,14 @@ public class UserController {
                                                  @RequestParam(required = false) String bio,
                                                  @RequestParam(required = false) String location,
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The task completed is invalid.") String taskCompleted) {
-
+        String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
+        Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
+        Preconditions.checkArgument(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
         List<ShowUser> result = new ArrayList<>(),
-                users = userService.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1, order.length() - 1) : order));
+                users = userService.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
+        if (limit == -1) limit = users.size() - 1;
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit == null || limit > users.size() ? users.size() : start + limit; // Donde va a terminar.
+        int end = limit > users.size() ? users.size() : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
             ShowUser user = users.get(i);
             if (user != null &&
@@ -57,10 +60,12 @@ public class UserController {
                     (surname == null || user.getSurname().equals(surname)) &&
                     (email == null || user.getEmail().equals(email)) &&
                     (location == null || user.getLocation().equals(location)) &&
-                    (taskCompleted == null || Filter.isGEL(user.getTaskCompleted(), taskCompleted)))
+                    (taskCompleted == null || Filter.isGEL(user.getTaskCompleted(), taskCompleted)) &&
+                    (bio == null || user.getBio().contains(bio)) &&
+                    (avatar == null || user.getAvatar().equals(avatar)))
                 result.add(user);
         }
-        return result.stream().map(user -> user.getFields(fieldsUser, fieldsTask)).collect(Collectors.toList());
+        return result.stream().map(user -> user.getFields(fieldsUser, fieldsTask)).toList();
     }
 
     @GetMapping("/{idUser}")
@@ -68,36 +73,29 @@ public class UserController {
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
                                        @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
-        if (!Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The users' fields are invalid.|/api/v1/users/" + idUser);
-        if (!Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The tasks' fields are invalid.|/api/v1/users/" + idUser);
+        Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
+        Preconditions.checkArgument(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The users' fields are invalid.");
+        Preconditions.checkArgument(Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The tasks' fields are invalid.");
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
     }
 
     @PostMapping
     public Map<String, Object> addUser(@RequestBody @Valid User user) {
-        if (user.getName() == null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have name.|/api/v1/users/");
-        else if (user.getSurname() == null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have surname.|/api/v1/users/");
-        else if (user.getEmail() == null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have email.|/api/v1/users/");
-        else if (user.getPassword() == null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have password.|/api/v1/users/");
-        else if (user.getToken() != null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must not have token.|/api/v1/users/");
-        userService.saveUser(user);
+        Preconditions.checkNotNull(user, "The user is null.");
+        Preconditions.checkNotNull(user.getUsername(), "The username is required.");
+        Preconditions.checkNotNull(user.getName(), "The name is required.");
+        Preconditions.checkNotNull(user.getSurname(), "The surname is required.");
+        Preconditions.checkNotNull(user.getEmail(), "The email is required.");
+        Preconditions.checkNotNull(user.getPassword(), "The password is required.");
+        Preconditions.checkNotNull(user.getAvatar(), "The avatar is required.");
+        user = userService.saveUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
     @PutMapping
     public Map<String, Object> updateUser(@RequestBody @Valid User user) {
         User oldUser = userService.findUserById(user.getIdUser());
-        if (oldUser == null)
-            throw new NullPointerException("The user with idUser " + user.getIdUser() + " does not exist.|/api/v1/users/" + user.getIdUser());
+        Preconditions.checkNotNull(oldUser, "The user with idUser " + user.getIdUser() + " does not exist.");
         if (user.getName() != null)
             oldUser.setName(user.getName());
         if (user.getSurname() != null)
@@ -110,10 +108,8 @@ public class UserController {
             oldUser.setBio(user.getBio());
         if (user.getLocation() != null)
             oldUser.setLocation(user.getLocation());
-        if (!Objects.equals(user.getPassword(), oldUser.getPassword()))
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must have password.|/api/v1/users/" + user.getIdUser());
-        if (user.getToken() != null)
-            throw new IllegalArgumentException("The user with idUser " + user.getIdUser() + " must not have token.|/api/v1/users/" + user.getIdUser());
+        Preconditions.checkArgument(Objects.equals(user.getPassword(), oldUser.getPassword()), "The password is required.");
+        Preconditions.checkArgument(user.getToken() != null, "The token can't be updated with an UPDATE.");
         Set<ConstraintViolation<User>> errors = validator.validate(oldUser);
         if (!errors.isEmpty())
             throw new ConstraintViolationException(errors);
@@ -124,8 +120,7 @@ public class UserController {
     @DeleteMapping("/{idUser}")
     public Map<String, Object> deleteUser(@PathVariable("idUser") @Min(value = 0, message = "The idGroup must be positive.") Long idUser) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
+        Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
         userService.deleteUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -133,11 +128,9 @@ public class UserController {
     @PostMapping("/{idUser}/tasks/{idTask}")
     public Map<String, Object> addTaskToUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
+        Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
+        Preconditions.checkNotNull(task, "The task with idTask " + idTask + " does not exist.");
         userService.addTaskToUser(user, task);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -145,11 +138,9 @@ public class UserController {
     @DeleteMapping("/{idUser}/tasks/{idTask}")
     public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
+        Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
+        Preconditions.checkNotNull(task, "The task with idTask " + idTask + " does not exist.");
         userService.removeTaskFromUser(user, task);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -157,8 +148,7 @@ public class UserController {
     @DeleteMapping("/{idUser}/tasks")
     public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Long idUser) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
+        Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
         userService.removeAllTasksFromUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -166,10 +156,9 @@ public class UserController {
     @PutMapping("/{idUser}/token/{token}")
     public Map<String, Object> updateToken(@PathVariable("idUser") Long idUser, @PathVariable("token") String token) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NullPointerException("The user with idUser " + idUser + " does not exist.|/api/v1/users/" + idUser);
+        Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
         user.setToken(token);
-        userService.saveUser(user);
+        user = userService.saveUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 }

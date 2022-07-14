@@ -47,7 +47,10 @@ CREATE TABLE IF NOT EXISTS `user`
     `email`    varchar(255) NOT NULL,
     `location` varchar(50)  DEFAULT NULL,
     `name`     varchar(50)  NOT NULL,
-    `surname`  varchar(50)  NOT NULL
+    `surname`  varchar(50)  NOT NULL,
+    `username` varchar(50)  NOT NULL,
+    `password` varchar(255) NOT NULL,
+    'token'    varchar(255) DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 

@@ -1,12 +1,14 @@
 package com.todolist.config.errors;
 
 import com.google.common.base.Splitter;
+import lombok.Getter;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class ManagerException {
 
     private LocalDate timestamp;
@@ -26,7 +28,6 @@ public class ManagerException {
             this.path = info.get("path");
             this.status = info.get("status");
         } catch (Exception e) {
-            System.out.println(exception.getResponseBodyAsString());
             info = new HashMap<>(Splitter.on(",")
                     .withKeyValueSeparator(":")
                     .split(
@@ -41,23 +42,5 @@ public class ManagerException {
             this.path = info.get("path");
             this.status = info.get("error");
         }
-
-
-    }
-
-    public LocalDate getTimestamp() {
-        return timestamp;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public String getStatus() {
-        return status;
     }
 }

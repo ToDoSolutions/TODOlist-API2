@@ -25,6 +25,6 @@ public enum Difficulty {
         else if (Pattern.compile("i[_ ]want[_ ]to[_ ]die").matcher(difficultyLowerCase).matches())
             return I_WANT_TO_DIE;
         else
-            return null;
+            throw new IllegalArgumentException("Invalid difficulty: " + difficulty);
     }
 }

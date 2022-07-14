@@ -1,5 +1,6 @@
 package com.todolist.controllers.github;
 
+import com.google.common.base.Preconditions;
 import com.todolist.dtos.ShowTask;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
@@ -30,8 +31,7 @@ public class RepoController {
             @PathVariable long idUser,
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new IllegalArgumentException("User not found");
+        Preconditions.checkNotNull(user, "User not found.");
         String uri = "https://api.github.com/users/" + user.getUsername() + "/repos";
         RestTemplate restTemplate = new RestTemplate();
         TaskGitHub[] repos;
@@ -52,8 +52,7 @@ public class RepoController {
             @PathVariable String repoName,
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new IllegalArgumentException("User not found");
+        Preconditions.checkNotNull(user, "User not found.");
         String uri = "https://api.github.com/users/" + user.getUsername() + "/repos/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
         TaskGitHub repo;
@@ -74,17 +73,13 @@ public class RepoController {
             @PathVariable long idUser,
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new IllegalArgumentException("User not found");
+        Preconditions.checkNotNull(user, "User not found.");
         String uri = "https://api.github.com/user/repos";
         RestTemplate restTemplate = new RestTemplate();
-        if (user.getToken() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + user.getToken());
-            restTemplate.postForObject(uri, createRepo, TaskGitHub.class, headers);
-        } else {
-            throw new IllegalArgumentException("The user has not a token.");
-        }
+        Preconditions.checkArgument(user.getToken() != null, "User must have a token.");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + user.getToken());
+        restTemplate.postForObject(uri, createRepo, TaskGitHub.class, headers);
         return createRepo;
     }
 
@@ -95,17 +90,13 @@ public class RepoController {
             @PathVariable String repoName,
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new IllegalArgumentException("User not found");
+        Preconditions.checkNotNull(user, "User not found.");
         String uri = "https://api.github.com/repos" + user.getUsername() + "/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
-        if (user.getToken() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + user.getToken());
-            restTemplate.put(uri, updateRepo, TaskGitHub.class, headers);
-        } else {
-            throw new IllegalArgumentException("The user has not a token.");
-        }
+        Preconditions.checkArgument(user.getToken() != null, "User must have a token.");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + user.getToken());
+        restTemplate.put(uri, updateRepo, TaskGitHub.class, headers);
         return updateRepo;
     }
 
@@ -114,16 +105,12 @@ public class RepoController {
             @PathVariable long idUser,
             @PathVariable String repoName) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new IllegalArgumentException("User not found");
+        Preconditions.checkNotNull(user, "User not found.");
         String uri = "https://api.github.com/repos" + user.getUsername() + "/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
-        if (user.getToken() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + user.getToken());
-            restTemplate.delete(uri, headers);
-        } else {
-            throw new IllegalArgumentException("The user has not a token.");
-        }
+        Preconditions.checkArgument(user.getToken() != null, "User must have a token.");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + user.getToken());
+        restTemplate.delete(uri, headers);
     }
 }

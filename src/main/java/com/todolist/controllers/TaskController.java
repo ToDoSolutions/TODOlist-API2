@@ -1,5 +1,6 @@
 package com.todolist.controllers;
 
+import com.google.common.base.Preconditions;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
@@ -34,18 +35,16 @@ public class TaskController {
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fields,
                                                  @RequestParam(required = false) String title,
                                                  @RequestParam(required = false) String description,
-                                                 @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
+                                                 @RequestParam(required = false) /*@Pattern(regexp = "[Dd][Rr][Aa][Ff][Tt]|[Ii][Nn][_ ][Pp][Rr][Oo][Gg][Rr][Ee][Ss][Ss]|[Dd][Oo][Nn][Ee]|[Ii][Nn][_ ][Rr][Ee][Vv][Ii][Ss][Ii][Oo][Nn]|[Cc][Aa][Nn][Cc][Ee][Ll][Ll][Ee][Dd]", message = "The status is invalid.")*/ String status,
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
                                                  @RequestParam(required = false) String annotation,
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The priority is invalid.") String priority,
-                                                 @RequestParam(required = false) String difficulty,
+                                                 @RequestParam(required = false) /*@Pattern(regexp = "[Ss][Ll][Ee][Ee][Pp]|[Ee][Aa][Ss][Yy]|[Mm][Ee][Dd][Ii][Uu][Mm]|[Hh][Aa][Rr][Dd]|[Hh][Aa][Rr][Dd][Cc][Oo][Rr][Ee]|[Ii][_ ][Ww][Aa][Nn][Tt][_ ][Tt][Oo][_ ][Dd][Ii][Ee]", message = "The difficulty is invalid.")*/ String difficulty,
                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The priority is invalid.") String duration) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        if (Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
-            throw new IllegalArgumentException("The order is invalid.|/api/v1/tasks");
-        if (!Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The fields are invalid.|/api/v1/tasks");
+        Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
+        Preconditions.checkArgument(Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
         List<ShowTask> result = new ArrayList<>(), tasks = taskService.findAllShowTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         Status auxStatus = status != null ? Status.valueOf(status.toUpperCase()) : null;
         Difficulty auxDifficulty = difficulty != null ? Difficulty.valueOf(difficulty.toUpperCase()) : null;
@@ -74,29 +73,21 @@ public class TaskController {
     public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
-        if (!Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
-            throw new IllegalArgumentException("The fields are invalid.|/api/v1/tasks/" + idTask);
-
+        Preconditions.checkNotNull(task, "The task with idTask " + idTask + " does not exist.");
+        Preconditions.checkArgument(Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
         return new ShowTask(task).getFields(fields);
     }
 
     @PostMapping
     public Map<String, Object> addTask(@RequestBody @Valid Task task) {
-        if (task.getTitle() == null)
-            throw new IllegalArgumentException("The task with idTask " + task.getIdTask() + " must have title.|/api/v1/tasks/");
-        if (task.getDescription() == null)
-            throw new IllegalArgumentException("The task with idTask " + task.getIdTask() + " must have description.|/api/v1/tasks/");
-        if (task.getFinishedDate() == null)
-            throw new IllegalArgumentException("The task with idTask " + task.getIdTask() + " must have finishedDate.|/api/v1/tasks/");
+        Preconditions.checkNotNull(task, "The task is null.|/api/v1/tasks");
+        Preconditions.checkNotNull(task.getTitle(), "The task with idTask " + task.getIdTask() + " must have title.");
+        Preconditions.checkNotNull(task.getDescription(), "The task with idTask " + task.getIdTask() + " must have description.");
+        Preconditions.checkNotNull(task.getFinishedDate(), "The task with idTask " + task.getIdTask() + " must have finishedDate.");
         task = taskService.saveTask(task);
         ShowTask showTask = new ShowTask(task);
-        if (!showTask.getStartDate().isBefore(showTask.getFinishedDate())) {
-            throw new IllegalArgumentException("The startDate is must be before the finishedDate.|/api/v1/tasks");
-        } else if (showTask.getFinishedDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("The finishedDate is must be after the current date.|/api/v1/tasks");
-        }
+        Preconditions.checkArgument(showTask.getStartDate().isBefore(showTask.getFinishedDate()), "The startDate is must be before the finishedDate.");
+        Preconditions.checkArgument(!showTask.getFinishedDate().isBefore(LocalDate.now()), "The finishedDate is must be after the current date.");
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
 
@@ -104,7 +95,7 @@ public class TaskController {
     public Map<String, Object> updateTask(@RequestBody Task task) {
         Task oldTask = taskService.findTaskById(task.getIdTask());
         if (oldTask == null)
-            throw new NullPointerException("The task with idTask " + task.getIdTask() + " does not exist.|/api/v1/tasks/" + task.getIdTask());
+            throw new NullPointerException("The task with idTask " + task.getIdTask() + " does not exist." + task.getIdTask());
         if (task.getTitle() != null)
             oldTask.setTitle(task.getTitle());
         if (task.getDescription() != null)
@@ -125,10 +116,8 @@ public class TaskController {
         if (!errors.isEmpty())
             throw new ConstraintViolationException(errors);
         ShowTask showTask = new ShowTask(oldTask);
-        if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
-            throw new IllegalArgumentException("The startDate is must be before the finishedDate.|/api/v1/tasks");
-        else if (showTask.getFinishedDate().isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("The finishedDate is must be after the current date.|/api/v1/tasks");
+        Preconditions.checkArgument(showTask.getStartDate().isBefore(showTask.getFinishedDate()), "The startDate is must be before the finishedDate.");
+        Preconditions.checkArgument(!showTask.getFinishedDate().isBefore(LocalDate.now()), "The finishedDate is must be after the current date.");
         oldTask = taskService.saveTask(oldTask);
         showTask = new ShowTask(oldTask);
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
@@ -138,8 +127,7 @@ public class TaskController {
     @DeleteMapping("/{idTask}")
     public Map<String, Object> deleteTask(@PathVariable("idTask") Long idTask) {
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NullPointerException("The task with idTask " + idTask + " does not exist.|/api/v1/tasks/" + idTask);
+        Preconditions.checkNotNull(task, "The task with idTask " + idTask + " does not exist.");
         taskService.deleteTask(task);
         return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }

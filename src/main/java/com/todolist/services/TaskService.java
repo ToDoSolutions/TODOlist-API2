@@ -2,7 +2,7 @@ package com.todolist.services;
 
 import com.todolist.dtos.ShowTask;
 import com.todolist.entity.Task;
-import com.todolist.repository.TaskRepository;
+import com.todolist.repositories.TaskRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;

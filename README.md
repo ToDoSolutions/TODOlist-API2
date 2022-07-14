@@ -16,7 +16,7 @@ Using the interactive documentation you will be able to check out URIs, response
 
 # Resources
 Here is an overview of the resources Harmony offers in the form
-of their response bodies and a short description of the relationship between them. 
+of their response bodies and a short description of the relationship between them.
 A basic schema of the organization is the next:
 <div align="center">
 <img src="src/main/resources/static/images/package.png" alt="package" align="center">
@@ -27,16 +27,16 @@ The Task resource is used to create, retrieve, update, and delete tasks. If we'r
 
 ```json
 {
-    "annotation": "Some details that must be taken into account.",
-    "description": "Explain the purpose of this task",
-    "difficulty": "It could be SLEEP, EASY, MEDIUM, HARD, HARDCORE and I_WANT_TO_DIE",
-    "duration": "Calculated using the start date and the end date-",
-    "finishedDate": "The date that the task must be finished.",
-    "idTask": "The id of the task",
-    "priority": "It must be a number between 0 and 5 (0 not important, 5 very important).",
-    "startDate": "The date that the task was started.",
-    "status": "It could be DRAFT, IN_PROGRESS, IN_REVISION, DONE and CANCELLED",
-    "title": "The title of the task"
+  "annotation": "Some details that must be taken into account.",
+  "description": "Explain the purpose of this task",
+  "difficulty": "It could be SLEEP, EASY, MEDIUM, HARD, HARDCORE and I_WANT_TO_DIE",
+  "duration": "Calculated using the start date and the end date-",
+  "finishedDate": "The date that the task must be finished.",
+  "idTask": "The id of the task",
+  "priority": "It must be a number between 0 and 5 (0 not important, 5 very important).",
+  "startDate": "The date that the task was started.",
+  "status": "It could be DRAFT, IN_PROGRESS, IN_REVISION, DONE and CANCELLED",
+  "title": "The title of the task"
 }
 ```
 
@@ -72,5 +72,3 @@ The Group resource is used to create, retrieve, update, and delete groups. They 
   "users": [ "The users that belong to the group." ]
 }
 ```
-
-

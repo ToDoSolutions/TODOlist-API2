@@ -66,7 +66,7 @@ public class PostTest {
     @Test
     void testPostWithDescriptionGreaterThan500() {
         group.setDescription(new String(new char[501]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri  + "/groups", group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
     }
 
     // CreatedDate
