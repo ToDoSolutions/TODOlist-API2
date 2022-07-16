@@ -4,7 +4,7 @@ USE `b8iyr7xai8wk75ismpbt`;
 -- En local
 -- USE `todolist-api2`;
 
-SET GLOBAL event_scheduler = ON;
+-- SET GLOBAL event_scheduler = ON;
 
 CREATE EVENT task_expires ON SCHEDULE EVERY 1 DAY DO
     DELETE
