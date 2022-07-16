@@ -1,5 +1,5 @@
 <div align="center">
-<h1><a href="https://todolist-api2.herokuapp.com/swagger-ui/" target="_blank">TODOlist-API2<a></h1>
+<h1><a href="https://todolist-api2.herokuapp.com">TODOlist-API2<a></h1>
 </div>
 <div align="center">
 <img src="src/main/resources/static/images/logo.gif" alt="TODOlist-API2" width="200" height="200" align="center">
