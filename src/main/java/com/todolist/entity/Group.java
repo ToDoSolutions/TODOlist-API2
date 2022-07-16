@@ -23,8 +23,6 @@ public class Group {
 
     @Column(name = "name")
     @Size(max = 50, message = "The name is too long.")
-    @NotNull(message = "The name is required.")
-    @NotBlank(message = "The name is required.")
     private String name;
 
     @Column(name = "description")

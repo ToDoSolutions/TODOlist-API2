@@ -12,7 +12,6 @@ import com.todolist.filters.FilterNumber;
 import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import com.todolist.utilities.Filter;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.*;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -84,7 +84,8 @@ public class GroupController {
 
     @PostMapping
     public Map<String, Object> addGroup(@RequestBody @Valid Group group) {
-        Preconditions.checkNotNull(group, "The group with idGroup " + group.getIdGroup() + " must have name.");
+        Preconditions.checkArgument(group.getName() != null && !Objects.equals(group.getName(), ""), "The group with idGroup " + group.getIdGroup() + " must have name.");
+        if (group.getCreatedDate() == null) group.setCreatedDate(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         group = groupService.saveGroup(group);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -93,11 +94,11 @@ public class GroupController {
     public Map<String, Object> updateGroup(@RequestBody @Valid Group group) {
         Group oldGroup = groupService.findGroupById(group.getIdGroup());
         Preconditions.checkNotNull(oldGroup, "The group with idGroup " + group.getIdGroup() + " does not exist.");
-        if (group.getName() != null)
+        if (group.getName() != null && !Objects.equals(group.getName(), ""))
             oldGroup.setName(group.getName());
-        if (group.getDescription() != null)
+        if (group.getDescription() != null && !Objects.equals(group.getDescription(), ""))
             oldGroup.setDescription(group.getDescription());
-        if (group.getCreatedDate() != null)
+        if (group.getCreatedDate() != null && !Objects.equals(group.getCreatedDate(), ""))
             oldGroup.setCreatedDate(group.getCreatedDate());
         Set<ConstraintViolation<Group>> errors = validator.validate(oldGroup);
         if (!errors.isEmpty())

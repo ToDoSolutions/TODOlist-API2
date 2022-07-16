@@ -29,6 +29,8 @@ public class ShowGroup {
 
     private List<ShowUser> users;
 
+    public ShowGroup() {}
+
     public ShowGroup(Group group, List<ShowUser> users) {
         this.idGroup = group.getIdGroup();
         this.name = group.getName();

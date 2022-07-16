@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
@@ -43,12 +41,12 @@ class PostTest {
     void testPostWithNullOrEmptyName() {
         user.setName(null);
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The name cannot be null or empty.")
+                .assertMsg("The name is required.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
         user.setName("");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The name cannot be null or empty.")
+                .assertMsg("The name is required.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
@@ -57,7 +55,7 @@ class PostTest {
     void testPostWithTitleGreaterThan50() {
         user.setName(new String(new char[51]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The name cannot be greater than 50 characters.")
+                .assertMsg("The name is too long.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
@@ -67,12 +65,12 @@ class PostTest {
     void testPostWithNullOrEmptySurname() {
         user.setSurname(null);
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The surname cannot be null or empty.")
+                .assertMsg("The surname is required.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
         user.setSurname("");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The surname cannot be null or empty.")
+                .assertMsg("The surname is required.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
@@ -81,31 +79,31 @@ class PostTest {
     void testPostWithSurnameGreaterThan50() {
         user.setSurname(new String(new char[51]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The surname cannot be greater than 50 characters.")
+                .assertMsg("The surname is too long.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
 
     // Email
     @Test
-    void testPostWithIncorrectEmail() {
-        user.setEmail("user");
+    void testPostWithNullOrEmptyEmail() {
+        user.setEmail(null);
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The email is not correct.")
+                .assertMsg("The email is required.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
+        user.setEmail("");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
+                .assertMsg("The email is required.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
 
     @Test
-    void testPostWithNullEmail() {
-        user.setEmail(null);
+    void testPostWithIncorrectEmail() {
+        user.setEmail("user");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The email cannot be null.")
-                .assertStatus("Bad Request")
-                .assertPath("/api/v1/users");
-        user.setEmail("hola");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The email is not correct.")
+                .assertMsg("The email is invalid.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
@@ -114,20 +112,22 @@ class PostTest {
     @Test
     void testPostWithNullOrEmptyAvatar() {
         user.setAvatar(null);
-        ShowUser response = restTemplate.postForObject(uri + "/users", user, ShowUser.class);
-        assertNull(response.getAvatar(), "Avatar is not null");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
+                .assertMsg("The avatar is required.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
         user.setAvatar("");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The avatar cannot be null or empty.")
+                .assertMsg("The avatar is invalid.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
 
     @Test
     void testPostWithIncorrectAvatar() {
-        user.setEmail("user");
+        user.setAvatar("user");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The avatar is not correct.")
+                .assertMsg("The avatar is invalid.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
@@ -147,7 +147,7 @@ class PostTest {
     void testPostWithBioGreaterTan500() {
         user.setBio(new String(new char[501]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The bio cannot be greater than 500 characters.")
+                .assertMsg("The bio is too long.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
@@ -167,7 +167,7 @@ class PostTest {
     void testPostWithLocationGreaterThan50() {
         user.setEmail(new String(new char[51]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/users", user, ShowUser.class)))
-                .assertMsg("The location cannot be greater than 50 characters.")
+                .assertMsg("The email is invalid.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }

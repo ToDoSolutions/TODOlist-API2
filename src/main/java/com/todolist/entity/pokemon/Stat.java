@@ -15,14 +15,14 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class Stat {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("base_stat")
     private Integer baseStat;
     @JsonProperty("effort")
     private Integer effort;
     @JsonProperty("stat")
     private InfoStat stat;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("base_stat")
     public Integer getBaseStat() {

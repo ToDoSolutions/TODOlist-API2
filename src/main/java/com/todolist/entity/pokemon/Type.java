@@ -14,12 +14,12 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class Type {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("slot")
     private Integer slot;
     @JsonProperty("type")
     private InfoType type;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("slot")
     public Integer getSlot() {

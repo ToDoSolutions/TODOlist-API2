@@ -16,14 +16,14 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class Pokemon {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("name")
     private String name;
     @JsonProperty("stats")
     private List<Stat> stats = null;
     @JsonProperty("types")
     private List<Type> types = null;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("name")
     public String getName() {

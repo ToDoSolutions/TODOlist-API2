@@ -8,7 +8,6 @@ import com.todolist.entity.User;
 import com.todolist.filters.FilterNumber;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import com.todolist.utilities.Filter;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
@@ -83,12 +82,13 @@ public class UserController {
     @PostMapping
     public Map<String, Object> addUser(@RequestBody @Valid User user) {
         Preconditions.checkNotNull(user, "The user is null.");
-        Preconditions.checkNotNull(user.getUsername(), "The username is required.");
-        Preconditions.checkNotNull(user.getName(), "The name is required.");
-        Preconditions.checkNotNull(user.getSurname(), "The surname is required.");
-        Preconditions.checkNotNull(user.getEmail(), "The email is required.");
-        Preconditions.checkNotNull(user.getPassword(), "The password is required.");
-        Preconditions.checkNotNull(user.getAvatar(), "The avatar is required.");
+        Preconditions.checkArgument(user.getUsername() != null && !Objects.equals(user.getUsername(), ""), "The username is required.");
+        Preconditions.checkArgument(user.getName() != null && !Objects.equals(user.getName(), ""), "The name is required.");
+        Preconditions.checkArgument(user.getSurname() != null && !Objects.equals(user.getSurname(), ""), "The surname is required.");
+        Preconditions.checkArgument(user.getEmail() != null && !Objects.equals(user.getEmail(), ""), "The email is required.");
+        Preconditions.checkArgument(user.getPassword() != null && !Objects.equals(user.getPassword(), ""), "The password is required.");
+        Preconditions.checkArgument(user.getAvatar() != null && !Objects.equals(user.getAvatar(), ""), "The avatar is required.");
+        Preconditions.checkArgument(user.getToken() == null, "The token can't be added with an CREATE.");
         user = userService.saveUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -97,20 +97,22 @@ public class UserController {
     public Map<String, Object> updateUser(@RequestBody @Valid User user) {
         User oldUser = userService.findUserById(user.getIdUser());
         Preconditions.checkNotNull(oldUser, "The user with idUser " + user.getIdUser() + " does not exist.");
-        if (user.getName() != null)
+        if (user.getName() != null && !Objects.equals(user.getName(), ""))
             oldUser.setName(user.getName());
-        if (user.getSurname() != null)
+        if (user.getSurname() != null && !Objects.equals(user.getSurname(), ""))
             oldUser.setSurname(user.getSurname());
-        if (user.getEmail() != null)
+        if (user.getEmail() != null && !Objects.equals(user.getEmail(), ""))
             oldUser.setEmail(user.getEmail());
-        if (user.getAvatar() != null)
+        if (user.getAvatar() != null && !Objects.equals(user.getAvatar(), ""))
             oldUser.setAvatar(user.getAvatar());
-        if (user.getBio() != null)
+        if (user.getBio() != null && !Objects.equals(user.getBio(), ""))
             oldUser.setBio(user.getBio());
-        if (user.getLocation() != null)
+        if (user.getLocation() != null && !Objects.equals(user.getLocation(), ""))
             oldUser.setLocation(user.getLocation());
+        if (user.getUsername() != null && !Objects.equals(user.getUsername(), ""))
+            oldUser.setUsername(user.getUsername());
         Preconditions.checkArgument(Objects.equals(user.getPassword(), oldUser.getPassword()), "The password is required.");
-        Preconditions.checkArgument(user.getToken() != null, "The token can't be updated with an UPDATE.");
+        Preconditions.checkArgument(user.getToken() == null, "The token can't be updated with an UPDATE.");
         Set<ConstraintViolation<User>> errors = validator.validate(oldUser);
         if (!errors.isEmpty())
             throw new ConstraintViolationException(errors);

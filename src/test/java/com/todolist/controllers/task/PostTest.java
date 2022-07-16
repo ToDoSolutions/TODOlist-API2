@@ -2,11 +2,11 @@ package com.todolist.controllers.task;
 
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
-import com.todolist.exceptions.ManagerException;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
+import com.todolist.exceptions.ManagerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
@@ -29,16 +29,7 @@ class PostTest {
 
     @BeforeEach
     void setUp() {
-        task = new Task();
-        task.setTitle("Task 1");
-        task.setDescription("Task 1 description");
-        task.setAnnotation("Task 1 annotation");
-        task.setStatus("DRAFT");
-        task.setFinishedDate("3000-01-22");
-        task.setStartDate("2015-01-01");
-        task.setDifficulty("EASY");
-        task.setPriority(1L);
-        task.setIdTask(0L);
+        task = Task.of("Task 1", "Task 1 Description", "Task 1 annotation", "DRAFT", "3000-01-22", "2015-01-01", 1L, "EASY");
         restTemplate = new RestTemplate();
     }
 
@@ -114,7 +105,7 @@ class PostTest {
     void testPostWithWrongStatus() {
         task.setStatus("WRONG");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
-                .assertMsg("The status WRONG is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled.")
+                .assertMsg("status-> The status WRONG is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
@@ -222,7 +213,7 @@ class PostTest {
     void testPostWithWrongDifficulty() {
         task.setDifficulty("WRONG");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
-                .assertMsg("The difficulty WRONG is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die.")
+                .assertMsg("difficulty-> The difficulty WRONG is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }

@@ -2,9 +2,9 @@ package com.todolist.controllers.user;
 
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
-import com.todolist.exceptions.ManagerException;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
+import com.todolist.exceptions.ManagerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;

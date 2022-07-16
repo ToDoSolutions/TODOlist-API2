@@ -12,19 +12,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-// @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
-@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
+@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+// @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
 class PutTest {
 
     Group group;
     ShowGroup showGroup;
-    // String uri = "http://localhost:8080/api/v1";
-    String uri = "https://todolist-api2.herokuapp.com/api/v1";
+    String uri = "http://localhost:8080/api/v1";
+    // String uri = "https://todolist-api2.herokuapp.com/api/v1";
     RestTemplate restTemplate;
 
     @BeforeEach
@@ -35,6 +32,7 @@ class PutTest {
         String uri = "http://localhost:8080/api/v1/groups";
         restTemplate = new RestTemplate();
         showGroup = restTemplate.postForObject(uri, group, ShowGroup.class);
+        group.setIdGroup(showGroup.getIdGroup());
     }
 
     // Correct
@@ -53,22 +51,18 @@ class PutTest {
     @Test
     void testPostWithNullOrEmptyName() {
         group.setName(null);
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
-                .assertMsg("Name is required")
-                .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups");
+        ShowGroup response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        assertNotNull(response.getName(), "Name is null.");
         group.setName("");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
-                .assertMsg("Name is required")
-                .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups");
+        response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        assertEquals(showGroup.getName(), response.getName(), "Name is not correct.");
     }
 
     @Test
     void testPostWithNameGreaterThan50() {
         group.setName(new String(new char[51]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
-                .assertMsg("Name must be less than 50 characters")
+                .assertMsg("The name is too long.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/groups");
     }
@@ -77,22 +71,18 @@ class PutTest {
     @Test
     void testPostWithNullOrEmptyDescription() {
         group.setDescription(null);
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
-                .assertMsg("Description is required")
-                .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups");
+        ShowGroup response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        assertNotNull(response.getDescription(), "Description is null.");
         group.setDescription("");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
-                .assertMsg("Description is required")
-                .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups");
+        response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        assertEquals(showGroup.getDescription(), response.getDescription(), "Description is not correct.");
     }
 
     @Test
     void testPostWithDescriptionGreaterThan500() {
         group.setDescription(new String(new char[501]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
-                .assertMsg("Description must be less than 500 characters")
+                .assertMsg("The description is too long.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/groups");
     }
@@ -102,8 +92,21 @@ class PutTest {
     void testPostWithInvalidCreatedDate() {
         group.setCreatedDate("ayer");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
-                .assertMsg("CreatedDate is not a valid date")
+                .assertMsg("The createdDate is invalid.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/groups");
+    }
+
+    @Test
+    void testPostWithNullOrEmptyCreatedDate() {
+        group.setCreatedDate(null);
+        ShowGroup response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        assertNotNull(response.getCreatedDate(), "CreatedDate is null.");
+        group.setCreatedDate("");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
+                .assertMsg("The createdDate is invalid.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/groups");
+        assertEquals(showGroup.getCreatedDate(), response.getCreatedDate(), "CreatedDate is not correct.");
     }
 }

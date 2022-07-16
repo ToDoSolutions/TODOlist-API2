@@ -20,14 +20,10 @@ public class Task implements Serializable {
 
     @Column(name = "title")
     @Size(max = 50, message = "The title is too long.")
-    // @NotNull(message = "The title is required.")
-    @NotBlank(message = "The title is required.")
     private String title;
 
     @Column(name = "description")
     @Size(max = 200, message = "The description is too long.")
-    // @NotNull(message = "The description is required.")
-    @NotBlank(message = "The description is required.")
     private String description;
 
     @Column(name = "annotation")
@@ -35,12 +31,10 @@ public class Task implements Serializable {
     private String annotation;
 
     @Column(name = "status")
-    // @Pattern(regexp = "[Dd][Rr][Aa][Ff][Tt]|[Ii][Nn][_ ][Pp][Rr][Oo][Gg][Rr][Ee][Ss][Ss]|[Dd][Oo][Nn][Ee]|[Ii][Nn][_ ][Rr][Ee][Vv][Ii][Ss][Ii][Oo][Nn]|[Cc][Aa][Nn][Cc][Ee][Ll][Ll][Ee][Dd]", message = "The status is invalid.")
     private String status;
 
     @Column(name = "finished_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate must be in format yyyy-MM-dd.")
-    // @NotNull(message = "The finishedDate is required.")
     private String finishedDate;
 
     @Column(name = "start_date")

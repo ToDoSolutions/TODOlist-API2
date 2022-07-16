@@ -2,11 +2,11 @@ package com.todolist.controllers.task;
 
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
-import com.todolist.exceptions.ManagerException;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
+import com.todolist.exceptions.ManagerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -14,8 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 // @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
@@ -63,16 +62,19 @@ class PutTest {
 
     // Title
     @Test
-    void testPostWithNullOrEmptyTitle() {
+    void testPutWithNullOrEmptyTitle() {
+        task.setTitle(null);
+        ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertNotNull(response.getTitle(), "Title is null");
         task.setTitle("");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
-                .assertMsg("The title is required.")
-                .assertStatus("Bad Request")
-                .assertPath("/api/v1/tasks");
+        response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertEquals(showTask.getTitle(), response.getTitle(), "Title is empty.");
+
+
     }
 
     @Test
-    void testPostWithTitleGreaterThan50() {
+    void testPutWithTitleGreaterThan50() {
         task.setTitle(new String(new char[51]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
                 .assertMsg("The title is too long.")
@@ -82,17 +84,17 @@ class PutTest {
 
     // Description
     @Test
-    void testPostWithEmptyDescription() {
-        RestTemplate restTemplate = new RestTemplate();
+    void testPutWithNullOrEmptyDescription() {
+        task.setDescription(null);
+        ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertNotNull(response.getDescription(), "Description is null");
         task.setDescription("");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
-                .assertMsg("The description is required.")
-                .assertStatus("Bad Request")
-                .assertPath("/api/v1/tasks");
+        response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertEquals(showTask.getDescription(), response.getDescription(), "Description is empty.");
     }
 
     @Test
-    void testPostWithDescriptionGreaterThan200() {
+    void testPutWithDescriptionGreaterThan200() {
         task.setDescription(new String(new char[201]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
                 .assertMsg("The description is too long.")
@@ -102,7 +104,17 @@ class PutTest {
 
     // Annotation
     @Test
-    void testPostWithAnnotationGreaterThan50() {
+    void testPutWithNullOrEmptyAnnotation() {
+        task.setAnnotation(null);
+        ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertNotNull(response.getAnnotation(), "Annotation is null");
+        task.setAnnotation("");
+        response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertEquals(showTask.getAnnotation(), response.getAnnotation(), "Annotation is empty.");
+    }
+
+    @Test
+    void testPutWithAnnotationGreaterThan50() {
         task.setAnnotation(new String(new char[51]).replace("\0", "a"));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
                 .assertMsg("The annotation is too long.")
@@ -112,16 +124,26 @@ class PutTest {
 
     // Status
     @Test
-    void testPostWithWrongStatus() {
+    void testPutWithNullOrEmptyStatus() {
+        task.setStatus(null);
+        ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertNotNull(response.getStatus(), "Status is null");
+        task.setStatus("");
+        response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertEquals(showTask.getStatus(), response.getStatus(), "Status is empty.");
+    }
+
+    @Test
+    void testPutWithWrongStatus() {
         task.setStatus("WRONG");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
-                .assertMsg("The status WRONG is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled")
+                .assertMsg("The status WRONG is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
 
     @Test
-    void testPostWithLowerStatus() {
+    void testPutWithLowerStatus() {
         task.setStatus("in progress");
         ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
@@ -130,7 +152,7 @@ class PutTest {
 
     // Relation between StartDate and FinishedDate
     @Test
-    void testPostWithStartDateIsAfterFinishedDate() {
+    void testPutWithStartDateIsAfterFinishedDate() {
         task.setStartDate("3001-01-30");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
                 .assertMsg("The startDate is must be before the finishedDate.")
@@ -140,16 +162,29 @@ class PutTest {
 
     // StartDate
     @Test
-    void testPostWithWrongPatternInStartDate() {
+    void testPutWithNullOrEmptyStartDate() {
+        task.setStartDate(null);
+        ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertNotNull(response.getStartDate(), "StartDate is null");
+        task.setStartDate("");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
+                .assertMsg("The startDate must be in format yyyy-MM-dd.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
+        assertEquals(showTask.getStartDate(), response.getStartDate(), "StartDate is empty.");
+    }
+
+    @Test
+    void testPutWithWrongPatternInStartDate() {
         task.setStartDate("2015/01/30");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
-                .assertMsg("The startDate is invalid.")
+                .assertMsg("The startDate must be in format yyyy-MM-dd.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
 
     @Test
-    void testPostWithNullStartDate() {
+    void testPutWithNullStartDate() {
         task.setStartDate(null);
         ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
@@ -158,16 +193,29 @@ class PutTest {
 
     // FinishedDate
     @Test
-    void testPostWithWrongPatternInFinishedDate() {
+    void testPutWithNullOrEmptyFinishedDate() {
+        task.setFinishedDate(null);
+        ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertNotNull(response.getFinishedDate(), "FinishedDate is null");
+        task.setFinishedDate("");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
+                .assertMsg("The finishedDate must be in format yyyy-MM-dd.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
+        assertEquals(showTask.getFinishedDate(), response.getFinishedDate(), "FinishedDate is empty.");
+    }
+
+    @Test
+    void testPutWithWrongPatternInFinishedDate() {
         task.setFinishedDate("2015/01/30");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
-                .assertMsg("The finishedDate is invalid.")
+                .assertMsg("The finishedDate must be in format yyyy-MM-dd.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
 
     @Test
-    void testPostWithNullFinishedDate() {
+    void testPutWithNullFinishedDate() {
         task.setFinishedDate(null);
         ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
         assertEquals(showTask.getFinishedDate(), response.getFinishedDate(), "FinishedDate is not correct");
@@ -175,21 +223,28 @@ class PutTest {
 
     // Priority
     @Test
-    void testPostWithPriorityEqualToZero() {
+    void testPutWithNullPriority() {
+        task.setPriority(null);
+        ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertNotNull(response.getPriority(), "Priority is null");
+    }
+
+    @Test
+    void testPutWithPriorityEqualToZero() {
         task.setPriority(0L);
         ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
     @Test
-    void testPostWithPriorityEqualToFive() {
+    void testPutWithPriorityEqualToFive() {
         task.setPriority(5L);
         ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
     @Test
-    void testPostWithPriorityLowerThanZero() {
+    void testPutWithPriorityLowerThanZero() {
         task.setPriority(-1L);
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
                 .assertMsg("The priority must be between 0 and 5.")
@@ -198,7 +253,7 @@ class PutTest {
     }
 
     @Test
-    void testPostWithPriorityGreaterThanFive() {
+    void testPutWithPriorityGreaterThanFive() {
         task.setPriority(6L);
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
                 .assertMsg("The priority must be between 0 and 5.")
@@ -206,19 +261,29 @@ class PutTest {
                 .assertPath("/api/v1/tasks");
     }
 
-    // Dificulty
+    // Difficulty
     @Test
-    void testPostWithWrongDifficulty() {
+    void testPutWithNullOrEmptyDifficulty() {
+        task.setDifficulty(null);
+        ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertNotNull(response.getDifficulty(), "Difficulty is null");
+        task.setDifficulty("");
+        response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
+        assertEquals(showTask.getDifficulty(), response.getDifficulty(), "Difficulty is empty.");
+    }
+
+    @Test
+    void testPutWithWrongDifficulty() {
         task.setDifficulty("WRONG");
         //HttpClientErrorException hola = assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class));
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class)))
-                .assertMsg("The difficulty WRONG is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die")
+                .assertMsg("The difficulty WRONG is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
 
     @Test
-    void testPostWithLowerDifficulty() {
+    void testPutWithLowerDifficulty() {
         task.setDifficulty("i want to die");
         ShowTask response = restTemplate.exchange(uri + "/tasks", HttpMethod.PUT, new HttpEntity<>(task), ShowTask.class).getBody();
         assertEquals(1, response.getIdTask(), "IdTask is not correct");

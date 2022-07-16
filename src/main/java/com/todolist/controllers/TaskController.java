@@ -8,7 +8,6 @@ import com.todolist.entity.Task;
 import com.todolist.filters.FilterDate;
 import com.todolist.filters.FilterNumber;
 import com.todolist.services.TaskService;
-import com.todolist.utilities.Filter;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.*;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -83,9 +81,9 @@ public class TaskController {
     @PostMapping
     public Map<String, Object> addTask(@RequestBody @Valid Task task) {
         Preconditions.checkNotNull(task, "The task is null.|/api/v1/tasks");
-        Preconditions.checkArgument(task.getTitle() != null, "The task with idTask " + task.getIdTask() + " must have title.");
-        Preconditions.checkArgument(task.getDescription() != null, "The task with idTask " + task.getIdTask() + " must have description.");
-        Preconditions.checkArgument(task.getFinishedDate() != null, "The task with idTask " + task.getIdTask() + " must have finishedDate.");
+        Preconditions.checkArgument(task.getTitle() != null && !Objects.equals(task.getTitle(), ""), "The task with idTask " + task.getIdTask() + " must have title.");
+        Preconditions.checkArgument(task.getDescription() != null && !Objects.equals(task.getDescription(), ""), "The task with idTask " + task.getIdTask() + " must have description.");
+        Preconditions.checkArgument(task.getFinishedDate() != null && !Objects.equals(task.getFinishedDate(), ""), "The task with idTask " + task.getIdTask() + " must have finishedDate.");
         if (task.getStartDate() == null) task.setStartDate(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         task = taskService.saveTask(task);
         ShowTask showTask = new ShowTask(task);
@@ -95,25 +93,25 @@ public class TaskController {
     }
 
     @PutMapping
-    public Map<String, Object> updateTask(@RequestBody Task task) {
+    public Map<String, Object> updateTask(@RequestBody @Valid Task task) {
         Task oldTask = taskService.findTaskById(task.getIdTask());
         if (oldTask == null)
             throw new NullPointerException("The task with idTask " + task.getIdTask() + " does not exist.");
-        if (task.getTitle() != null)
+        if (task.getTitle() != null && !Objects.equals(task.getTitle(), ""))
             oldTask.setTitle(task.getTitle());
-        if (task.getDescription() != null)
+        if (task.getDescription() != null && !Objects.equals(task.getDescription(), ""))
             oldTask.setDescription(task.getDescription());
-        if (task.getStatus() != null)
+        if (task.getStatus() != null && !Objects.equals(task.getStatus(), ""))
             oldTask.setStatus(task.getStatus());
-        if (task.getFinishedDate() != null)
+        if (task.getFinishedDate() != null && !Objects.equals(task.getFinishedDate(), ""))
             oldTask.setFinishedDate(task.getFinishedDate());
-        if (task.getStartDate() != null)
+        if (task.getStartDate() != null && !Objects.equals(task.getStartDate(), ""))
             oldTask.setStartDate(task.getStartDate());
-        if (task.getAnnotation() != null)
+        if (task.getAnnotation() != null && !Objects.equals(task.getAnnotation(), ""))
             oldTask.setAnnotation(task.getAnnotation());
-        if (task.getPriority() != null)
+        if (task.getPriority() != null && !Objects.equals(task.getPriority(), ""))
             oldTask.setPriority(task.getPriority());
-        if (task.getDifficulty() != null)
+        if (task.getDifficulty() != null && !Objects.equals(task.getDifficulty(), ""))
             oldTask.setDifficulty(task.getDifficulty());
         Set<ConstraintViolation<Task>> errors = validator.validate(oldTask);
         if (!errors.isEmpty())
