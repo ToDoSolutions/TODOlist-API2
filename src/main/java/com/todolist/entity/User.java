@@ -70,7 +70,7 @@ public class User implements Serializable {
         this.idUser = 0L;
     }
 
-    public static User of(String name, String surname, String username, String email, String avatar, String bio, String location, String password, String token) {
+    public static User of(String name, String surname, String username, String email, String avatar, String bio, String location, String password) {
         User user = new User();
         user.setName(name);
         user.setSurname(surname);
@@ -80,7 +80,6 @@ public class User implements Serializable {
         user.setBio(bio);
         user.setLocation(location);
         user.setPassword(password);
-        user.setToken(token);
         return user;
     }
 }

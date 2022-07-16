@@ -20,7 +20,8 @@ public enum Status {
         } else if (statusLowerCase.equals("cancelled")) {
             return CANCELLED;
         } else {
-            throw new IllegalArgumentException("Invalid status: " + status);
+
+            throw new IllegalArgumentException("The status " + status + " is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled.");
         }
     }
 }

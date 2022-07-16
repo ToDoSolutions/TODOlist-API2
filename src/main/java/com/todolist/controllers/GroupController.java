@@ -7,6 +7,8 @@ import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Group;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
+import com.todolist.filters.FilterDate;
+import com.todolist.filters.FilterNumber;
 import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
@@ -45,8 +47,8 @@ public class GroupController {
                                                   @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
                                                   @RequestParam(required = false) String name,
                                                   @RequestParam(required = false) String description,
-                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The tasks' number is invalid.") String numTasks,
-                                                  @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d{4}-\\d{2}-\\d{2}|[<>=]\\d{4}-\\d{2}-\\d{2}", message = "The createdDate is invalid.") String createdDate) {
+                                                  @RequestParam(required = false) FilterNumber numTasks,
+                                                  @RequestParam(required = false) FilterDate createdDate) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
         Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
         Preconditions.checkArgument(Arrays.stream(fieldsGroup.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
@@ -60,8 +62,8 @@ public class GroupController {
             if (group != null &&
                     (name == null || group.getName().equals(name)) &&
                     (description == null || group.getDescription().equals(description)) &&
-                    (numTasks == null || Filter.isGEL((long) group.getNumTasks(), numTasks)) &&
-                    (createdDate == null || Filter.isGEL(group.getCreatedDate(), createdDate)))
+                    (numTasks == null || numTasks.isValid(group.getNumTasks())) &&
+                    (createdDate == null || createdDate.isValid(group.getCreatedDate())))
                 result.add(group);
         }
         return result.stream().map(group -> group.getFields(fieldsGroup, fieldsUser, fieldsTask)).collect(Collectors.toList());

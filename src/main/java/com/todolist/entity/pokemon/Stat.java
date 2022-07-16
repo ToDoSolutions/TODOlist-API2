@@ -22,7 +22,7 @@ public class Stat {
     @JsonProperty("stat")
     private InfoStat stat;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("base_stat")
     public Integer getBaseStat() {

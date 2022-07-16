@@ -19,7 +19,7 @@ public class InfoStat {
     @JsonProperty("url")
     private String url;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("name")
     public String getName() {

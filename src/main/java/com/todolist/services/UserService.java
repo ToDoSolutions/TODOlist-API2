@@ -41,7 +41,7 @@ public class UserService {
     }
 
     public void deleteUser(User user) {
-        userRepository.deleteById(user);
+        userRepository.delete(user);
     }
 
     public List<Task> getTasksFromUser(User user) {

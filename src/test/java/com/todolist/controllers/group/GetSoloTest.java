@@ -3,13 +3,15 @@ package com.todolist.controllers.group;
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.dtos.ShowGroup;
+import com.todolist.exceptions.ManagerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.jar.Manifest;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // @FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
 @FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
@@ -34,27 +36,31 @@ class GetSoloTest {
     void testGetSoloFields() {
         ShowGroup response = restTemplate.getForObject(uri + "/groups/1?fieldsGroup=idGroup,name,description", ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
-        assertEquals(null, response.getUsers(), "Users is not correct");
+        assertNull(response.getUsers(), "Users is not correct");
     }
 
     @Test
     void testGetSoloFieldsWithWrongField() {
         RestTemplate restTemplate = new RestTemplate();
-        HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/groups/1?fieldsGroup=idGroup,wrongField", ShowGroup.class));
-        assertEquals("404", exception.getMessage().split(":")[0].trim(), "Status code is not correct");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/groups/1?fieldsGroup=idGroup,wrongField", ShowGroup.class)))
+                .assertMsg("The field wrongField does not exist.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/groups/1");
     }
 
     @Test
     void testGetSoloUpperFields() {
         ShowGroup response = restTemplate.getForObject(uri + "/groups/1?fieldsGroup=IDGROUP,NAME,DESCRIPTION", ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
-        assertEquals(null, response.getUsers(), "Users is not correct");
+        assertNull(response.getUsers(), "Users is not correct");
     }
 
 
     @Test
     void testGetSoloNotFound() {
-        Throwable exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/groups/99", ShowGroup.class));
-        assertEquals("404", exception.getMessage().split(":")[0].trim(), "Status code is not correct");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/groups/99", ShowGroup.class)))
+                .assertMsg("Group not found")
+                .assertStatus("Not Found")
+                .assertPath("/api/v1/groups/99");
     }
 }

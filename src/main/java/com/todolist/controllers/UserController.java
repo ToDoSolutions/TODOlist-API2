@@ -5,6 +5,7 @@ import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
+import com.todolist.filters.FilterNumber;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
 import com.todolist.utilities.Filter;
@@ -44,7 +45,7 @@ public class UserController {
                                                  @RequestParam(required = false) @Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z\\d+&@#/%?=~_|!:,.;]*[-a-zA-Z\\d+&@#/%=~_|]", message = "The avatar is invalid.") String avatar,
                                                  @RequestParam(required = false) String bio,
                                                  @RequestParam(required = false) String location,
-                                                 @RequestParam(required = false) @Pattern(regexp = "[<>=]{2}\\d+|[<>=]\\d+", message = "The task completed is invalid.") String taskCompleted) {
+                                                 @RequestParam(required = false) FilterNumber taskCompleted) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
         Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
         Preconditions.checkArgument(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
@@ -60,7 +61,7 @@ public class UserController {
                     (surname == null || user.getSurname().equals(surname)) &&
                     (email == null || user.getEmail().equals(email)) &&
                     (location == null || user.getLocation().equals(location)) &&
-                    (taskCompleted == null || Filter.isGEL(user.getTaskCompleted(), taskCompleted)) &&
+                    (taskCompleted == null || taskCompleted.isValid(user.getTaskCompleted())) &&
                     (bio == null || user.getBio().contains(bio)) &&
                     (avatar == null || user.getAvatar().equals(avatar)))
                 result.add(user);

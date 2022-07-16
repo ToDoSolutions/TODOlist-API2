@@ -24,7 +24,7 @@ public class PokemonController {
 
     private TaskService taskService;
 
-    public static Task parsePokemon(String name, String status, String finishedDate, String startDate, Integer priority, Integer days) {
+    public static Task parsePokemon(String name, String status, String finishedDate, String startDate, Long priority, Integer days) {
         String uri = "https://pokeapi.co/api/v2/pokemon/" + name;
         RestTemplate restTemplate = new RestTemplate();
         Pokemon response = restTemplate.getForObject(uri, Pokemon.class);
@@ -36,7 +36,7 @@ public class PokemonController {
             if (i != response.getTypes().size() - 1)
                 types.append(" - ");
         }
-        Task task = Task.of("Catch: " + response.getName(), "Type pokemon: " + types, getPokemonAnnotation(response), status,
+        return Task.of("Catch: " + response.getName(), "Type pokemon: " + types, getPokemonAnnotation(response), status,
                 finishedDate == null ?
                         startDate == null ?
                                 LocalDate.now().plusDays(days).toString() :
@@ -44,7 +44,6 @@ public class PokemonController {
                         finishedDate,
                 startDate == null ? LocalDate.now().toString() : startDate, priority,
                 getPokemonDifficulty(response).toString());
-        return task;
     }
 
     private static String getPokemonAnnotation(Pokemon pokemon) {
@@ -83,7 +82,7 @@ public class PokemonController {
                                           @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
                                           @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
                                           @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
-                                          @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Integer priority,
+                                          @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Long priority,
                                           @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
                                           @RequestParam(required = false) Integer days
     ) {
@@ -95,7 +94,7 @@ public class PokemonController {
                                           @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
                                           @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
                                           @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
-                                          @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Integer priority,
+                                          @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Long priority,
                                           @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
                                           @RequestParam(required = false) Integer days) {
         return new ShowTask(taskService.saveTask(parsePokemon(name, status, finishedDate, startDate, priority, days))).getFields(fields);

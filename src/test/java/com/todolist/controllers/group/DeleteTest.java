@@ -3,6 +3,7 @@ package com.todolist.controllers.group;
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.dtos.ShowGroup;
+import com.todolist.exceptions.ManagerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
@@ -29,15 +30,17 @@ class DeleteTest {
     void testDeleteFine() {
         ShowGroup response = restTemplate.exchange(uri + "/groups/1", HttpMethod.DELETE, null, ShowGroup.class).getBody();
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
-        Throwable exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/groups/1", ShowGroup.class));
-        assertEquals("404", exception.getMessage().split(":")[0].trim(), "Status code is not correct");
-        assertEquals("The group with idGroup 1 does not exist.", exception.getMessage().split(":")[6].split(",")[0].replace("\"", "").trim(), "Message is not correct");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/groups/1", ShowGroup.class)))
+                .assertMsg("The group with idGroup 1 does not exist.")
+                .assertStatus("Not Found")
+                .assertPath("/api/v1/groups/1");
     }
 
     @Test
     void testDeleteWithWrongId() {
-        Throwable exception = assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups/0", HttpMethod.DELETE, null, ShowGroup.class));
-        assertEquals("404", exception.getMessage().split(":")[0].trim(), "Status code is not correct");
-        assertEquals("The group with idGroup 0 does not exist.", exception.getMessage().split(":")[6].split(",")[0].replace("\"", "").trim(), "Message is not correct");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups/0", HttpMethod.DELETE, null, ShowGroup.class)))
+                .assertMsg("The group with idGroup 0 does not exist.")
+                .assertStatus("Not Found")
+                .assertPath("/api/v1/groups/0");
     }
 }

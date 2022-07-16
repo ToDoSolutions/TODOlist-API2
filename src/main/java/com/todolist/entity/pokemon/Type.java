@@ -19,7 +19,7 @@ public class Type {
     @JsonProperty("type")
     private InfoType type;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("slot")
     public Integer getSlot() {

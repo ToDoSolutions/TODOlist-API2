@@ -69,7 +69,7 @@ public class OwnerController {
     public Map<String, Object> addTask(@PathVariable long idUser,
                                        @PathVariable String repoName,
                                        @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
-                                       @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5.") Integer priority,
+                                       @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5.") Long priority,
                                        @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
                                        @RequestParam(required = false) String annotation,
                                        @RequestParam(required = false) String difficulty) {

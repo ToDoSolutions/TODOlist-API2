@@ -39,18 +39,18 @@ public class Task implements Serializable {
     private String status;
 
     @Column(name = "finished_date")
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate must be in format yyyy-MM-dd.")
     // @NotNull(message = "The finishedDate is required.")
     private String finishedDate;
 
     @Column(name = "start_date")
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate must be in format yyyy-MM-dd.")
     private String startDate;
 
     @Column(name = "priority")
     @Max(value = 5, message = "The priority must be between 0 and 5.")
     @Min(value = 0, message = "The priority must be between 0 and 5.")
-    private Integer priority;
+    private Long priority;
 
     @Column(name = "difficulty")
     // @Pattern(regexp = "[Ss][Ll][Ee][Ee][Pp]|[Ee][Aa][Ss][Yy]|[Mm][Ee][Dd][Ii][Uu][Mm]|[Hh][Aa][Rr][Dd]|[Hh][Aa][Rr][Dd][Cc][Oo][Rr][Ee]|[Ii][_ ][Ww][Aa][Nn][Tt][_ ][Tt][Oo][_ ][Dd][Ii][Ee]", message = "The difficulty is invalid.")
@@ -60,7 +60,7 @@ public class Task implements Serializable {
         this.idTask = 0L;
     }
 
-    public static Task of(String title, String description, String annotation, String status, String finishedDate, String startDate, Integer priority, String difficulty) {
+    public static Task of(String title, String description, String annotation, String status, String finishedDate, String startDate, Long priority, String difficulty) {
         Task task = new Task();
         task.setTitle(title);
         task.setDescription(description);

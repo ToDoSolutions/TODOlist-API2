@@ -28,8 +28,11 @@ public class ShowTask {
     private String title, description, annotation;
     private Status status;
     private LocalDate finishedDate, startDate;
-    private Integer priority;
+    private Long priority;
     private Difficulty difficulty;
+
+    public ShowTask() {
+    }
 
     public ShowTask(Task task) {
         this.idTask = task.getIdTask();

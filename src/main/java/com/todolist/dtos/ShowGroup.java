@@ -37,8 +37,8 @@ public class ShowGroup {
         this.users = users;
     }
 
-    public Integer getNumTasks() {
-        return users.stream()
+    public Long getNumTasks() {
+        return (long) users.stream()
                 .flatMap(user -> user.getTasks().stream().map(ShowTask::getIdTask))
                 .collect(Collectors.toSet()).size();
     }

@@ -23,7 +23,7 @@ public class Pokemon {
     @JsonProperty("types")
     private List<Type> types = null;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("name")
     public String getName() {

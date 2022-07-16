@@ -4,6 +4,7 @@ import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.User;
+import com.todolist.exceptions.ManagerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -11,28 +12,24 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.jar.Manifest;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-// @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
-@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
+@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+// @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
 class PutTest {
 
     User user;
     ShowUser showUser;
-    // String uri = "http://localhost:8080/api/v1";
-    String uri = "https://todolist-api2.herokuapp.com/api/v1";
+    String uri = "http://localhost:8080/api/v1";
+    // String uri = "https://todolist-api2.herokuapp.com/api/v1";
     RestTemplate restTemplate;
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setName("User 1");
-        user.setSurname("User 1 surname");
-        user.setEmail("user@todolist.com");
-        user.setAvatar("https://avatar.com/user1");
-        user.setBio("User 1 bio");
-        user.setLocation("User 1 location");
-        user.setIdUser(1L);
+        user = User.of("User 1", "User 1 surname", "User 1 username", "user@todolist.com", "https://avatar.com/user1", "User 1 bio",
+                "User 1 location", "User 1 password");
         restTemplate = new RestTemplate();
         showUser = restTemplate.postForObject(uri, user, ShowUser.class);
     }
@@ -57,60 +54,89 @@ class PutTest {
     // Not exist
     @Test
     void testPutNotExist() {
-        user.setName("User 2");
-        user.setSurname("User 2 surname");
-        user.setEmail("user2@todolist.com");
-        user.setAvatar("https://avatar.com/user2");
-        user.setBio("User 2 bio");
-        user.setLocation("User 2 location");
+        //user.setName("User 2");
+        //user.setSurname("User 2 surname");
+        //user.setEmail("user2@todolist.com");
+        //user.setAvatar("https://avatar.com/user2");
+        //user.setBio("User 2 bio");
+        //user.setLocation("User 2 location");
         user.setIdUser(99L);
-        RestTemplate restTemplate = new RestTemplate();
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users/0", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users/0", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("User not found")
+                .assertStatus("Not Found")
+                .assertPath("/api/v1/users");
     }
 
     // Name
     @Test
     void testPostWithNullOrEmptyName() {
         user.setName(null);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Name is required")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
         user.setName("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Name is required")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     @Test
     void testPostWithTitleGreaterThan50() {
         user.setName(new String(new char[51]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Name must be less than 50 characters")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     // Surname
     @Test
     void testPostWithNullOrEmptySurname() {
         user.setSurname(null);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Surname is required")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
         user.setSurname("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Surname is required")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     @Test
     void testPostWithSurnameGreaterThan50() {
         user.setSurname(new String(new char[51]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Surname must be less than 50 characters")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     // Email
     @Test
     void testPostWithIncorrectEmail() {
         user.setEmail("user");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Email is not valid")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     @Test
     void testPostWithNullEmail() {
         user.setEmail(null);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Email is required")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
         user.setEmail("hola");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Email is not valid")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     // Avatar
@@ -120,13 +146,19 @@ class PutTest {
         ShowUser response = restTemplate.postForObject(uri + "/users", user, ShowUser.class);
         assertNull(response.getAvatar(), "Avatar is not null");
         user.setAvatar("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Avatar is required")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     @Test
     void testPostWithIncorrectAvatar() {
         user.setEmail("user");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Avatar is not valid")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     // Bio
@@ -143,7 +175,10 @@ class PutTest {
     @Test
     void testPostWithBioGreaterTan500() {
         user.setBio(new String(new char[501]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Bio must be less than 500 characters")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
     // Location
@@ -160,7 +195,10 @@ class PutTest {
     @Test
     void testPostWithLocationGreaterThan50() {
         user.setEmail(new String(new char[51]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users", HttpMethod.PUT, new HttpEntity<>(user), ShowUser.class)))
+                .assertMsg("Location must be less than 50 characters")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/users");
     }
 
 

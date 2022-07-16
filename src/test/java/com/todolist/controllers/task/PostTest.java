@@ -2,6 +2,7 @@ package com.todolist.controllers.task;
 
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
+import com.todolist.exceptions.ManagerException;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
@@ -17,13 +18,13 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-// @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
-@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
+@FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+// @FlywayTest(additionalLocations = "db/testWithOutData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
 class PostTest {
 
     Task task;
-    // String uri = "http://localhost:8080/api/v1";
-    String uri = "https://todolist-api2.herokuapp.com/api/v1";
+    String uri = "http://localhost:8080/api/v1";
+    // String uri = "https://todolist-api2.herokuapp.com/api/v1";
     RestTemplate restTemplate;
 
     @BeforeEach
@@ -36,7 +37,7 @@ class PostTest {
         task.setFinishedDate("3000-01-22");
         task.setStartDate("2015-01-01");
         task.setDifficulty("EASY");
-        task.setPriority(1);
+        task.setPriority(1L);
         task.setIdTask(0L);
         restTemplate = new RestTemplate();
     }
@@ -54,44 +55,68 @@ class PostTest {
     @Test
     void testPostWithNullOrEmptyTitle() {
         task.setTitle(null);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The title is required.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
         task.setTitle("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The title is required.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     @Test
     void testPostWithTitleGreaterThan50() {
         task.setTitle(new String(new char[51]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The title is too long.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     // Description
     @Test
     void testPostWithNullOrEmptyDescription() {
         task.setDescription(null);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The description is required.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
         task.setDescription("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri, task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The description is required.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     @Test
     void testPostWithDescriptionGreaterThan200() {
         task.setDescription(new String(new char[201]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The description is too long.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     // Annotation
     @Test
     void testPostWithAnnotationGreaterThan50() {
         task.setAnnotation(new String(new char[51]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The annotation is too long.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     // Status
     @Test
     void testPostWithWrongStatus() {
         task.setStatus("WRONG");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The status WRONG is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     @Test
@@ -106,14 +131,20 @@ class PostTest {
     @Test
     void testPostWithStartDateIsAfterFinishedDate() {
         task.setStartDate("3001-01-30");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The startDate must be before the finishedDate.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     // StartDate
     @Test
     void testPostWithWrongPatternInStartDate() {
         task.setStartDate("2015/01/30");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The startDate must be in format yyyy-MM-dd.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
 
@@ -129,53 +160,71 @@ class PostTest {
     @Test
     void testPostWithWrongPatternInFinishedDate() {
         task.setFinishedDate("2015/01/30");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The finishedDate must be in format yyyy-MM-dd.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     @Test
     void testPostWithNullFinishedDate() {
         task.setFinishedDate(null);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The task with idTask 0 must have finishedDate.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     @Test
     void testPostWithFinishedDateIsBeforeCurrentDate() {
         task.setFinishedDate(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The finishedDate must be after the current date.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     // Priority
     @Test
     void testPostWithPriorityEqualToZero() {
-        task.setPriority(0);
+        task.setPriority(0L);
         ShowTask response = restTemplate.postForObject(uri + "/tasks", task, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
     @Test
     void testPostWithPriorityEqualToFive() {
-        task.setPriority(5);
+        task.setPriority(5L);
         ShowTask response = restTemplate.postForObject(uri + "/tasks", task, ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
     @Test
     void testPostWithPriorityLowerThanZero() {
-        task.setPriority(-1);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        task.setPriority(-1L);
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The priority must be between 0 and 5.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     @Test
     void testPostWithPriorityGreaterThanFive() {
-        task.setPriority(6);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        task.setPriority(6L);
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The priority must be between 0 and 5.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     // Dificulty
     @Test
     void testPostWithWrongDifficulty() {
         task.setDifficulty("WRONG");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class));
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
+                .assertMsg("The difficulty WRONG is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 
     @Test
