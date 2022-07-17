@@ -7,8 +7,8 @@ import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Group;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
-import com.todolist.filters.FilterDate;
-import com.todolist.filters.FilterNumber;
+import com.todolist.filters.DateFilter;
+import com.todolist.filters.NumberFilter;
 import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
@@ -38,6 +38,7 @@ public class GroupController {
 
     private UserService userService;
 
+    @SuppressWarnings("unchecked")
     @GetMapping
     public List<Map<String, Object>> getAllGroups(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                   @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive") Integer limit,
@@ -47,8 +48,8 @@ public class GroupController {
                                                   @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
                                                   @RequestParam(required = false) String name,
                                                   @RequestParam(required = false) String description,
-                                                  @RequestParam(required = false) FilterNumber numTasks,
-                                                  @RequestParam(required = false) FilterDate createdDate) {
+                                                  @RequestParam(required = false) NumberFilter numTasks,
+                                                  @RequestParam(required = false) DateFilter createdDate) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
         Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
         Preconditions.checkArgument(Arrays.stream(fieldsGroup.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
@@ -69,6 +70,7 @@ public class GroupController {
         return result.stream().map(group -> group.getFields(fieldsGroup, fieldsUser, fieldsTask)).collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unchecked")
     @GetMapping("/{idGroup}")
     public Map<String, Object> getGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                         @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES) String fieldsGroup,
@@ -115,6 +117,7 @@ public class GroupController {
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
+    @SuppressWarnings("unchecked")
     @PostMapping("/{idGroup}/users/{idUser}")
     public Map<String, Object> addUserFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                                 @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
@@ -126,6 +129,7 @@ public class GroupController {
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
+    @SuppressWarnings("unchecked")
     @DeleteMapping("/{idGroup}/users/{idUser}")
     public Map<String, Object> deleteUserFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                                    @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
@@ -137,6 +141,7 @@ public class GroupController {
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
+    @SuppressWarnings("unchecked")
     @PostMapping("/{idGroup}/tasks/{idTask}")
     public Map<String, Object> addTaskFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                                 @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
@@ -148,6 +153,7 @@ public class GroupController {
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
+    @SuppressWarnings("unchecked")
     @DeleteMapping("/{idGroup}/tasks/{idTask}")
     public Map<String, Object> deleteTaskFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                                    @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
@@ -159,11 +165,32 @@ public class GroupController {
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
+    @SuppressWarnings("unchecked")
     @DeleteMapping("/{idGroup}/users")
     public Map<String, Object> deleteAllUsersFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
         Group group = groupService.findGroupById(idGroup);
         Preconditions.checkNotNull(group, "The group with idGroup " + idGroup + " does not exist.");
         groupService.removeAllUsersFromGroup(group);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+    }
+
+    @SuppressWarnings("unchecked")
+    @GetMapping("/user/{idUser}")
+    public List<Map<String, Object>> getGroupsWithUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
+        User user = userService.findUserById(idUser);
+        Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
+        List<Group> groups = groupService.findGroupsWithUser(user);
+        Preconditions.checkNotNull(groups, "The user with idUser " + idUser + " does not belong to any group.");
+        return groups.stream().map(group -> new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES)).toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    @GetMapping("/task/{idTask}")
+    public List<Map<String, Object>> getGroupsWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
+        Task task = taskService.findTaskById(idTask);
+        Preconditions.checkNotNull(task, "The task with idTask " + idTask + " does not exist.");
+        List<Group> groups = groupService.findGroupsWithTask(task);
+        Preconditions.checkNotNull(groups, "The task with idTask " + idTask + " does not belong to any group.");
+        return groups.stream().map(group -> new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES)).toList();
     }
 }

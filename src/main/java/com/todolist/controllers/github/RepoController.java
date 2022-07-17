@@ -8,6 +8,8 @@ import com.todolist.entity.github.Repo;
 import com.todolist.entity.github.TaskGitHub;
 import com.todolist.services.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +23,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/github")
 @Validated
-@AllArgsConstructor
 public class RepoController {
 
+    @Value("${github.api.url}")
+    private String startUrl;
+
+    @Autowired
     private UserService userService;
 
     @GetMapping("repos/{idUser}")
@@ -32,15 +37,15 @@ public class RepoController {
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         User user = userService.findUserById(idUser);
         Preconditions.checkNotNull(user, "User not found.");
-        String uri = "https://api.github.com/users/" + user.getUsername() + "/repos";
+        String url = startUrl + "/users/" + user.getUsername() + "/repos";
         RestTemplate restTemplate = new RestTemplate();
         TaskGitHub[] repos;
         if (user.getToken() != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + user.getToken());
-            repos = restTemplate.getForObject(uri, TaskGitHub[].class, headers);
+            repos = restTemplate.getForObject(url, TaskGitHub[].class, headers);
         } else {
-            repos = restTemplate.getForObject(uri, TaskGitHub[].class);
+            repos = restTemplate.getForObject(url, TaskGitHub[].class);
         }
         return Arrays.stream(repos).map(repo -> new ShowTask(Task.of(repo.getName(), repo.getDescription(), null, null, null, repo.getCreatedAt().split("T")[0], null, null)).getFields(fields)
         ).toList();
@@ -53,15 +58,15 @@ public class RepoController {
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         User user = userService.findUserById(idUser);
         Preconditions.checkNotNull(user, "User not found.");
-        String uri = "https://api.github.com/users/" + user.getUsername() + "/repos/" + repoName;
+        String url = startUrl + "/users/" + user.getUsername() + "/repos/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
         TaskGitHub repo;
         if (user.getToken() != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + user.getToken());
-            repo = restTemplate.getForObject(uri, TaskGitHub.class, headers);
+            repo = restTemplate.getForObject(url, TaskGitHub.class, headers);
         } else {
-            repo = restTemplate.getForObject(uri, TaskGitHub.class);
+            repo = restTemplate.getForObject(url, TaskGitHub.class);
         }
         Task task = Task.of(repo.getName(), repo.getDescription(), null, null, null, repo.getCreatedAt().split("T")[0], null, null);
         return new ShowTask(task).getFields(fields);
@@ -74,12 +79,12 @@ public class RepoController {
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         User user = userService.findUserById(idUser);
         Preconditions.checkNotNull(user, "User not found.");
-        String uri = "https://api.github.com/user/repos";
+        String url = startUrl + "/user/repos";
         RestTemplate restTemplate = new RestTemplate();
         Preconditions.checkArgument(user.getToken() != null, "User must have a token.");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.postForObject(uri, createRepo, TaskGitHub.class, headers);
+        restTemplate.postForObject(url, createRepo, TaskGitHub.class, headers);
         return createRepo;
     }
 
@@ -91,12 +96,12 @@ public class RepoController {
             @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         User user = userService.findUserById(idUser);
         Preconditions.checkNotNull(user, "User not found.");
-        String uri = "https://api.github.com/repos" + user.getUsername() + "/" + repoName;
+        String url = startUrl + "/repos" + user.getUsername() + "/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
         Preconditions.checkArgument(user.getToken() != null, "User must have a token.");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.put(uri, updateRepo, TaskGitHub.class, headers);
+        restTemplate.put(url, updateRepo, TaskGitHub.class, headers);
         return updateRepo;
     }
 
@@ -106,11 +111,11 @@ public class RepoController {
             @PathVariable String repoName) {
         User user = userService.findUserById(idUser);
         Preconditions.checkNotNull(user, "User not found.");
-        String uri = "https://api.github.com/repos" + user.getUsername() + "/" + repoName;
+        String url = startUrl + "/repos" + user.getUsername() + "/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
         Preconditions.checkArgument(user.getToken() != null, "User must have a token.");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.delete(uri, headers);
+        restTemplate.delete(url, headers);
     }
 }

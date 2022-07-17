@@ -8,6 +8,8 @@ import com.todolist.entity.pokemon.Pokemon;
 import com.todolist.entity.pokemon.Stat;
 import com.todolist.services.TaskService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,15 +21,18 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/tasks/pokemon")
-@AllArgsConstructor
 public class PokemonController {
 
+    @Value("${pokemon.api.url}")
+    private String startUrl;
+
+    @Autowired
     private TaskService taskService;
 
-    public static Task parsePokemon(String name, String status, String finishedDate, String startDate, Long priority, Integer days) {
-        String uri = "https://pokeapi.co/api/v2/pokemon/" + name;
+    public Task parsePokemon(String name, String status, String finishedDate, String startDate, Long priority, Integer days) {
+        String url = startUrl + "/pokemon/" + name;
         RestTemplate restTemplate = new RestTemplate();
-        Pokemon response = restTemplate.getForObject(uri, Pokemon.class);
+        Pokemon response = restTemplate.getForObject(url, Pokemon.class);
         StringBuilder types = new StringBuilder();
         Preconditions.checkArgument(!(finishedDate != null && days != null), "You can't set both finishedDate and days");
         Preconditions.checkArgument(!(finishedDate == null && days == null), "You must set either finishedDate or days");
@@ -46,7 +51,7 @@ public class PokemonController {
                 getPokemonDifficulty(response).toString());
     }
 
-    private static String getPokemonAnnotation(Pokemon pokemon) {
+    private String getPokemonAnnotation(Pokemon pokemon) {
         if (getAvgStats(pokemon) < 50) {
             return "easy peasy lemon squeezy, take one pokeball";
         } else if (getAvgStats(pokemon) < 100) {
@@ -60,7 +65,7 @@ public class PokemonController {
         }
     }
 
-    private static Difficulty getPokemonDifficulty(Pokemon pokemon) {
+    private Difficulty getPokemonDifficulty(Pokemon pokemon) {
         if (getAvgStats(pokemon) < 50)
             return Difficulty.EASY;
         else if (getAvgStats(pokemon) < 100)
@@ -73,7 +78,7 @@ public class PokemonController {
             return Difficulty.I_WANT_TO_DIE;
     }
 
-    private static Double getAvgStats(Pokemon pokemon) {
+    private Double getAvgStats(Pokemon pokemon) {
         return pokemon.getStats().stream().mapToInt(Stat::getBaseStat).average().orElse(0);
     }
 

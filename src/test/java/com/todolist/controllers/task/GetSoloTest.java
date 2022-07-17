@@ -11,8 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
-// @FlywayTest(additionalLocations = "db/testWithData", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
+@FlywayTest(additionalLocations = "db/migration", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
+// @FlywayTest(additionalLocations = "db/migration", value = @DataSource(url = "jdbc:mysql://uqiweqtspt5rb4xp:uWHt8scUWIMHRDzt7HCg@b8iyr7xai8wk75ismpbt-mysql.services.clever-cloud.com:3306/b8iyr7xai8wk75ismpbt", username = "uqiweqtspt5rb4xp", password = "uWHt8scUWIMHRDzt7HCg"))
 class GetSoloTest {
 
     String uri = "http://localhost:8080/api/v1";
@@ -69,6 +69,14 @@ class GetSoloTest {
     @Test
     void testGetSoloNotFound() {
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks/99", ShowTask.class)))
+                .assertMsg("The task with idTask 99 does not exist.")
+                .assertStatus("Not Found")
+                .assertPath("/api/v1/tasks/99");
+    }
+
+    @Test
+    void testGetSoloWithNegativeId() {
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks/-1", ShowTask.class)))
                 .assertMsg("The task with idTask 99 does not exist.")
                 .assertStatus("Not Found")
                 .assertPath("/api/v1/tasks/99");

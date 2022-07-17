@@ -10,6 +10,8 @@ import com.todolist.entity.github.TaskGitHub;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -22,11 +24,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/github")
-@AllArgsConstructor
 public class OwnerController {
 
+    @Value("${github.api.url}")
+    private String startUrl;
+
+    @Autowired
     private TaskService taskService;
 
+    @Autowired
     private UserService userService;
 
     private static String getAdditional(Map<String, Object> additional, String key) {
@@ -41,15 +47,15 @@ public class OwnerController {
             @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
         User oldUser = userService.findUserById(idUser);
         Preconditions.checkNotNull(oldUser, "User not found");
-        String uri = "https://api.github.com/users/" + oldUser.getUsername();
+        String url = startUrl + "/users/" + oldUser.getUsername();
         RestTemplate restTemplate = new RestTemplate();
         Owner owner;
         if (oldUser.getToken() != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + oldUser.getToken());
-            owner = restTemplate.getForObject(uri, Owner.class, headers);
+            owner = restTemplate.getForObject(url, Owner.class, headers);
         } else {
-            owner = restTemplate.getForObject(uri, Owner.class);
+            owner = restTemplate.getForObject(url, Owner.class);
         }
         Map<String, Object> additional = owner.getAdditionalProperties();
         Object auxName = additional.get("name");
@@ -75,15 +81,15 @@ public class OwnerController {
                                        @RequestParam(required = false) String difficulty) {
         User user = userService.findUserById(idUser);
         Preconditions.checkNotNull(user, "User not found");
-        String uri = "https://api.github.com/users/" + user.getUsername() + "/repos/" + repoName;
+        String url = startUrl + "/users/" + user.getUsername() + "/repos/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
         TaskGitHub repo;
         if (user.getToken() != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + user.getToken());
-            repo = restTemplate.getForObject(uri, TaskGitHub.class, headers);
+            repo = restTemplate.getForObject(url, TaskGitHub.class, headers);
         } else {
-            repo = restTemplate.getForObject(uri, TaskGitHub.class);
+            repo = restTemplate.getForObject(url, TaskGitHub.class);
         }
         Task task = Task.of(repo.getName(), repo.getDescription(), annotation, status, finishedDate, repo.getCreatedAt().split("T")[0], priority, difficulty);
         task = taskService.saveTask(task);

@@ -93,6 +93,14 @@ public class GroupService {
         }
     }
 
+    public List<Group> findGroupsWithUser(User user) {
+        return groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).contains(user)).toList();
+    }
+
+    public List<Group> findGroupsWithTask(Task task) {
+        return groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).stream().anyMatch(user -> userService.getTasksFromUser(user).contains(task))).toList();
+    }
+
     /*
     public void removeAllTasksFromGroup(Group group) {
         List<User> users = getUsersFromGroup(group);

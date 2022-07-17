@@ -44,6 +44,10 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    public List<User> findUsersWithTask(Task task) {
+        return userRepository.findAll().stream().filter(user -> getTasksFromUser(user).contains(task)).toList();
+    }
+
     public List<Task> getTasksFromUser(User user) {
         return userTaskRepository.findByIdUser(user.getIdUser()).stream()
                 .map(userTask -> taskRepository.findById(userTask.getIdTask()).orElseThrow(() -> new RuntimeException("Task not found.")))
@@ -85,9 +89,16 @@ public class UserService {
     }
 
     /*
+    public void removeAllTasksFromUser(User user, Task task) {
+        List<UserTask> userTask = userTaskRepository.findByIdTaskAndIdUser(task.getIdTask(), user.getIdUser());
+        userTaskRepository.deleteAll(userTask);
+    }
+     */
+
+    /*
     public void removeUserFromAllGroups(User user) {
         List<GroupUser> groupUser = groupUserRepository.findByIdUser(user.getIdUser());
         groupUserRepository.deleteAll(groupUser);
     }
-     */
+    */
 }

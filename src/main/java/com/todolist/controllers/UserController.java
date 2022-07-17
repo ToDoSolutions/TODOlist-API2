@@ -5,13 +5,14 @@ import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
-import com.todolist.filters.FilterNumber;
+import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.ServletWebRequest;
 
 import javax.validation.*;
 import javax.validation.constraints.Email;
@@ -32,6 +33,7 @@ public class UserController {
 
     private UserService userService;
 
+    @SuppressWarnings("unchecked")
     @GetMapping
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive") Integer limit,
@@ -44,7 +46,7 @@ public class UserController {
                                                  @RequestParam(required = false) @Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z\\d+&@#/%?=~_|!:,.;]*[-a-zA-Z\\d+&@#/%=~_|]", message = "The avatar is invalid.") String avatar,
                                                  @RequestParam(required = false) String bio,
                                                  @RequestParam(required = false) String location,
-                                                 @RequestParam(required = false) FilterNumber taskCompleted) {
+                                                 @RequestParam(required = false) NumberFilter taskCompleted) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
         Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
         Preconditions.checkArgument(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
@@ -68,6 +70,7 @@ public class UserController {
         return result.stream().map(user -> user.getFields(fieldsUser, fieldsTask)).toList();
     }
 
+    @SuppressWarnings("unchecked")
     @GetMapping("/{idUser}")
     public Map<String, Object> getUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser,
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
@@ -128,6 +131,8 @@ public class UserController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
+
+    @SuppressWarnings("unchecked")
     @PostMapping("/{idUser}/tasks/{idTask}")
     public Map<String, Object> addTaskToUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = userService.findUserById(idUser);
@@ -138,6 +143,7 @@ public class UserController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
+    @SuppressWarnings("unchecked")
     @DeleteMapping("/{idUser}/tasks/{idTask}")
     public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = userService.findUserById(idUser);
@@ -148,6 +154,7 @@ public class UserController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
+    @SuppressWarnings("unchecked")
     @DeleteMapping("/{idUser}/tasks")
     public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Long idUser) {
         User user = userService.findUserById(idUser);
@@ -156,12 +163,29 @@ public class UserController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @PutMapping("/{idUser}/token/{token}")
-    public Map<String, Object> updateToken(@PathVariable("idUser") Long idUser, @PathVariable("token") String token) {
+    @SuppressWarnings("unchecked")
+    @PutMapping("/{idUser}/token")
+    public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser, ServletWebRequest request) {
+
         User user = userService.findUserById(idUser);
         Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
+        String token = request.getHeader("Authorization");
+        Preconditions.checkArgument(token != null, "The token is required.");
+        if (token.contains("Bearer")) token = token.replace("Bearer ", "").trim();
         user.setToken(token);
         user = userService.saveUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
+
+    @SuppressWarnings("unchecked")
+    @GetMapping("/tasks/{idTask}")
+    public List<Map<String, Object>> getUserWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
+        Task task = taskService.findTaskById(idTask);
+        Preconditions.checkNotNull(task, "The task with idTask " + idTask + " does not exist.");
+        List<User> users = userService.findUsersWithTask(task);
+        Preconditions.checkNotNull(users, "The task with idTask " + idTask + " does not belong to any user.");
+        return users.stream().map(user -> new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES)).toList();
+    }
+
+
 }

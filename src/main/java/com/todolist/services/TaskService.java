@@ -20,6 +20,10 @@ public class TaskService {
         return taskRepository.findAll(sort).stream().map(ShowTask::new).toList();
     }
 
+    public List<Task> findAllTasks() {
+        return taskRepository.findAll().stream().toList();
+    }
+
     public Task findTaskById(Long idTask) {
         return taskRepository.findById(idTask).orElse(null);
     }

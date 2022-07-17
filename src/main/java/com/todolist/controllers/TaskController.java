@@ -5,8 +5,8 @@ import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
-import com.todolist.filters.FilterDate;
-import com.todolist.filters.FilterNumber;
+import com.todolist.filters.DateFilter;
+import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -29,6 +29,7 @@ public class TaskController {
 
     private TaskService taskService;
 
+    @SuppressWarnings("unchecked")
     @GetMapping
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
@@ -37,12 +38,12 @@ public class TaskController {
                                                  @RequestParam(required = false) String title,
                                                  @RequestParam(required = false) String description,
                                                  @RequestParam(required = false) Status status,
-                                                 @RequestParam(required = false) FilterDate finishedDate,
-                                                 @RequestParam(required = false) FilterDate startDate,
+                                                 @RequestParam(required = false) DateFilter finishedDate,
+                                                 @RequestParam(required = false) DateFilter startDate,
                                                  @RequestParam(required = false) String annotation,
-                                                 @RequestParam(required = false) FilterNumber priority,
+                                                 @RequestParam(required = false) NumberFilter priority,
                                                  @RequestParam(required = false) Difficulty difficulty,
-                                                 @RequestParam(required = false) FilterNumber duration) {
+                                                 @RequestParam(required = false) NumberFilter duration) {
         System.out.println("hola");
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
         Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
@@ -69,6 +70,7 @@ public class TaskController {
     }
 
 
+    @SuppressWarnings("unchecked")
     @GetMapping("/{idTask}")
     public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
