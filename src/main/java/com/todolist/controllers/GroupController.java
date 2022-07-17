@@ -1,6 +1,7 @@
 package com.todolist.controllers;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.todolist.dtos.ShowGroup;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
@@ -51,9 +52,9 @@ public class GroupController {
                                                   @RequestParam(required = false) NumberFilter numTasks,
                                                   @RequestParam(required = false) DateFilter createdDate) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
-        Preconditions.checkArgument(Arrays.stream(fieldsGroup.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
-        List<ShowGroup> result = new ArrayList<>(),
+        Preconditions.checkArgument(Arrays.stream(ShowGroup.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
+        Preconditions.checkArgument(Arrays.stream(fieldsGroup.split(",")).allMatch(field -> ShowGroup.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
+        List<ShowGroup> result = Lists.newArrayList(),
                 groups = groupService.findAllShowGroups(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = groups.size() - 1;
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.

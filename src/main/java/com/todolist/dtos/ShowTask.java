@@ -1,6 +1,11 @@
 package com.todolist.dtos;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.todolist.entity.Task;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,30 +56,15 @@ public class ShowTask {
     }
 
     public Map<String, Object> getFields(String fields) {
-        List<String> attributes = Stream.of(fields.split(",")).map(String::trim).collect(Collectors.toList());
-        Map<String, Object> map = new TreeMap<>();
-        for (String attribute : attributes) {
-            if (Objects.equals(attribute.toLowerCase(), "idtask"))
-                map.put("idTask", getIdTask());
-            else if (Objects.equals(attribute.toLowerCase(), "title"))
-                map.put("title", getTitle());
-            else if (Objects.equals(attribute.toLowerCase(), "description"))
-                map.put("description", getDescription());
-            else if (Objects.equals(attribute.toLowerCase(), "status"))
-                map.put("status", getStatus());
-            else if (Objects.equals(attribute.toLowerCase(), "finisheddate"))
-                map.put("finishedDate", getFinishedDate());
-            else if (Objects.equals(attribute.toLowerCase(), "startdate"))
-                map.put("startDate", getStartDate());
-            else if (Objects.equals(attribute.toLowerCase(), "annotation"))
-                map.put("annotation", getAnnotation());
-            else if (Objects.equals(attribute.toLowerCase(), "priority"))
-                map.put("priority", getPriority());
-            else if (Objects.equals(attribute.toLowerCase(), "difficulty"))
-                map.put("difficulty", getDifficulty());
-            else if (Objects.equals(attribute.toLowerCase(), "duration"))
-                map.put("duration", getDuration());
-        }
+        List<String> attributes = Stream.of(fields.split(",")).map(String::trim).toList();
+        List<String> attributesNotNeeded = Stream.of(ALL_ATTRIBUTES.split(",")).map(String::trim).filter(attribute -> !attributes.contains(attribute)).toList();
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new ParameterNamesModule())
+                .registerModule(new Jdk8Module())
+                .registerModule(new JavaTimeModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        Map<String, Object> map = mapper.convertValue(this, Map.class);
+        for (String attribute : attributesNotNeeded) map.remove(attribute);
         return map;
     }
 }

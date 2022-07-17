@@ -1,6 +1,7 @@
 package com.todolist.controllers;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
@@ -48,7 +49,7 @@ public class TaskController {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
         Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
         Preconditions.checkArgument(Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
-        List<ShowTask> result = new ArrayList<>(), tasks = taskService.findAllShowTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
+        List<ShowTask> result = Lists.newArrayList(), tasks = taskService.findAllShowTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = tasks.size() - 1;
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
         int end = limit > tasks.size() ? tasks.size() - 1 : start + limit; // Donde va a terminar.

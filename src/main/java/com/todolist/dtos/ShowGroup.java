@@ -1,5 +1,10 @@
 package com.todolist.dtos;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.todolist.entity.Group;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +51,7 @@ public class ShowGroup {
                 .collect(Collectors.toSet()).size();
     }
 
+    /*
     public Map<String, Object> getFields(String fieldsGroup, String fieldsUser, String fieldsTask) {
         List<String> attributesShown = Stream.of(fieldsGroup.split(",")).map(String::trim).toList();
         Map<String, Object> map = new TreeMap<>();
@@ -63,6 +69,22 @@ public class ShowGroup {
             else if (Objects.equals(attribute.toLowerCase(), "users"))
                 map.put("users", users.stream().map(u -> u.getFields(fieldsUser, fieldsTask)).collect(Collectors.toList()));
         }
+        return map;
+    }
+     */
+
+    public Map<String, Object> getFields(String fieldsGroup, String fieldsUser, String fieldsTask) {
+        List<String> attributes = Stream.of(fieldsGroup.split(",")).map(String::trim).toList();
+        List<String> attributesNotNeeded = Stream.of(ALL_ATTRIBUTES.split(",")).map(String::trim).filter(attribute -> !attributes.contains(attribute)).toList();
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new ParameterNamesModule())
+                .registerModule(new Jdk8Module())
+                .registerModule(new JavaTimeModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        Map<String, Object> map = mapper.convertValue(this, Map.class);
+        for (String attribute : attributesNotNeeded) map.remove(attribute);
+        if (attributes.contains("users"))
+            map.put("users", getUsers().stream().map(task -> task.getFields(fieldsUser, fieldsTask)).toList());
         return map;
     }
 }

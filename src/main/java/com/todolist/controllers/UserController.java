@@ -1,6 +1,7 @@
 package com.todolist.controllers;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Task;
@@ -48,9 +49,9 @@ public class UserController {
                                                  @RequestParam(required = false) String location,
                                                  @RequestParam(required = false) NumberFilter taskCompleted) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        Preconditions.checkArgument(Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
-        Preconditions.checkArgument(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
-        List<ShowUser> result = new ArrayList<>(),
+        Preconditions.checkArgument(Arrays.stream(ShowUser.ALL_ATTRIBUTES.split(",")).anyMatch(prop -> prop.equalsIgnoreCase(propertyOrder)), "The order is invalid.");
+        Preconditions.checkArgument(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())), "The fields are invalid.");
+        List<ShowUser> result = Lists.newArrayList(),
                 users = userService.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = users.size() - 1;
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
