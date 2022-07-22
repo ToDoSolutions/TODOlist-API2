@@ -1,5 +1,6 @@
 package com.todolist.filters;
 
+import com.todolist.exceptions.BadRequestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -27,7 +28,7 @@ public class DateFilter {
                 case ">" -> new DateFilter(true, false, false, localDate);
                 case "=" -> new DateFilter(false, false, true, localDate);
                 default ->
-                        throw new IllegalArgumentException("The filter is not valid and it should have a parameter filter (<,>,=,<=,=<,>=,=>,==,!=,<>,><) and a date with the format YYYY-MM-DD.");
+                        throw new BadRequestException("The filter is not valid and it should have a parameter filter (<,>,=,<=,=<,>=,=>,==,!=,<>,><) and a date with the format YYYY-MM-DD.");
             };
         } else if (Pattern.compile("[<>=]{2}\\d{4}-\\d{2}-\\d{2}").matcher(filterWithDate).matches()) {
             String filter = filterWithDate.charAt(0) + "" + filterWithDate.charAt(1);
@@ -38,10 +39,10 @@ public class DateFilter {
                 case "==" -> new DateFilter(false, false, true, localDate);
                 case "!=", "<>", "><" -> new DateFilter(true, true, false, localDate);
                 default ->
-                        throw new IllegalArgumentException("The filter is not valid and it should have a parameter filter (<,>,=,<=,=<,>=,=>,==,!=,<>,><) and a date with the format YYYY-MM-DD.");
+                        throw new BadRequestException("The filter is not valid and it should have a parameter filter (<,>,=,<=,=<,>=,=>,==,!=,<>,><) and a date with the format YYYY-MM-DD.");
             };
         } else {
-            throw new IllegalArgumentException("The filter is not valid and it should have a parameter filter (<,>,=,<=,=<,>=,=>,==,!=,<>,><) and a date with the format YYYY-MM-DD.");
+            throw new BadRequestException("The filter is not valid and it should have a parameter filter (<,>,=,<=,=<,>=,=>,==,!=,<>,><) and a date with the format YYYY-MM-DD.");
         }
     }
 

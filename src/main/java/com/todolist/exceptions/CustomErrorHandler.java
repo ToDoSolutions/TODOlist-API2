@@ -15,25 +15,29 @@ public class CustomErrorHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> handleConstraintViolationException(ConstraintViolationException exception, ServletWebRequest webRequest) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage().replace(":", "->"), webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+        String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
+        System.out.println("ConstraintViolationException: " + message);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), message, webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ExceptionResponse> handleNullPointerException(NullPointerException exception, ServletWebRequest webRequest) {
-        System.out.println("NullPointerException");
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage().replace(":", "->"), webRequest.getRequest().getRequestURI(), HttpStatus.NOT_FOUND.getReasonPhrase());
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException exception, ServletWebRequest webRequest) {
+        String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
+        System.out.println("BadRequestException: " + message);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), message, webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException exception, ServletWebRequest webRequest) {
+        String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
+        System.out.println("NotFoundException: " + message);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), message, webRequest.getRequest().getRequestURI(), HttpStatus.NOT_FOUND.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
-
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(IllegalArgumentException exception, ServletWebRequest webRequest) {
-        System.out.println("IllegalArgumentException");
-        System.out.println("IllegalArgumentException: " + exception.getMessage());
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage().replace(":", "->"), webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
-    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception, ServletWebRequest webRequest) {
@@ -42,19 +46,33 @@ public class CustomErrorHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /*
     @ExceptionHandler(NumberFormatException.class)
     public ResponseEntity<ExceptionResponse> handleNumberFormatException(NumberFormatException exception, ServletWebRequest webRequest) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage().replace(":", "->"), webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
-    /*
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ExceptionResponse> handleRuntimeException(RuntimeException exception, ServletWebRequest webRequest) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage(), webRequest.getRequest().getRequestURI(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ExceptionResponse> handleNullPointerException(NullPointerException exception, ServletWebRequest webRequest) {
+        System.out.println("NullPointerException");
+        String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), message, webRequest.getRequest().getRequestURI(), HttpStatus.NOT_FOUND.getReasonPhrase());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(IllegalArgumentException exception, ServletWebRequest webRequest) {
+        System.out.println("IllegalArgumentException");
+        System.out.println("IllegalArgumentException: " + exception.getMessage());
+        String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), message, webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
      */
+
+
 
 
 }

@@ -1,5 +1,7 @@
 package com.todolist.dtos;
 
+import com.todolist.exceptions.BadRequestException;
+
 import java.util.regex.Pattern;
 
 public enum Difficulty {
@@ -25,7 +27,7 @@ public enum Difficulty {
         else if (Pattern.compile("i[_ ]want[_ ]to[_ ]die").matcher(difficultyLowerCase).matches())
             return I_WANT_TO_DIE;
         else {
-            throw new IllegalArgumentException("The difficulty " + difficulty + " is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die.");
+            throw new BadRequestException("The difficulty " + difficulty + " is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die.");
         }
 
     }

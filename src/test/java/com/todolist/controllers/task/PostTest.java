@@ -2,11 +2,13 @@ package com.todolist.controllers.task;
 
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
+import com.todolist.TODOlistApplication;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import com.todolist.exceptions.ManagerException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
@@ -26,6 +28,11 @@ class PostTest {
     String uri = "http://localhost:8080/api/v1";
     // String uri = "https://todolist-api2.herokuapp.com/api/v1";
     RestTemplate restTemplate;
+
+    @BeforeAll
+    public static void beforeClass() {
+        TODOlistApplication.main(new String[]{});
+    }
 
     @BeforeEach
     void setUp() {
@@ -47,12 +54,12 @@ class PostTest {
     void testPostWithNullOrEmptyTitle() {
         task.setTitle(null);
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
-                .assertMsg("The title is required.")
+                .assertMsg("The task with idTask 0 must have title.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
         task.setTitle("");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
-                .assertMsg("The title is required.")
+                .assertMsg("The task with idTask 0 must have title.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
@@ -71,12 +78,12 @@ class PostTest {
     void testPostWithNullOrEmptyDescription() {
         task.setDescription(null);
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
-                .assertMsg("The description is required.")
+                .assertMsg(" The task with idTask 0 must have description.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
         task.setDescription("");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
-                .assertMsg("The description is required.")
+                .assertMsg(" The task with idTask 0 must have description.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
@@ -105,7 +112,7 @@ class PostTest {
     void testPostWithWrongStatus() {
         task.setStatus("WRONG");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
-                .assertMsg("status-> The status WRONG is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled.")
+                .assertMsg("The status WRONG is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
@@ -193,6 +200,7 @@ class PostTest {
     @Test
     void testPostWithPriorityLowerThanZero() {
         task.setPriority(-1L);
+        System.out.println(uri);
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
                 .assertMsg("The priority must be between 0 and 5.")
                 .assertStatus("Bad Request")
@@ -213,7 +221,7 @@ class PostTest {
     void testPostWithWrongDifficulty() {
         task.setDifficulty("WRONG");
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/tasks", task, ShowTask.class)))
-                .assertMsg("difficulty-> The difficulty WRONG is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die.")
+                .assertMsg("The difficulty WRONG is not valid and it should be one of the following -> sleep - easy - medium - hard - hardcore - i_want_to_die.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }

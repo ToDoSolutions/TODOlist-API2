@@ -51,31 +51,9 @@ public class ShowGroup {
                 .collect(Collectors.toSet()).size();
     }
 
-    /*
     public Map<String, Object> getFields(String fieldsGroup, String fieldsUser, String fieldsTask) {
-        List<String> attributesShown = Stream.of(fieldsGroup.split(",")).map(String::trim).toList();
-        Map<String, Object> map = new TreeMap<>();
-        for (String attribute : attributesShown) {
-            if (Objects.equals(attribute.toLowerCase(), "idgroup"))
-                map.put("idGroup", getIdGroup());
-            else if (Objects.equals(attribute.toLowerCase(), "name"))
-                map.put("name", getName());
-            else if (Objects.equals(attribute.toLowerCase(), "description"))
-                map.put("description", getDescription());
-            else if (Objects.equals(attribute.toLowerCase(), "createddate"))
-                map.put("createdDate", getCreatedDate());
-            else if (Objects.equals(attribute.toLowerCase(), "numtasks"))
-                map.put("numTasks", getNumTasks());
-            else if (Objects.equals(attribute.toLowerCase(), "users"))
-                map.put("users", users.stream().map(u -> u.getFields(fieldsUser, fieldsTask)).collect(Collectors.toList()));
-        }
-        return map;
-    }
-     */
-
-    public Map<String, Object> getFields(String fieldsGroup, String fieldsUser, String fieldsTask) {
-        List<String> attributes = Stream.of(fieldsGroup.split(",")).map(String::trim).toList();
-        List<String> attributesNotNeeded = Stream.of(ALL_ATTRIBUTES.split(",")).map(String::trim).filter(attribute -> !attributes.contains(attribute)).toList();
+        List<String> attributes = Stream.of(fieldsGroup.split(",")).map(attribute -> attribute.trim().toLowerCase()).toList();
+        List<String> attributesNotNeeded = Stream.of(ALL_ATTRIBUTES.split(",")).map(String::trim).filter(attribute -> !attributes.contains(attribute.toLowerCase())).toList();
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new ParameterNamesModule())
                 .registerModule(new Jdk8Module())

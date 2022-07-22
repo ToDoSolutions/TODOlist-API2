@@ -50,19 +50,19 @@ public class ManagerException {
     }
 
     public ManagerException assertStatus(String expected) {
-        if (!Objects.equals(status, expected))
+        if (!Objects.equals(status, expected.trim()))
             throw new AssertionError("Error Status: " + status + " != " + expected);
         return this;
     }
 
     public ManagerException assertPath(String expected) {
-        if (!Objects.equals(path, expected))
+        if (!Objects.equals(path, expected.trim()))
             throw new AssertionError("Error Path: " + path + " != " + expected);
         return this;
     }
 
     public ManagerException assertMsg(String expected) {
-        if (!Objects.equals(this.msg, expected))
+        if (!Objects.equals(this.msg, expected.trim()))
             throw new AssertionError("Error Message: " + this.msg + " != " + expected);
         return this;
     }
