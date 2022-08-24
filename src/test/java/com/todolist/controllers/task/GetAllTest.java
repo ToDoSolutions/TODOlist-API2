@@ -50,7 +50,7 @@ class GetAllTest {
     @Test
     void testGetAllWithIncorrectOffset() {
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks?offset=a", ShowTask[].class)))
-                .assertMsg("For input string-> \\a\\")
+                .assertMsg("Error while parsing the next string  \\a\\.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
@@ -58,7 +58,7 @@ class GetAllTest {
     @Test
     void testGetAllWithNegativeOffset() {
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks?offset=-1", ShowTask[].class)))
-                .assertMsg("getAllTasks.offset-> The offset must be positive.")
+                .assertMsg("The offset must be positive.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
@@ -74,7 +74,7 @@ class GetAllTest {
     @Test
     void testGetAllWithIncorrectLimit() {
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks?limit=a", ShowTask[].class)))
-                .assertMsg("For input string-> \\a\\")
+                .assertMsg("Error while parsing the next string  \\a\\.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }
@@ -82,7 +82,7 @@ class GetAllTest {
     @Test
     void testGetAllWithNegativeLimit() {
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks?limit=-2", ShowTask[].class)))
-                .assertMsg("getAllTasks.limit-> The limit must be positive.")
+                .assertMsg("The limit must be positive.")
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/tasks");
     }

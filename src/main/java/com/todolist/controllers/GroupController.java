@@ -9,6 +9,7 @@ import com.todolist.entity.Group;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
+import com.todolist.exceptions.NotFoundException;
 import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.GroupService;
@@ -78,14 +79,13 @@ public class GroupController {
         return result.stream().map(group -> group.getFields(fieldsGroup, fieldsUser, fieldsTask)).collect(Collectors.toList());
     }
 
-    @SuppressWarnings("unchecked")
     @GetMapping("/{idGroup}")
     public Map<String, Object> getGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                         @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES) String fieldsGroup,
                                         @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,
                                         @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null) throw new BadRequestException("The group with idGroup " + idGroup + " does not exist.");
+        if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         if (!Arrays.stream(fieldsGroup.split(",")).allMatch(field -> ShowGroup.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
             throw new BadRequestException("The groups' fields are invalid.");
         if (!Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase())))
@@ -124,7 +124,7 @@ public class GroupController {
     @DeleteMapping("/{idGroup}")
     public Map<String, Object> deleteGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null) throw new BadRequestException("The group with idGroup " + idGroup + " does not exist.");
+        if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         groupService.deleteGroup(group);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -141,14 +141,13 @@ public class GroupController {
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @SuppressWarnings("unchecked")
     @DeleteMapping("/{idGroup}/users/{idUser}")
     public Map<String, Object> deleteUserFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                                    @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null) throw new BadRequestException("The group with idGroup " + idGroup + " does not exist.");
+        if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         User user = userService.findUserById(idUser);
-        if (user == null) throw new BadRequestException("The user with idUser " + idUser + " does not exist.");
+        if (user == null) throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
         groupService.removeUserFromGroup(group, user);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -158,30 +157,28 @@ public class GroupController {
     public Map<String, Object> addTaskFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                                 @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null) throw new BadRequestException("The group with idGroup " + idGroup + " does not exist.");
+        if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         Task task = taskService.findTaskById(idTask);
-        if (task == null) throw new BadRequestException("The task with idTask " + idTask + " does not exist.");
+        if (task == null) throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
         groupService.addTaskToGroup(group, task);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @SuppressWarnings("unchecked")
     @DeleteMapping("/{idGroup}/tasks/{idTask}")
     public Map<String, Object> deleteTaskFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                                    @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null) throw new BadRequestException("The group with idGroup " + idGroup + " does not exist.");
+        if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         Task task = taskService.findTaskById(idTask);
-        if (task == null) throw new BadRequestException("The task with idTask " + idTask + " does not exist.");
+        if (task == null) throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
         groupService.removeTaskFromGroup(group, task);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @SuppressWarnings("unchecked")
     @DeleteMapping("/{idGroup}/users")
     public Map<String, Object> deleteAllUsersFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null) throw new BadRequestException("The group with idGroup " + idGroup + " does not exist.");
+        if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         groupService.removeAllUsersFromGroup(group);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
@@ -190,7 +187,7 @@ public class GroupController {
     @GetMapping("/user/{idUser}")
     public List<Map<String, Object>> getGroupsWithUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
         User user = userService.findUserById(idUser);
-        if (user == null) throw new BadRequestException("The user with idUser " + idUser + " does not exist.");
+        if (user == null) throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
         List<Group> groups = groupService.findGroupsWithUser(user);
         if (groups == null || groups.isEmpty())
             throw new BadRequestException("The user with idUser " + idUser + " does not belong to any group.");
@@ -201,7 +198,7 @@ public class GroupController {
     @GetMapping("/task/{idTask}")
     public List<Map<String, Object>> getGroupsWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
         Task task = taskService.findTaskById(idTask);
-        if (task == null) throw new BadRequestException("The task with idTask " + idTask + " does not exist.");
+        if (task == null) throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
         List<Group> groups = groupService.findGroupsWithTask(task);
         if (groups == null || groups.isEmpty())
             throw new BadRequestException("The task with idTask " + idTask + " does not belong to any group.");

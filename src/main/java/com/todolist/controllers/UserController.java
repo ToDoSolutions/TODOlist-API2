@@ -54,9 +54,9 @@ public class UserController {
         if (Arrays.stream(ShowUser.ALL_ATTRIBUTES.split(",")).noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
             throw new BadRequestException("The order is invalid.");
         if (!(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
-            throw new BadRequestException("The fieldsUser is invalid.");
+            throw new BadRequestException("The users' fields are invalid.");
         if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
-            throw new BadRequestException("The fieldsTask is invalid.");
+            throw new BadRequestException("The tasks' fields are invalid.");
         List<ShowUser> result = Lists.newArrayList(),
                 users = userService.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = users.size() - 1;
@@ -86,9 +86,9 @@ public class UserController {
         if (user == null)
             throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
         if (!(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
-            throw new BadRequestException("The fieldsUser is invalid.");
+            throw new BadRequestException("The users' fields are invalid.");
         if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
-            throw new BadRequestException("The fieldsTask is invalid.");
+            throw new BadRequestException("The tasks' fields are invalid.");
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
     }
 
@@ -106,7 +106,7 @@ public class UserController {
             throw new BadRequestException("The avatar is required.");
         if (user.getPassword() == null || user.getPassword().isEmpty())
             throw new BadRequestException("The password is required.");
-        if (user.getToken() != null || !user.getToken().isEmpty())
+        if (user.getToken() != null)
             throw new BadRequestException("The token is not required.");
         user = userService.saveUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
@@ -115,7 +115,8 @@ public class UserController {
     @PutMapping
     public Map<String, Object> updateUser(@RequestBody @Valid User user) {
         User oldUser = userService.findUserById(user.getIdUser());
-        Preconditions.checkNotNull(oldUser, "The user with idUser " + user.getIdUser() + " does not exist.");
+        if (oldUser == null)
+            throw new NotFoundException("The user with idUser " + user.getIdUser() + " does not exist.");
         if (user.getName() != null && !user.getName().isEmpty())
             oldUser.setName(user.getName());
         if (user.getSurname() != null && !user.getSurname().isEmpty())
@@ -144,7 +145,8 @@ public class UserController {
     @DeleteMapping("/{idUser}")
     public Map<String, Object> deleteUser(@PathVariable("idUser") @Min(value = 0, message = "The idGroup must be positive.") Long idUser) {
         User user = userService.findUserById(idUser);
-        Preconditions.checkNotNull(user, "The user with idUser " + idUser + " does not exist.");
+        if (user == null)
+            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
         userService.deleteUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }

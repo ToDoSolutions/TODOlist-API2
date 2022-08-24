@@ -7,6 +7,7 @@ import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.entity.github.Owner;
 import com.todolist.entity.github.TaskGitHub;
+import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
 import lombok.AllArgsConstructor;
@@ -30,9 +31,6 @@ public class OwnerController {
     private String startUrl;
 
     @Autowired
-    private TaskService taskService;
-
-    @Autowired
     private UserService userService;
 
     private static String getAdditional(Map<String, Object> additional, String key) {
@@ -40,6 +38,7 @@ public class OwnerController {
         return aux == null ? null : aux.toString();
     }
 
+    // Obtener usuario de GitHub (ya existente)
     @GetMapping("user/{idUser}")
     public Map<String, Object> getOwner(
             @PathVariable long idUser,
@@ -71,28 +70,11 @@ public class OwnerController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
     }
 
-    @PostMapping("user/{idUser}/task/{repoName}")
-    public Map<String, Object> addTask(@PathVariable long idUser,
-                                       @PathVariable String repoName,
-                                       @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
-                                       @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5.") Long priority,
-                                       @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
-                                       @RequestParam(required = false) String annotation,
-                                       @RequestParam(required = false) String difficulty) {
-        User user = userService.findUserById(idUser);
-        Preconditions.checkNotNull(user, "User not found");
-        String url = startUrl + "/users/" + user.getUsername() + "/repos/" + repoName;
-        RestTemplate restTemplate = new RestTemplate();
-        TaskGitHub repo;
-        if (user.getToken() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + user.getToken());
-            repo = restTemplate.getForObject(url, TaskGitHub.class, headers);
-        } else {
-            repo = restTemplate.getForObject(url, TaskGitHub.class);
-        }
-        Task task = Task.of(repo.getName(), repo.getDescription(), annotation, status, finishedDate, repo.getCreatedAt().split("T")[0], priority, difficulty);
-        task = taskService.saveTask(task);
-        return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
-    }
+    // Sabir tareas a GitHub para un usuario ya existente, pedir password
+    // Mover a repo.
+
+    // Actualizar usuario.
+
+    // Añadir colaboradores de un proyecto/repos/{owner}/{repo}/collaborators
+    // Añadir Y eliminar colaborador /repos/{owner}/{repo}/collaborators/{username}
 }

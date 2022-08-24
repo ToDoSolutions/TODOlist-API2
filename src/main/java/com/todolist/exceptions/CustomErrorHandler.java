@@ -46,13 +46,16 @@ public class CustomErrorHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
-    /*
+
     @ExceptionHandler(NumberFormatException.class)
     public ResponseEntity<ExceptionResponse> handleNumberFormatException(NumberFormatException exception, ServletWebRequest webRequest) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage().replace(":", "->"), webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+        String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
+        System.out.println("NumberFormatException: " + message);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), "Error while parsing the next string " + message + ".", webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /*
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ExceptionResponse> handleNullPointerException(NullPointerException exception, ServletWebRequest webRequest) {
         System.out.println("NullPointerException");

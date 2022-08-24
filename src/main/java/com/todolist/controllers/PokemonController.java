@@ -1,4 +1,4 @@
-package com.todolist.controllers.pokemon;
+package com.todolist.controllers;
 
 import com.google.common.base.Preconditions;
 import com.todolist.dtos.Difficulty;
@@ -82,6 +82,11 @@ public class PokemonController {
         return pokemon.getStats().stream().mapToInt(Stat::getBaseStat).average().orElse(0);
     }
 
+    @GetMapping
+    public ShowTask getAllPokemon(@RequestParam Integer generation) {
+        return  null;
+    }
+
     @GetMapping("/{name}")
     public Map<String, Object> getPokemon(@PathVariable String name,
                                           @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
@@ -104,4 +109,6 @@ public class PokemonController {
                                           @RequestParam(required = false) Integer days) {
         return new ShowTask(taskService.saveTask(parsePokemon(name, status, finishedDate, startDate, priority, days))).getFields(fields);
     }
+
+
 }

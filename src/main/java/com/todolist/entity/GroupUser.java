@@ -20,7 +20,5 @@ public class GroupUser {
     @Column(name = "id_user")
     private Long idUser;
 
-    public GroupUser() {
-
-    }
+    public GroupUser() {}
 }

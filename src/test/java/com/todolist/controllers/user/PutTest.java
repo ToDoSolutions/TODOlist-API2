@@ -2,9 +2,11 @@ package com.todolist.controllers.user;
 
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
+import com.todolist.TODOlistApplication;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.User;
 import com.todolist.exceptions.ManagerException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -23,6 +25,11 @@ class PutTest {
     String uri = "http://localhost:8080/api/v1";
     // String uri = "https://todolist-api2.herokuapp.com/api/v1";
     RestTemplate restTemplate;
+
+    @BeforeAll
+    public static void beforeClass() {
+        TODOlistApplication.main(new String[]{});
+    }
 
     @BeforeEach
     void setUp() {
@@ -177,4 +184,6 @@ class PutTest {
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
+
+    // TODO: test for a task.
 }
