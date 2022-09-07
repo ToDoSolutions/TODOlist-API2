@@ -1,24 +1,16 @@
 package com.todolist.controllers.github;
 
-import com.google.common.base.Preconditions;
-import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
-import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.entity.github.Owner;
-import com.todolist.entity.github.TaskGitHub;
 import com.todolist.exceptions.NotFoundException;
-import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Pattern;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +32,10 @@ public class OwnerController {
 
     // Obtener usuario de GitHub (ya existente)
     @GetMapping("user/{idUser}")
-    public Map<String, Object> getOwner(
-            @PathVariable long idUser,
-            @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
-            @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
+    public ShowUser getOwner(@PathVariable long idUser) {
         User oldUser = userService.findUserById(idUser);
-        Preconditions.checkNotNull(oldUser, "User not found");
+        if (oldUser == null)
+            throw new NotFoundException("User not found");
         String url = startUrl + "/users/" + oldUser.getUsername();
         RestTemplate restTemplate = new RestTemplate();
         Owner owner;
@@ -67,7 +57,7 @@ public class OwnerController {
             surname = fullName.size() == 1 ? null : fullName.stream().skip(1).reduce("", (ac, nx) -> ac + " " + nx);
         }
         User user = User.of(name, surname, getAdditional(additional, "login"), getAdditional(additional, "avatar_url"), getAdditional(additional, "email"), getAdditional(additional, "bio"), getAdditional(additional, "location"), "pwd");
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
+        return new ShowUser(user, userService.getShowTaskFromUser(user));
     }
 
     // Sabir tareas a GitHub para un usuario ya existente, pedir password

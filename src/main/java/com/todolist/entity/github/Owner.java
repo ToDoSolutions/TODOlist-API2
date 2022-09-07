@@ -69,6 +69,15 @@ public class Owner {
     @JsonProperty("site_admin")
     private Boolean siteAdmin;
 
+    @JsonProperty("email")
+    private String email;
+
+    @JsonProperty("bio")
+    private String bio;
+
+    @JsonProperty("location")
+    private String location;
+
     @JsonProperty("login")
     public String getLogin() {
         return login;
@@ -259,4 +268,33 @@ public class Owner {
         this.additionalProperties.put(name, value);
     }
 
+    @JsonAnySetter
+    public String getEmail() {
+        return email;
+    }
+
+    @JsonAnySetter
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @JsonAnyGetter
+    public String getBio() {
+        return bio;
+    }
+
+    @JsonAnySetter
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    @JsonAnyGetter
+    public String getLocation() {
+        return location;
+    }
+
+    @JsonAnySetter
+    public void setLocation(String location) {
+        this.location = location;
+    }
 }
