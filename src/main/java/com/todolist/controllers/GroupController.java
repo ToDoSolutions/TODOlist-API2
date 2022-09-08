@@ -69,7 +69,7 @@ public class GroupController {
                 groups = groupService.findAllShowGroups(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = groups.size();
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > groups.size() ? limit : start + limit; // Donde va a terminar.
+        int end = limit > groups.size() || start + limit > groups.size() ? limit : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
             ShowGroup group = groups.get(i);
             if (group != null &&

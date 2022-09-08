@@ -58,11 +58,10 @@ public class TaskController {
         List<ShowTask> result = Lists.newArrayList(), tasks = taskService.findAllShowTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = tasks.size();
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > tasks.size() | limit + start > tasks.size() ? limit : start + limit; // Donde va a terminar.
+        int end = limit > tasks.size() | limit + start > tasks.size() ? tasks.size() : start + limit; // Donde va a terminar.
         System.out.println(end);
         for (int i = start; i < end; i++) {
             ShowTask task = tasks.get(i);
-            System.out.println(task);
             if (task != null &&
                     (title == null || task.getTitle().contains(title)) &&
                     (status == null || task.getStatus() == status) &&

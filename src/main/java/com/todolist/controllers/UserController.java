@@ -39,7 +39,7 @@ public class UserController {
     @SuppressWarnings("unchecked")
     @GetMapping
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
-                                                 @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive") Integer limit,
+                                                 @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive.") Integer limit,
                                                  @RequestParam(defaultValue = "idUser") String order,
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
                                                  @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,
@@ -63,7 +63,7 @@ public class UserController {
                 users = userService.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = users.size();
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > users.size() ? limit : start + limit; // Donde va a terminar.
+        int end = limit > users.size() || start + limit > users.size() ? users.size() : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
             ShowUser user = users.get(i);
             if (user != null &&
