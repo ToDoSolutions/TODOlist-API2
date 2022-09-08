@@ -48,16 +48,21 @@ public class TaskController {
                                                  @RequestParam(required = false) Difficulty difficulty,
                                                  @RequestParam(required = false) NumberFilter duration) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        if (Arrays.stream(ShowTask.ALL_ATTRIBUTES.split(",")).noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
+        List<String> listFields =  List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
+        System.out.println(listFields);
+        System.out.println(propertyOrder);
+        if (listFields.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
             throw new BadRequestException("The order is invalid.");
-        if (!(Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
+        if (!(Arrays.stream(fields.split(",")).allMatch(field -> listFields.contains(field.toLowerCase()))))
             throw new BadRequestException("The fields are invalid.");
         List<ShowTask> result = Lists.newArrayList(), tasks = taskService.findAllShowTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
-        if (limit == -1) limit = tasks.size() - 1;
+        if (limit == -1) limit = tasks.size();
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > tasks.size() ? tasks.size() - 1 : start + limit; // Donde va a terminar.
+        int end = limit > tasks.size() | limit + start > tasks.size() ? limit : start + limit; // Donde va a terminar.
+        System.out.println(end);
         for (int i = start; i < end; i++) {
             ShowTask task = tasks.get(i);
+            System.out.println(task);
             if (task != null &&
                     (title == null || task.getTitle().contains(title)) &&
                     (status == null || task.getStatus() == status) &&

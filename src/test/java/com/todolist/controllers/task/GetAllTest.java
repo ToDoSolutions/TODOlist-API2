@@ -36,7 +36,7 @@ class GetAllTest {
     void testGetAllFine() {
         ShowTask[] response = restTemplate.getForObject(uri + "/tasks", ShowTask[].class);
         assertNotNull(response, "Response is null");
-        assertEquals(7, response.length, "Length is not correct");
+        assertEquals(8, response.length, "Length is not correct");
     }
 
     // Offset
@@ -100,7 +100,7 @@ class GetAllTest {
     void testGetAllWithCorrectOrder() {
         ShowTask[] response = restTemplate.getForObject(uri + "/tasks?order=title", ShowTask[].class);
         assertNotNull(response, "Response is null");
-        assertEquals(7, response.length, "Length is not correct");
+        assertEquals(8, response.length, "Length is not correct");
     }
 
     @Test
@@ -137,13 +137,14 @@ class GetAllTest {
     void testGetAllWithCorrectFields() {
         ShowTask[] response = restTemplate.getForObject(uri + "/tasks?fields=title,description", ShowTask[].class);
         assertNotNull(response, "Response is null");
-        assertEquals(7, response.length, "Length is not correct");
+        assertEquals(8, response.length, "Length is not correct");
     }
 
     @Test
     void testGetAllWithIncorrectFields() {
-        ShowTask[] response = restTemplate.getForObject(uri + "/tasks?fields=a", ShowTask[].class);
-        assertNotNull(response, "Response is null");
-        assertEquals(7, response.length, "Length is not correct");
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () ->restTemplate.getForObject(uri + "/tasks?fields=a", ShowTask[].class)))
+                .assertMsg("The fields are invalid.")
+                .assertStatus("Bad Request")
+                .assertPath("/api/v1/tasks");
     }
 }

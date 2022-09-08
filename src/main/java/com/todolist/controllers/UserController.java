@@ -51,17 +51,19 @@ public class UserController {
                                                  @RequestParam(required = false) String location,
                                                  @RequestParam(required = false) NumberFilter taskCompleted) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        if (Arrays.stream(ShowUser.ALL_ATTRIBUTES.split(",")).noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
+        List<String> listUserFields = List.of(ShowUser.ALL_ATTRIBUTES.toLowerCase().split(","));
+        List<String> listTaskFields = List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
+        if (listUserFields.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
             throw new BadRequestException("The order is invalid.");
-        if (!(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
+        if (!(Arrays.stream(fieldsUser.split(",")).allMatch(field -> listUserFields.contains(field.toLowerCase()))))
             throw new BadRequestException("The users' fields are invalid.");
-        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
+        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> listTaskFields.contains(field.toLowerCase()))))
             throw new BadRequestException("The tasks' fields are invalid.");
         List<ShowUser> result = Lists.newArrayList(),
                 users = userService.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
-        if (limit == -1) limit = users.size() - 1;
+        if (limit == -1) limit = users.size();
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > users.size() ? users.size() : start + limit; // Donde va a terminar.
+        int end = limit > users.size() ? limit : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
             ShowUser user = users.get(i);
             if (user != null &&
