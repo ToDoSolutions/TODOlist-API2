@@ -34,29 +34,29 @@ class GetSoloTest {
 
     @Test
     void testGetSoloFine() {
-        ShowUser response = restTemplate.getForObject(uri + "/users/1", ShowUser.class);
+        ShowUser response = restTemplate.getForObject(uri + "/user/1", ShowUser.class);
         assertEquals(1, response.getIdUser(), "IdUser is not correct");
     }
 
     @Test
     void testGetSoloFields() {
-        ShowUser response = restTemplate.getForObject(uri + "/users/1?fieldsUser=idUser,name,surname", ShowUser.class);
+        ShowUser response = restTemplate.getForObject(uri + "/user/1?fieldsUser=idUser,name,surname", ShowUser.class);
         assertEquals(1, response.getIdUser(), "IdUser is not correct");
         assertNull(response.getTasks(), "Tasks is not correct");
     }
 
     @Test
     void testGetSoloFieldsWithWrongField() {
-        ManagerException exception = ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/users/1?fieldsUser=idUser,wrongField", ShowTask.class)));
+        ManagerException exception = ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/user/1?fieldsUser=idUser,wrongField", ShowTask.class)));
         assertEquals("Bad Request", exception.getStatus(), "Status is not correct");
         assertEquals("The users' fields are invalid.", exception.getMsg(), "Message is not correct");
-        assertEquals("/api/v1/users/1", exception.getPath(), "Code is not correct");
+        assertEquals("/api/v1/user/1", exception.getPath(), "Code is not correct");
 
     }
 
     @Test
     void testGetSoloUpperFields() {
-        ShowUser response = restTemplate.getForObject(uri + "/users/1?fieldsUser=IDUSER,NAME,SURNAME", ShowUser.class);
+        ShowUser response = restTemplate.getForObject(uri + "/user/1?fieldsUser=IDUSER,NAME,SURNAME", ShowUser.class);
         assertEquals(1, response.getIdUser(), "IdUser is not correct");
         assertNull(response.getTasks(), "Tasks is not correct");
     }
@@ -64,9 +64,9 @@ class GetSoloTest {
 
     @Test
     void testGetSoloNotFound() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/users/99", ShowUser.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/user/99", ShowUser.class)))
                 .assertMsg("The user with idUser 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/99");
+                .assertPath("/api/v1/user/99");
     }
 }

@@ -34,7 +34,7 @@ class GetAllTest {
 
     @Test
     void testGetAllFine() {
-        ShowUser[] response = restTemplate.getForObject(uri + "users", ShowUser[].class);
+        ShowUser[] response = restTemplate.getForObject(uri + "/users", ShowUser[].class);
         RestTemplate restTemplate = new RestTemplate();
         assertNotNull(response, "Response is null");
         assertEquals(6, response.length, "Length is not correct");

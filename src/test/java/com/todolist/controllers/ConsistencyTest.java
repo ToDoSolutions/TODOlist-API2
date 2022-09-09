@@ -34,29 +34,29 @@ class ConsistencyTest {
 
     @Test
     void testDeleteTaskFromUser() {
-        restTemplate.exchange(uri + "/tasks/1", HttpMethod.DELETE, null, ShowTask.class);
-        ShowUser response = restTemplate.getForObject(uri + "/users/1", ShowUser.class);
+        restTemplate.exchange(uri + "/task/1", HttpMethod.DELETE, null, ShowTask.class);
+        ShowUser response = restTemplate.getForObject(uri + "/user/1", ShowUser.class);
         assertEquals(0, response.getTasks().size(), "Task was not deleted");
     }
 
     @Test
     void testDelteUserFromTask() {
-        restTemplate.exchange(uri + "/users/1", HttpMethod.DELETE, null, ShowUser.class);
-        ShowTask response = restTemplate.getForObject(uri + "/tasks/1", ShowTask.class);
+        restTemplate.exchange(uri + "/user/1", HttpMethod.DELETE, null, ShowUser.class);
+        ShowTask response = restTemplate.getForObject(uri + "/task/1", ShowTask.class);
         assertEquals(1, response.getIdTask(), "Task was deleted.");
     }
 
     @Test
     void testDeleteUserFromGroup() {
-        restTemplate.exchange(uri + "/users/1", HttpMethod.DELETE, null, ShowUser.class);
-        ShowGroup response = restTemplate.getForObject(uri + "/groups/1", ShowGroup.class);
+        restTemplate.exchange(uri + "/user/1", HttpMethod.DELETE, null, ShowUser.class);
+        ShowGroup response = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
         assertEquals(1, response.getUsers().size(), "User was not deleted.");
     }
 
     @Test
     void testDeleteGroupFromUser() {
-        restTemplate.exchange(uri + "/groups/1", HttpMethod.DELETE, null, ShowGroup.class);
-        ShowUser response = restTemplate.getForObject(uri + "/users/1", ShowUser.class);
+        restTemplate.exchange(uri + "/group/1", HttpMethod.DELETE, null, ShowGroup.class);
+        ShowUser response = restTemplate.getForObject(uri + "/user/1", ShowUser.class);
         assertEquals(1, response.getIdUser(), "User was deleted.");
     }
 

@@ -36,31 +36,31 @@ public class DeleteTest {
 
     @Test
     void testDeleteFine() {
-        ShowUser response1 = restTemplate.getForObject(uri + "/users/1", ShowUser.class);
-        ShowUser response2 = restTemplate.exchange(uri + "/users/1/tasks/1", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class).getBody();
+        ShowUser response1 = restTemplate.getForObject(uri + "/user/1", ShowUser.class);
+        ShowUser response2 = restTemplate.exchange(uri + "/user/1/task/1", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class).getBody();
         assertEquals(response1.getTasks().size() - 1, response2.getTasks().size(), "The number of tasks is not correct");
     }
 
     @Test
     void testDeleteNotAdded() {
-        ShowUser response1 = restTemplate.getForObject(uri + "/users/1", ShowUser.class);
-        ShowUser response2 = restTemplate.exchange(uri + "/users/1/tasks/2", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class).getBody();;
+        ShowUser response1 = restTemplate.getForObject(uri + "/user/1", ShowUser.class);
+        ShowUser response2 = restTemplate.exchange(uri + "/user/1/task/2", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class).getBody();;
         assertEquals(response1.getTasks().size(), response2.getTasks().size(), "The number of tasks is not correct");
     }
 
     @Test
     void testDeleteWithNotExistTask() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users/1/tasks/-1", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/user/1/task/-1", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class)))
                 .assertMsg("The task with idTask -1 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/1/tasks/-1");
+                .assertPath("/api/v1/user/1/task/-1");
     }
 
     @Test
     void testDeleteWithNotExistUser() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users/-1/tasks/2", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/user/-1/task/2", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class)))
                 .assertMsg("The user with idUser -1 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/-1/tasks/2");
+                .assertPath("/api/v1/user/-1/task/2");
     }
 }

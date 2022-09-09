@@ -33,13 +33,13 @@ class GetSoloTest {
 
     @Test
     void testGetSoloFine() {
-        ShowTask response = restTemplate.getForObject(uri + "/tasks/1", ShowTask.class);
+        ShowTask response = restTemplate.getForObject(uri + "/task/1", ShowTask.class);
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
     }
 
     @Test
     void testGetSoloFields() {
-        ShowTask response = restTemplate.getForObject(uri + "/tasks/1?fields=title,description,annotation,idTask", ShowTask.class);
+        ShowTask response = restTemplate.getForObject(uri + "/task/1?fields=title,description,annotation,idTask", ShowTask.class);
         System.out.println(response);
         assertEquals("Vacaciones", response.getTitle(), "Title is not correct");
         assertEquals("Quiero vacaciones", response.getDescription(), "Description is not correct");
@@ -54,15 +54,15 @@ class GetSoloTest {
 
     @Test
     void testGetSoloFieldsWithWrongField() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks/1?fields=idTask,title,description,annotation,wrongField", ShowTask.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/task/1?fields=idTask,title,description,annotation,wrongField", ShowTask.class)))
                 .assertMsg("The fields are invalid.")
                 .assertStatus("Bad Request")
-                .assertPath("/api/v1/tasks/1");
+                .assertPath("/api/v1/task/1");
     }
 
     @Test
     void testGetSoloUpperFields() {
-        ShowTask response = restTemplate.getForObject(uri + "/tasks/1?fields=IDTASK,TITLE,DESCRIPTION,ANNOTATION", ShowTask.class);
+        ShowTask response = restTemplate.getForObject(uri + "/task/1?fields=IDTASK,TITLE,DESCRIPTION,ANNOTATION", ShowTask.class);
         assertEquals("Vacaciones", response.getTitle(), "Title is not correct");
         assertEquals("Quiero vacaciones", response.getDescription(), "Description is not correct");
         assertEquals("Vacaciones", response.getAnnotation(), "Annotation is not correct");
@@ -76,17 +76,17 @@ class GetSoloTest {
 
     @Test
     void testGetSoloNotFound() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks/99", ShowTask.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/task/99", ShowTask.class)))
                 .assertMsg("The task with idTask 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/tasks/99");
+                .assertPath("/api/v1/task/99");
     }
 
     @Test
     void testGetSoloWithNegativeId() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks/-1", ShowTask.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/task/-1", ShowTask.class)))
                 .assertMsg("The idTask must be positive.")
                 .assertStatus("Bad Request")
-                .assertPath("/api/v1/tasks/-1");
+                .assertPath("/api/v1/task/-1");
     }
 }

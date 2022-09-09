@@ -80,7 +80,7 @@ public class GroupController {
         return result.stream().map(group -> group.getFields(fieldsGroup, fieldsUser, fieldsTask)).collect(Collectors.toList());
     }
 
-    @GetMapping("/groups/{idGroup}")
+    @GetMapping("/group/{idGroup}")
     public Map<String, Object> getGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                         @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES) String fieldsGroup,
                                         @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,

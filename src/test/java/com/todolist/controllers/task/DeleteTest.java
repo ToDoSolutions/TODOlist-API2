@@ -36,19 +36,19 @@ class DeleteTest {
 
     @Test
     void testDeleteFine() {
-        ShowTask response = restTemplate.exchange(uri + "/tasks/1", HttpMethod.DELETE, null, ShowTask.class).getBody();
+        ShowTask response = restTemplate.exchange(uri + "/task/1", HttpMethod.DELETE, null, ShowTask.class).getBody();
         assertEquals(1, response.getIdTask(), "IdTask is not correct");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/tasks/1", ShowTask.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/task/1", ShowTask.class)))
                 .assertMsg("The task with idTask 1 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/tasks/1");
+                .assertPath("/api/v1/task/1");
     }
 
     @Test
     void testDeleteWithWrongId() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/tasks/0", HttpMethod.DELETE, null, ShowTask.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/task/0", HttpMethod.DELETE, null, ShowTask.class)))
                 .assertMsg("The task with idTask 0 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/tasks/0");
+                .assertPath("/api/v1/task/0");
     }
 }

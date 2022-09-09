@@ -35,21 +35,19 @@ class DeleteTest {
 
     @Test
     void testDeleteFine() {
-        ShowUser response = restTemplate.exchange(uri + "/users/1", HttpMethod.DELETE, null, ShowUser.class).getBody();
+        ShowUser response = restTemplate.exchange(uri + "/user/1", HttpMethod.DELETE, null, ShowUser.class).getBody();
         assertEquals(1, response.getIdUser(), "IdUser is not correct");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/users/1", ShowUser.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/user/1", ShowUser.class)))
                 .assertMsg("The user with idUser 1 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/1");
+                .assertPath("/api/v1/user/1");
     }
 
     @Test
     void testDeleteWithWrongId() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users/0", HttpMethod.DELETE, null, ShowUser.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/user/0", HttpMethod.DELETE, null, ShowUser.class)))
                 .assertMsg("The user with idUser 0 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/0");
+                .assertPath("/api/v1/user/0");
     }
-
-    // TODO: test delete for tasks.
 }
