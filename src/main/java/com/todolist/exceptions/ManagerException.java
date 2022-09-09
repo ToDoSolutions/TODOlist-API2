@@ -20,6 +20,7 @@ public class ManagerException {
 
     private ManagerException(HttpStatusCodeException exception) {
         Map<String, String> info;
+        System.out.println("exception: " + exception);
         try {
             info = new HashMap<>(Splitter.on(",")
                     .withKeyValueSeparator(":")

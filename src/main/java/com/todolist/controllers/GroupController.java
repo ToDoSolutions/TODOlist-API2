@@ -44,7 +44,7 @@ public class GroupController {
     @SuppressWarnings("unchecked")
     @GetMapping
     public List<Map<String, Object>> getAllGroups(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
-                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive") Integer limit,
+                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
                                                   @RequestParam(defaultValue = "idGroup") String order,
                                                   @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES) String fieldsGroup,
                                                   @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,

@@ -43,7 +43,7 @@ class GetAllTest {
     // Offset
     @Test
     void testGetAllWithCorrectOffset() {
-        ShowUser[] response = restTemplate.getForObject(uri + "users?offset=2", ShowUser[].class);
+        ShowUser[] response = restTemplate.getForObject(uri + "/users?offset=2", ShowUser[].class);
         assertNotNull(response, "Response is null");
         assertEquals(5, response.length, "Length is not correct");
     }
@@ -214,6 +214,7 @@ class GetAllTest {
                 .assertPath("/api/v1/users");
     }
 
+    // Bio
     @Test
     void testGetAllByBio() {
         ShowUser[] response = restTemplate.getForObject(uri + "/users?bio=Solamente defender al mundo del caos", ShowUser[].class);
@@ -239,14 +240,14 @@ class GetAllTest {
 
     @Test
     void testGetAllGreaterTaskCompleted() {
-        ShowUser[] response = restTemplate.getForObject(uri + "/users?taskCompleted>1", ShowUser[].class);
+        ShowUser[] response = restTemplate.getForObject(uri + "/users?taskCompleted=>1", ShowUser[].class);
         assertNotNull(response, "Response is null");
         assertEquals(0, response.length, "Length is not correct");
     }
 
     @Test
     void testGetAllLowerTaskCompleted() {
-        ShowUser[] response = restTemplate.getForObject(uri + "/users?taskCompleted<1", ShowUser[].class);
+        ShowUser[] response = restTemplate.getForObject(uri + "/users?taskCompleted=<1", ShowUser[].class);
         assertNotNull(response, "Response is null");
         assertEquals(5, response.length, "Length is not correct");
     }
