@@ -1,6 +1,7 @@
 package com.todolist.entity;
 
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode(of = {"idGroup"})
 public class Group {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)

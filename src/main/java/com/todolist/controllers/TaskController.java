@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1/tasks")
+@RequestMapping("/api/v1")
 @Validated
 @AllArgsConstructor
 public class TaskController {
@@ -32,8 +32,7 @@ public class TaskController {
 
     private TaskService taskService;
 
-    @SuppressWarnings("unchecked")
-    @GetMapping
+    @GetMapping("/tasks")
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
                                                  @RequestParam(defaultValue = "idTask") String order,
@@ -49,8 +48,6 @@ public class TaskController {
                                                  @RequestParam(required = false) NumberFilter duration) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
         List<String> listFields =  List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
-        System.out.println(listFields);
-        System.out.println(propertyOrder);
         if (listFields.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
             throw new BadRequestException("The order is invalid.");
         if (!(Arrays.stream(fields.split(",")).allMatch(field -> listFields.contains(field.toLowerCase()))))
@@ -58,8 +55,7 @@ public class TaskController {
         List<ShowTask> result = Lists.newArrayList(), tasks = taskService.findAllShowTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = tasks.size();
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > tasks.size() | limit + start > tasks.size() ? tasks.size() : start + limit; // Donde va a terminar.
-        System.out.println(end);
+        int end = limit > tasks.size() || limit + start > tasks.size() ? tasks.size() : start + limit; // Donde va a terminar.
         for (int i = start; i < end; i++) {
             ShowTask task = tasks.get(i);
             if (task != null &&
@@ -77,9 +73,7 @@ public class TaskController {
         return result.stream().map(task -> task.getFields(fields)).toList();
     }
 
-
-    @SuppressWarnings("unchecked")
-    @GetMapping("/{idTask}")
+    @GetMapping("/task/{idTask}")
     public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         Task task = taskService.findTaskById(idTask);
@@ -90,7 +84,7 @@ public class TaskController {
         return new ShowTask(task).getFields(fields);
     }
 
-    @PostMapping
+    @PostMapping("/task")
     public Map<String, Object> addTask(@RequestBody @Valid Task task) {
         if (task == null)
             throw new BadRequestException("Task is null.");
@@ -111,7 +105,7 @@ public class TaskController {
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
 
-    @PutMapping
+    @PutMapping("/task")
     public Map<String, Object> updateTask(@RequestBody @Valid Task task) {
         Task oldTask = taskService.findTaskById(task.getIdTask());
         if (oldTask == null)
@@ -146,7 +140,7 @@ public class TaskController {
     }
 
 
-    @DeleteMapping("/{idTask}")
+    @DeleteMapping("/task/{idTask}")
     public Map<String, Object> deleteTask(@PathVariable("idTask") Long idTask) {
         Task task = taskService.findTaskById(idTask);
         if (task == null)

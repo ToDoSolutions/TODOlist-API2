@@ -1,5 +1,6 @@
 package com.todolist.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode(of = {"idUser"})
 public class User implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)

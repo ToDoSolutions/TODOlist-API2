@@ -23,7 +23,7 @@ public class UserTask {
     public UserTask() {
     }
 
-    public UserTask(long idTask, long idUser) {
+    public UserTask(long idUser, long idTask) {
         this.idUserTask = 0L;
         this.idTask = idTask;
         this.idUser = idUser;

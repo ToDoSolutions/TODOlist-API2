@@ -184,6 +184,4 @@ class PutTest {
                 .assertStatus("Bad Request")
                 .assertPath("/api/v1/users");
     }
-
-    // TODO: test for a task.
 }
