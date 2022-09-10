@@ -72,7 +72,7 @@ public class UserService {
     }
      */
 
-    public void addTaskToUser(User user, Task task) {;
+    public void addTaskToUser(User user, Task task) {
         userTaskRepository.save(new UserTask(user.getIdUser(), task.getIdTask()));
     }
 

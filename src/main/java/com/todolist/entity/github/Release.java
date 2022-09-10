@@ -1,37 +1,32 @@
-
 package com.todolist.entity.github;
 
+import com.fasterxml.jackson.annotation.*;
+
+import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "url",
-    "assets_url",
-    "upload_url",
-    "html_url",
-    "id",
-    "author",
-    "node_id",
-    "tag_name",
-    "target_commitish",
-    "name",
-    "draft",
-    "prerelease",
-    "created_at",
-    "published_at",
-    "assets",
-    "tarball_url",
-    "zipball_url",
-    "body"
+        "url",
+        "assets_url",
+        "upload_url",
+        "html_url",
+        "id",
+        "author",
+        "node_id",
+        "tag_name",
+        "target_commitish",
+        "name",
+        "draft",
+        "prerelease",
+        "created_at",
+        "published_at",
+        "assets",
+        "tarball_url",
+        "zipball_url",
+        "body"
 })
 @Generated("jsonschema2pojo")
 public class Release {
@@ -73,7 +68,7 @@ public class Release {
     @JsonProperty("body")
     private String body;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("url")
     public String getUrl() {

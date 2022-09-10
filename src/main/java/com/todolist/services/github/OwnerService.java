@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class OwnerService {
 
@@ -22,6 +22,11 @@ public class OwnerService {
 
     @Autowired
     private UserService userService;
+
+    private static String getAdditional(Map<String, Object> additional, String key) {
+        Object aux = additional.get(key);
+        return aux == null ? null : aux.toString();
+    }
 
     // findById(String userId)
     public Owner findById(Long idUser) {
@@ -79,12 +84,7 @@ public class OwnerService {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + oldUser.getToken());
-        owner = restTemplate.postForEntity(url, owner , Owner.class, headers).getBody();
+        owner = restTemplate.postForEntity(url, owner, Owner.class, headers).getBody();
         return owner;
-    }
-
-    private static String getAdditional(Map<String, Object> additional, String key) {
-        Object aux = additional.get(key);
-        return aux == null ? null : aux.toString();
     }
 }

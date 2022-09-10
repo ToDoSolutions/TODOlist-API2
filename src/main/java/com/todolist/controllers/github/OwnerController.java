@@ -8,7 +8,10 @@ import com.todolist.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -29,6 +32,7 @@ public class OwnerController {
         Object aux = additional.get(key);
         return aux == null ? null : aux.toString();
     }
+
 
     // Obtener usuario de GitHub (ya existente)
     @GetMapping("user/{idUser}")

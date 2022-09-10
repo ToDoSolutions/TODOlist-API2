@@ -9,6 +9,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @RestControllerAdvice
 public class CustomErrorHandler {
@@ -38,7 +39,6 @@ public class CustomErrorHandler {
     }
 
 
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception, ServletWebRequest webRequest) {
         System.out.println("MethodArgumentNotValidException");
@@ -52,6 +52,14 @@ public class CustomErrorHandler {
         String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
         System.out.println("NumberFormatException: " + message);
         ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), "Error while parsing the next string " + message + ".", webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ExceptionResponse> handleDateTimeParseException(DateTimeParseException exception, ServletWebRequest webRequest) {
+        String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1].split("'")[1] : exception.getMessage().split("'")[1];
+        System.out.println("DateTimeParseException: " + message);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), "The date " + message + " is not valid and it should be in the format yyyy-MM-dd.", webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -74,8 +82,6 @@ public class CustomErrorHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
      */
-
-
 
 
 }

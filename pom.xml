@@ -111,7 +111,6 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
-
     </dependencies>
     <build>
         <plugins>
@@ -128,5 +127,4 @@
             <url>https://repo.clojars.org/</url>
         </repository>
     </repositories>
-
 </project>

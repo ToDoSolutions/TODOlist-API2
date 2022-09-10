@@ -1,6 +1,5 @@
 package com.todolist.controllers;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
@@ -24,7 +23,6 @@ import javax.validation.constraints.Pattern;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1")
 @Validated
 @AllArgsConstructor
 public class UserController {
@@ -36,7 +34,18 @@ public class UserController {
 
     private UserService userService;
 
-    @GetMapping("/users")
+    /* USER OPERATIONS */
+
+    @DeleteMapping("/user/{idUser}") // DeleteTest
+    public Map<String, Object> deleteUser(@PathVariable("idUser") @Min(value = 0, message = "The idGroup must be positive.") Long idUser) {
+        User user = userService.findUserById(idUser);
+        if (user == null)
+            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
+        userService.deleteUser(user);
+        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+    }
+
+    @GetMapping("/users") // GetAllTest
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive.") Integer limit,
                                                  @RequestParam(defaultValue = "idUser") String order,
@@ -78,7 +87,7 @@ public class UserController {
         return result.stream().map(user -> user.getFields(fieldsUser, fieldsTask)).toList();
     }
 
-    @GetMapping("/user/{idUser}")
+    @GetMapping("/user/{idUser}") // GetSoloTest
     public Map<String, Object> getUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser,
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
                                        @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
@@ -92,7 +101,7 @@ public class UserController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
     }
 
-    @PostMapping("/user")
+    @PostMapping("/user") // PostTest
     public Map<String, Object> addUser(@RequestBody @Valid User user) {
         if (user == null)
             throw new BadRequestException("The user is null.");
@@ -112,7 +121,7 @@ public class UserController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @PutMapping("/user")
+    @PutMapping("/user") // PutTest
     public Map<String, Object> updateUser(@RequestBody @Valid User user) {
         User oldUser = userService.findUserById(user.getIdUser());
         if (oldUser == null)
@@ -142,28 +151,18 @@ public class UserController {
         return new ShowUser(oldUser, userService.getShowTaskFromUser(oldUser)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @DeleteMapping("/user/{idUser}")
-    public Map<String, Object> deleteUser(@PathVariable("idUser") @Min(value = 0, message = "The idGroup must be positive.") Long idUser) {
+    /* TASK OPERATIONS */
+
+    @DeleteMapping("/user/{idUser}/tasks") // DeleteTest
+    public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Long idUser) {
         User user = userService.findUserById(idUser);
         if (user == null)
             throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
-        userService.deleteUser(user);
+        userService.removeAllTasksFromUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @PutMapping("/user/{idUser}/task/{idTask}")
-    public Map<String, Object> addTaskToUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
-        User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
-        Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
-        if (!userService.getTasksFromUser(user).contains(task)) userService.addTaskToUser(user, task);
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
-    }
-
-    @DeleteMapping("/user/{idUser}/task/{idTask}")
+    @DeleteMapping("/user/{idUser}/task/{idTask}") // DeleteAllTest
     public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = userService.findUserById(idUser);
         if (user == null)
@@ -175,19 +174,34 @@ public class UserController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @DeleteMapping("/user/{idUser}/tasks")
-    public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Long idUser) {
+    @GetMapping("/users/task/{idTask}") // GetAllTest
+    public List<Map<String, Object>> getUserWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
+        Task task = taskService.findTaskById(idTask);
+        if (task == null)
+            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
+        List<User> users = userService.findUsersWithTask(task);
+        if (users == null || users.isEmpty())
+            throw new BadRequestException("The task with idTask " + idTask + " does not belong to any user.");
+        return users.stream().map(user -> new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES)).toList();
+    }
+
+    @PutMapping("/user/{idUser}/task/{idTask}") // PutTest
+    public Map<String, Object> addTaskToUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = userService.findUserById(idUser);
         if (user == null)
             throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
-        userService.removeAllTasksFromUser(user);
+        Task task = taskService.findTaskById(idTask);
+        if (task == null)
+            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
+        if (!userService.getTasksFromUser(user).contains(task)) userService.addTaskToUser(user, task);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @SuppressWarnings("unchecked")
-    @PutMapping("/user/{idUser}/token")
-    public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser, ServletWebRequest request) {
+    /* TOKEN OPERATION */
 
+    @SuppressWarnings("unchecked")
+    @PutMapping("/user/{idUser}/token") // TokenTest
+    public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser, ServletWebRequest request) {
         User user = userService.findUserById(idUser);
         if (user == null)
             throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
@@ -200,14 +214,5 @@ public class UserController {
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
-    @GetMapping("/users/task/{idTask}")
-    public List<Map<String, Object>> getUserWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
-        Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
-        List<User> users = userService.findUsersWithTask(task);
-        if (users == null || users.isEmpty())
-            throw  new BadRequestException("The task with idTask " + idTask + " does not belong to any user.");
-        return users.stream().map(user -> new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES)).toList();
-    }
+
 }

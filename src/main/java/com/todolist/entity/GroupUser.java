@@ -20,7 +20,8 @@ public class GroupUser {
     @Column(name = "id_user")
     private Long idUser;
 
-    public GroupUser() {}
+    public GroupUser() {
+    }
 
     public GroupUser(Long idGroup, Long idUser) {
         this.idGroup = idGroup;

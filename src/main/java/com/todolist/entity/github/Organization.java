@@ -1,47 +1,42 @@
-
 package com.todolist.entity.github;
 
+import com.fasterxml.jackson.annotation.*;
+
+import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "login",
-    "id",
-    "node_id",
-    "url",
-    "repos_url",
-    "events_url",
-    "hooks_url",
-    "issues_url",
-    "members_url",
-    "public_members_url",
-    "avatar_url",
-    "description",
-    "name",
-    "company",
-    "blog",
-    "location",
-    "email",
-    "twitter_username",
-    "is_verified",
-    "has_organization_projects",
-    "has_repository_projects",
-    "public_repos",
-    "public_gists",
-    "followers",
-    "following",
-    "html_url",
-    "created_at",
-    "updated_at",
-    "type"
+        "login",
+        "id",
+        "node_id",
+        "url",
+        "repos_url",
+        "events_url",
+        "hooks_url",
+        "issues_url",
+        "members_url",
+        "public_members_url",
+        "avatar_url",
+        "description",
+        "name",
+        "company",
+        "blog",
+        "location",
+        "email",
+        "twitter_username",
+        "is_verified",
+        "has_organization_projects",
+        "has_repository_projects",
+        "public_repos",
+        "public_gists",
+        "followers",
+        "following",
+        "html_url",
+        "created_at",
+        "updated_at",
+        "type"
 })
 @Generated("jsonschema2pojo")
 public class Organization {
@@ -105,7 +100,7 @@ public class Organization {
     @JsonProperty("type")
     private String type;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("login")
     public String getLogin() {

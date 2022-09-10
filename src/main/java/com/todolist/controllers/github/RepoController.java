@@ -19,7 +19,6 @@ import java.util.List;
 public class RepoController {
 
 
-
     @Autowired
     private RepoService repoService;
 
@@ -75,6 +74,6 @@ public class RepoController {
                             @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5.") Long priority,
                             @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
                             @RequestParam(required = false) String difficulty) {
-        return repoService.saveTask(idUser, repoName, finishedDate, priority,  difficulty);
+        return repoService.saveTask(idUser, repoName, finishedDate, priority, difficulty);
     }
 }

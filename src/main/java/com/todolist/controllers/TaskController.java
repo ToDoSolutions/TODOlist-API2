@@ -1,6 +1,5 @@
 package com.todolist.controllers;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
@@ -23,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1")
 @Validated
 @AllArgsConstructor
 public class TaskController {
@@ -32,7 +30,18 @@ public class TaskController {
 
     private TaskService taskService;
 
-    @GetMapping("/tasks")
+    @DeleteMapping("/task/{idTask}") // DeleteTest
+    public Map<String, Object> deleteTask(@PathVariable("idTask") Long idTask) {
+        Task task = taskService.findTaskById(idTask);
+        if (task == null)
+            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
+        taskService.deleteTask(task);
+        return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
+    }
+
+    /* TASKS OPERATIONS */
+
+    @GetMapping("/tasks") // GetAllTest
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
                                                  @RequestParam(defaultValue = "idTask") String order,
@@ -47,7 +56,7 @@ public class TaskController {
                                                  @RequestParam(required = false) Difficulty difficulty,
                                                  @RequestParam(required = false) NumberFilter duration) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        List<String> listFields =  List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
+        List<String> listFields = List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
         if (listFields.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
             throw new BadRequestException("The order is invalid.");
         if (!(Arrays.stream(fields.split(",")).allMatch(field -> listFields.contains(field.toLowerCase()))))
@@ -73,7 +82,7 @@ public class TaskController {
         return result.stream().map(task -> task.getFields(fields)).toList();
     }
 
-    @GetMapping("/task/{idTask}")
+    @GetMapping("/task/{idTask}") // GetSoloTest
     public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         Task task = taskService.findTaskById(idTask);
@@ -84,7 +93,7 @@ public class TaskController {
         return new ShowTask(task).getFields(fields);
     }
 
-    @PostMapping("/task")
+    @PostMapping("/task") // PostTest
     public Map<String, Object> addTask(@RequestBody @Valid Task task) {
         if (task == null)
             throw new BadRequestException("Task is null.");
@@ -97,15 +106,15 @@ public class TaskController {
         if (task.getStartDate() == null) task.setStartDate(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         ShowTask showTask = new ShowTask(task);
         if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
-                throw  new BadRequestException("The startDate must be before the finishedDate.");
+            throw new BadRequestException("The startDate must be before the finishedDate.");
         if (showTask.getFinishedDate().isBefore(LocalDate.now()))
-                throw new BadRequestException("The finishedDate must be after the current date.");
+            throw new BadRequestException("The finishedDate must be after the current date.");
         task = taskService.saveTask(task);
         showTask = new ShowTask(task);
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
     }
 
-    @PutMapping("/task")
+    @PutMapping("/task") // PutTest
     public Map<String, Object> updateTask(@RequestBody @Valid Task task) {
         Task oldTask = taskService.findTaskById(task.getIdTask());
         if (oldTask == null)
@@ -131,21 +140,11 @@ public class TaskController {
             throw new ConstraintViolationException(errors);
         ShowTask showTask = new ShowTask(oldTask);
         if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
-                throw  new BadRequestException("The startDate is must be before the finishedDate.");
+            throw new BadRequestException("The startDate is must be before the finishedDate.");
         if (showTask.getFinishedDate().isBefore(LocalDate.now()))
-                throw new BadRequestException("The finishedDate is must be after the current date.");
+            throw new BadRequestException("The finishedDate is must be after the current date.");
         oldTask = taskService.saveTask(oldTask);
         showTask = new ShowTask(oldTask);
         return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
-    }
-
-
-    @DeleteMapping("/task/{idTask}")
-    public Map<String, Object> deleteTask(@PathVariable("idTask") Long idTask) {
-        Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
-        taskService.deleteTask(task);
-        return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
     }
 }

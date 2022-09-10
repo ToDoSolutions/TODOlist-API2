@@ -16,7 +16,6 @@ public class ExceptionResponse {
     public ExceptionResponse(LocalDate timestamp, String message, String path, String status) {
         super();
         this.timestamp = timestamp;
-        // System.out.println(message);
         this.msg = message /*!= null ? (message.contains(":") ? message.split(":")[1] : message) : message*/;
         this.path = path;
         this.status = status;

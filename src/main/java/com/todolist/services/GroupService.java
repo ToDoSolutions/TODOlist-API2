@@ -98,19 +98,11 @@ public class GroupService {
         return groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).stream().anyMatch(user -> userService.getTasksFromUser(user).contains(task))).toList();
     }
 
-    /*
+
     public void removeAllTasksFromGroup(Group group) {
         List<User> users = getUsersFromGroup(group);
         for (User user : users) {
             userService.removeAllTasksFromUser(user);
         }
     }
-
-    public void addTasktoAllUser(Group group, Task task) {
-        List<User> users = getUsersFromGroup(group);
-        for (User user : users) {
-            userService.addTaskToUser(user, task);
-        }
-    }
-     */
 }

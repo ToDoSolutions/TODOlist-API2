@@ -30,8 +30,10 @@ public class PokemonService {
 
     public Task parsePokemon(String status, String finishedDate, String startDate, Long priority, Integer days, Pokemon pokemon) {
         StringBuilder types = new StringBuilder();
-        if (finishedDate != null && days != null) throw new BadRequestException("You can't use both finishedDate and days");
-        if (finishedDate == null && days == null) throw new BadRequestException("You must set either finishedDate or days");
+        if (finishedDate != null && days != null)
+            throw new BadRequestException("You can't use both finishedDate and days");
+        if (finishedDate == null && days == null)
+            throw new BadRequestException("You must set either finishedDate or days");
         for (int i = 0; i < pokemon.getTypes().size(); i++) {
             types.append(pokemon.getTypes().get(i).getType().getName());
             if (i != pokemon.getTypes().size() - 1)
@@ -78,9 +80,9 @@ public class PokemonService {
         return pokemon.getStats().stream().mapToInt(Stat::getBaseStat).average().orElse(0);
     }
 
-    public List<Pokemon> findAllPokemon() {
+    public List<Pokemon> findAllPokemon(Integer limit, Integer offset) {
         RestTemplate restTemplate = new RestTemplate();
-        AllPokemon response = restTemplate.getForObject(startUrl + "/pokemon", AllPokemon.class);
+        AllPokemon response = restTemplate.getForObject(startUrl + "/pokemon?limit=" + limit + "&offset=" + offset, AllPokemon.class);
         return response.getResults().stream()
                 .map(url -> restTemplate.getForObject(url.getUrl(), Pokemon.class))
                 .filter(Objects::nonNull)

@@ -1,39 +1,50 @@
 package com.todolist.controllers;
 
 import com.todolist.dtos.ShowTask;
+import com.todolist.entity.Task;
+import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.PokemonService;
 import com.todolist.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.*;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/tasks/pokemon")
+@Validated
 public class PokemonController {
 
 
-
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator(); // Arreglar algún día.
     @Autowired
     private TaskService taskService;
 
     @Autowired
     private PokemonService pokemonService;
 
+    /* POKEMON OPERATIONS */
 
-
-    @GetMapping
-    public List<ShowTask> getAllPokemon(@RequestParam(required = false) NumberFilter hp,
+    @GetMapping("/pokemons") // GetAll
+    public List<Map<String, Object>> getAllPokemon(
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
+            @RequestParam(defaultValue = "1154") @Min(value = 0, message = "The limit must be positive.") Integer limit,
+                                        @RequestParam(required = false) NumberFilter hp,
                                         @RequestParam(required = false) NumberFilter attack,
                                         @RequestParam(required = false) NumberFilter defense,
                                         @RequestParam(required = false) NumberFilter specialAttack,
                                         @RequestParam(required = false) NumberFilter specialDefense,
-                                        @RequestParam(required = false) NumberFilter speed) {
-        return  pokemonService.findAllPokemon().stream()
+                                        @RequestParam(required = false) NumberFilter speed,
+                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
+        return pokemonService.findAllPokemon(limit, offset).stream()
                 .filter(pokemon -> {
                     var hp2 = pokemon.getStats().get(0).getBaseStat();
                     var attack2 = pokemon.getStats().get(1).getBaseStat();
@@ -41,32 +52,44 @@ public class PokemonController {
                     var specialAttack2 = pokemon.getStats().get(3).getBaseStat();
                     var specialDefense2 = pokemon.getStats().get(4).getBaseStat();
                     var speed2 = pokemon.getStats().get(5).getBaseStat();
-                    return hp.isValid(Long.valueOf(hp2)) && attack.isValid(Long.valueOf(attack2)) && defense.isValid(Long.valueOf(defense2)) && specialAttack.isValid(Long.valueOf(specialAttack2)) && specialDefense.isValid(Long.valueOf(specialDefense2)) && speed.isValid(Long.valueOf(speed2));
-                }).map(pokemon -> new ShowTask(pokemonService.parsePokemon(null, null, null, null, 0, pokemon))).toList();
+                    return (hp == null || hp.isValid(Long.valueOf(hp2))) &&
+                            (attack == null || attack.isValid(Long.valueOf(attack2))) &&
+                            (defense == null || defense.isValid(Long.valueOf(defense2))) &&
+                            (specialAttack == null || specialAttack.isValid(Long.valueOf(specialAttack2))) &&
+                            (specialDefense == null || specialDefense.isValid(Long.valueOf(specialDefense2))) &&
+                            (speed == null || speed.isValid(Long.valueOf(speed2)));
+                }).map(pokemon -> new ShowTask(pokemonService.parsePokemon(null, null, null, null, 0, pokemon)).getFields(fields)).toList();
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/pokemon/{name}") // GetSoloTest
     public Map<String, Object> getPokemon(@PathVariable String name,
-                                          @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
-                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
-                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
-                                          @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Long priority,
-                                          @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
-                                          @RequestParam(required = false) Integer days
-    ) {
-        return new ShowTask(pokemonService.findPokemonByName(name, status, finishedDate, startDate, priority, days)).getFields(fields);
+                                          @RequestParam(required = false) String status,
+                                          @RequestParam(required = false) String finishedDate,
+                                          @RequestParam(required = false) String startDate,
+                                          @RequestParam(required = false) Long priority,
+                                          @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
+                                          @RequestParam(required = false) @Min(value = 0, message = "The days must be positive.") Integer days) {
+        Task task = pokemonService.findPokemonByName(name, status, finishedDate, startDate, priority, days);
+        List<String> listFields = List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
+        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> listFields.contains(field.toLowerCase()))))
+            throw new BadRequestException("The fields are invalid.");
+        Set<ConstraintViolation<Task>> errors = validator.validate(task);
+        if (!errors.isEmpty())
+            throw new ConstraintViolationException(errors);
+        return new ShowTask(task).getFields(fieldsTask);
     }
 
-    @PostMapping("/{name}")
+    @PostMapping("/pokemon/{name}") // PostTest
     public Map<String, Object> addPokemon(@PathVariable String name,
-                                          @RequestParam(required = false) @Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.") String status,
-                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
-                                          @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.") String startDate,
-                                          @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5") Long priority,
-                                          @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields,
-                                          @RequestParam(required = false) Integer days) {
-        return new ShowTask(taskService.saveTask(pokemonService.findPokemonByName(name, status, finishedDate, startDate, priority, days))).getFields(fields);
+                                          @RequestParam(required = false) /*@Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.")*/ String status,
+                                          @RequestParam(required = false) /*@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")*/ String finishedDate,
+                                          @RequestParam(required = false) /*@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.")*/ String startDate,
+                                          @RequestParam(required = false) /*@Max(value = 5, message = "The priority must be between 0 and 5")*/ Long priority,
+                                          @RequestParam(required = false) @Min(value = 0, message = "The days must be positive.") Integer days) {
+        Task task = pokemonService.findPokemonByName(name, status, finishedDate, startDate, priority, days);
+        Set<ConstraintViolation<Task>> errors = validator.validate(task);
+        if (!errors.isEmpty())
+            throw new ConstraintViolationException(errors);
+        return new ShowTask(taskService.saveTask(task)).getFields(ShowTask.ALL_ATTRIBUTES);
     }
-
-
 }
