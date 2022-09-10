@@ -3,6 +3,7 @@ package com.todolist.controllers.group.task;
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.TODOlistApplication;
+import com.todolist.dtos.ShowGroup;
 import com.todolist.dtos.ShowUser;
 import com.todolist.exceptions.ManagerException;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,31 +37,31 @@ class DeleteTest {
 
     @Test
     void testDeleteFine() {
-        ShowUser response1 = restTemplate.getForObject(uri + "/group/1", ShowUser.class);
-        ShowUser response2 = restTemplate.exchange(uri + "/group/1/task/1", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class).getBody();
-        assertEquals(response1.getTasks().size() - 1, response2.getTasks().size(), "The number of tasks is not correct");
+        ShowGroup response1 = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
+        ShowGroup response2 = restTemplate.exchange(uri + "/group/1/task/1", HttpMethod.DELETE, new HttpEntity<>(null), ShowGroup.class).getBody();
+        assertEquals(response1.getNumTasks() - 1, response2.getNumTasks(), "The number of users is not correct");
     }
 
     @Test
     void testDeleteNotAdded() {
-        ShowUser response1 = restTemplate.getForObject(uri + "/user/1", ShowUser.class);
-        ShowUser response2 = restTemplate.exchange(uri + "/group/1/task/2", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class).getBody();;
-        assertEquals(response1.getTasks().size(), response2.getTasks().size(), "The number of tasks is not correct");
+        ShowGroup response1 = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
+        ShowGroup response2 = restTemplate.exchange(uri + "/group/1/task/5", HttpMethod.DELETE, new HttpEntity<>(null), ShowGroup.class).getBody();;
+        assertEquals(response1.getNumTasks(), response2.getNumTasks(), "The number of tasks is not correct");
     }
 
     @Test
     void testDeleteWithNotExistTask() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/1/task/-1", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class)))
-                .assertMsg("The task with idTask -1 does not exist.")
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/1/task/99", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class)))
+                .assertMsg("The task with idTask 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/1/tasks/-1");
+                .assertPath("/api/v1/group/1/task/99");
     }
 
     @Test
     void testDeleteWithNotExistGroup() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/-1/task/2", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class)))
-                .assertMsg("The group with idGroup -1 does not exist.")
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/99/task/2", HttpMethod.DELETE, new HttpEntity<>(null), ShowUser.class)))
+                .assertMsg("The group with idGroup 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/-1/tasks/2");
+                .assertPath("/api/v1/group/99/task/2");
     }
 }

@@ -40,9 +40,9 @@ class PostTest {
     // Correct
     @Test
     void testPostFine() {
-        ShowGroup response = restTemplate.postForObject(uri + "/groups", group, ShowGroup.class);
+        ShowGroup response = restTemplate.postForObject(uri + "/group", group, ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
-        response = restTemplate.getForObject(uri + "/groups/1", ShowGroup.class);
+        response = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
     }
 
@@ -50,30 +50,28 @@ class PostTest {
     @Test
     void testPostWithNullOrEmptyName() {
         group.setName(null);
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/group", group, ShowGroup.class));
         group.setName("");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/group", group, ShowGroup.class));
     }
 
     @Test
     void testPostWithNameGreaterThan50() {
         group.setName(new String(new char[51]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/group", group, ShowGroup.class));
     }
 
     // Description
     @Test
     void testPostWithDescriptionGreaterThan500() {
         group.setDescription(new String(new char[501]).replace("\0", "a"));
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/group", group, ShowGroup.class));
     }
 
     // CreatedDate
     @Test
     void testPostWithInvalidCreatedDate() {
         group.setCreatedDate("ayer");
-        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/groups", group, ShowGroup.class));
+        assertThrows(HttpClientErrorException.class, () -> restTemplate.postForObject(uri + "/group", group, ShowGroup.class));
     }
-
-    // TODO: test post for user and task.
 }

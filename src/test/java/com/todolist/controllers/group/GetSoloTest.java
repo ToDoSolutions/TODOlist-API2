@@ -33,13 +33,13 @@ class GetSoloTest {
 
     @Test
     void testGetSoloFine() {
-        ShowGroup response = restTemplate.getForObject(uri + "/groups/1", ShowGroup.class);
+        ShowGroup response = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
     }
 
     @Test
     void testGetSoloFields() {
-        ShowGroup response = restTemplate.getForObject(uri + "/groups/1?fieldsGroup=idGroup,name,description", ShowGroup.class);
+        ShowGroup response = restTemplate.getForObject(uri + "/group/1?fieldsGroup=idGroup,name,description", ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
         assertNull(response.getUsers(), "Users is not correct");
     }
@@ -47,15 +47,15 @@ class GetSoloTest {
     @Test
     void testGetSoloFieldsWithWrongField() {
         RestTemplate restTemplate = new RestTemplate();
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/groups/1?fieldsGroup=idGroup,wrongField", ShowGroup.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/group/1?fieldsGroup=idGroup,wrongField", ShowGroup.class)))
                 .assertMsg("The groups' fields are invalid.")
                 .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups/1");
+                .assertPath("/api/v1/group/1");
     }
 
     @Test
     void testGetSoloUpperFields() {
-        ShowGroup response = restTemplate.getForObject(uri + "/groups/1?fieldsGroup=IDGROUP,NAME,DESCRIPTION", ShowGroup.class);
+        ShowGroup response = restTemplate.getForObject(uri + "/group/1?fieldsGroup=IDGROUP,NAME,DESCRIPTION", ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
         assertNull(response.getUsers(), "Users is not correct");
     }
@@ -63,11 +63,9 @@ class GetSoloTest {
 
     @Test
     void testGetSoloNotFound() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/groups/99", ShowGroup.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.getForObject(uri + "/group/99", ShowGroup.class)))
                 .assertMsg("The group with idGroup 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/groups/99");
+                .assertPath("/api/v1/group/99");
     }
-
-    // TODO: test with fields users and tasks.
 }

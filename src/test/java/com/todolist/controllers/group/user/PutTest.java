@@ -7,6 +7,7 @@ import com.todolist.dtos.ShowGroup;
 import com.todolist.dtos.ShowUser;
 import com.todolist.exceptions.ManagerException;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
@@ -28,34 +29,38 @@ class PutTest {
         TODOlistApplication.main(new String[]{});
     }
 
+    @BeforeEach
+    void setUp() {
+        restTemplate = new RestTemplate();
+    }
+
     @Test
     void testPostFine() {
-        ShowUser response1 = restTemplate.getForObject(uri + "/group/1", ShowUser.class);
-        ShowUser response2 = restTemplate.exchange(uri + "/group/1/user/2", HttpMethod.PUT, null, ShowUser.class).getBody();
-        assertEquals(response1.getTasks().size() + 1, response2.getTasks().size(), "The number of tasks is not correct");
+        ShowGroup response1 = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
+        ShowGroup response2 = restTemplate.exchange(uri + "/group/1/user/4", HttpMethod.PUT, null, ShowGroup.class).getBody();
+        assertEquals(response1.getUsers().size() + 1, response2.getUsers().size(), "The number of users is not correct");
     }
 
     @Test
     void testPostAlreadyAdded() {
         ShowGroup response1 = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
         ShowGroup response2 = restTemplate.exchange(uri + "/group/1/user/1", HttpMethod.PUT, null, ShowGroup.class).getBody();
-        assertEquals(response1.getNumTasks(), response2.getNumTasks(), "The number of tasks is not correct");
+        assertEquals(response1.getUsers().size(), response2.getUsers().size(), "The number of users is not correct");
     }
 
     @Test
     void testPostWithNotExistTask() {
-
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/1/user/-1", HttpMethod.PUT, null, ShowGroup.class)))
-                .assertMsg("The user with idUser -1 does not exist.")
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/1/user/99", HttpMethod.PUT, null, ShowGroup.class)))
+                .assertMsg("The user with idUser 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/group/1/user/-1");
+                .assertPath("/api/v1/group/1/user/99");
     }
 
     @Test
     void testPostWithNotExistUser() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/-1/user/2", HttpMethod.PUT, null, ShowGroup.class)))
-                .assertMsg("The group with idGroup -1 does not exist.")
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/99/user/2", HttpMethod.PUT, null, ShowGroup.class)))
+                .assertMsg("The group with idGroup 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/group/-1/user/2");
+                .assertPath("/api/v1/group/99/user/2");
     }
 }

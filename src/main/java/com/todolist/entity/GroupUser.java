@@ -21,4 +21,9 @@ public class GroupUser {
     private Long idUser;
 
     public GroupUser() {}
+
+    public GroupUser(Long idGroup, Long idUser) {
+        this.idGroup = idGroup;
+        this.idUser = idUser;
+    }
 }

@@ -36,9 +36,16 @@ class PutTest {
 
     @Test
     void testPostFine() {
-        ShowUser response1 = restTemplate.getForObject(uri + "/group/1", ShowUser.class);
-        ShowUser response2 = restTemplate.exchange(uri + "/group/1/task/2", HttpMethod.PUT, null, ShowUser.class).getBody();
-        assertEquals(response1.getTasks().size() + 1, response2.getTasks().size(), "The number of tasks is not correct");
+        ShowGroup response1 = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
+        ShowGroup response2 = restTemplate.exchange(uri + "/group/1/task/3", HttpMethod.PUT, null, ShowGroup.class).getBody();
+        assertEquals(response1.getNumTasks()+1, response2.getNumTasks(), "The number of tasks is not correct");
+    }
+
+    @Test
+    void testPostIfAdded() {
+        ShowGroup response1 = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
+        ShowGroup response2 = restTemplate.exchange(uri + "/group/1/task/2", HttpMethod.PUT, null, ShowGroup.class).getBody();
+        assertEquals(response1.getNumTasks(), response2.getNumTasks(), "The number of tasks is not correct");
     }
 
     @Test
@@ -51,17 +58,17 @@ class PutTest {
     @Test
     void testPostWithNotExistTask() {
 
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/1/task/-1", HttpMethod.PUT, null, ShowGroup.class)))
-                .assertMsg("The task with idTask -1 does not exist.")
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/1/task/99", HttpMethod.PUT, null, ShowGroup.class)))
+                .assertMsg("The task with idTask 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/1/tasks/-1");
+                .assertPath("/api/v1/group/1/task/99");
     }
 
     @Test
     void testPostWithNotExistUser() {
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/-1/task/2", HttpMethod.PUT, null, ShowGroup.class)))
-                .assertMsg("The group with idGroup -1 does not exist.")
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group/99/task/2", HttpMethod.PUT, null, ShowGroup.class)))
+                .assertMsg("The group with idGroup 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/group/-1/task/2");
+                .assertPath("/api/v1/group/99/task/2");
     }
 }

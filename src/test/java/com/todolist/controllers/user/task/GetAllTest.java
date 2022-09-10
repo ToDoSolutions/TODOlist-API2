@@ -44,7 +44,7 @@ public class GetAllTest {
         ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/users/task/99", HttpMethod.GET, null, ShowUser[].class)))
                 .assertMsg("The task with idTask 99 does not exist.")
                 .assertStatus("Not Found")
-                .assertPath("/api/v1/users/tasks/99");
+                .assertPath("/api/v1/users/task/99");
     }
 
 

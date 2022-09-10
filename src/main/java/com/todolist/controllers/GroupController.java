@@ -40,7 +40,7 @@ public class GroupController {
 
     private UserService userService;
 
-    @GetMapping
+    @GetMapping("/groups")
     public List<Map<String, Object>> getAllGroups(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                   @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
                                                   @RequestParam(defaultValue = "idGroup") String order,
@@ -135,10 +135,11 @@ public class GroupController {
     public Map<String, Object> addUserToGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
                                               @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null) throw new BadRequestException("The group with idGroup " + idGroup + " does not exist.");
+        if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         User user = userService.findUserById(idUser);
-        if (user == null) throw new BadRequestException("The user with idUser " + idUser + " does not exist.");
-        groupService.addUserToGroup(group, user);
+        if (user == null) throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
+        if (!groupService.getShowUserFromGroup(group).contains(new ShowUser(user, userService.getShowTaskFromUser(user))))
+            groupService.addUserToGroup(group, user);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
@@ -162,7 +163,8 @@ public class GroupController {
         if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         Task task = taskService.findTaskById(idTask);
         if (task == null) throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
-        groupService.addTaskToGroup(group, task);
+        if (groupService.getShowUserFromGroup(group).stream().noneMatch(user -> user.getTasks().contains(new ShowTask(task))))
+            groupService.addTaskToGroup(group, task);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
@@ -174,7 +176,8 @@ public class GroupController {
         if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         Task task = taskService.findTaskById(idTask);
         if (task == null) throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
-        groupService.removeTaskFromGroup(group, task);
+        if (groupService.getShowUserFromGroup(group).stream().anyMatch(user -> user.getTasks().contains(new ShowTask(task))))
+            groupService.removeTaskFromGroup(group, task);
         return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 

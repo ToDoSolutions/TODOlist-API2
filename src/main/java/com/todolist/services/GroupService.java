@@ -59,10 +59,7 @@ public class GroupService {
     }
 
     public void addUserToGroup(Group group, User user) {
-        List<GroupUser> groupUsers = groupUserRepository.findByIdGroupAndIdUser(group.getIdGroup(), user.getIdUser());
-        if (groupUsers.isEmpty())
-            throw new NullPointerException("The user with idUser " + user.getIdUser() + " does not belong to the group with idGroup " + group.getIdGroup() + ".|method: addUserToGroup");
-        groupUserRepository.deleteAll(groupUsers);
+        groupUserRepository.save(new GroupUser(group.getIdGroup(), user.getIdUser()));
     }
 
     public void removeUserFromGroup(Group group, User user) {

@@ -36,84 +36,84 @@ class PutTest {
         group = new Group();
         group.setName("Group 1");
         group.setDescription("Group 1 description");
-        String uri = "http://localhost:8080/api/v1/groups";
         restTemplate = new RestTemplate();
-        showGroup = restTemplate.postForObject(uri, group, ShowGroup.class);
+        showGroup = restTemplate.postForObject(uri + "/group", group, ShowGroup.class);
+        System.out.println("testPutFine");
         group.setIdGroup(showGroup.getIdGroup());
     }
 
     // Correct
     @Test
-    void testPostFine() {
+    void testPutFine() {
         group.setName("Group 2");
         group.setDescription("Group 2 description");
         group.setIdGroup(showGroup.getIdGroup());
-        ShowGroup response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        ShowGroup response = restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
-        response = restTemplate.getForObject(uri + "/groups/1", ShowGroup.class);
+        response = restTemplate.getForObject(uri + "/group/1", ShowGroup.class);
         assertEquals(1, response.getIdGroup(), "IdGroup is not correct");
     }
 
     // Name
     @Test
-    void testPostWithNullOrEmptyName() {
+    void testPutWithNullOrEmptyName() {
         group.setName(null);
-        ShowGroup response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        ShowGroup response = restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
         assertNotNull(response.getName(), "Name is null.");
         group.setName("");
-        response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        response = restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
         assertEquals(showGroup.getName(), response.getName(), "Name is not correct.");
     }
 
     @Test
-    void testPostWithNameGreaterThan50() {
+    void testPutWithNameGreaterThan50() {
         group.setName(new String(new char[51]).replace("\0", "a"));
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
                 .assertMsg("The name is too long.")
                 .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups");
+                .assertPath("/api/v1/group");
     }
 
     // Description
     @Test
-    void testPostWithNullOrEmptyDescription() {
+    void testPutWithNullOrEmptyDescription() {
         group.setDescription(null);
-        ShowGroup response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        ShowGroup response = restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
         assertNotNull(response.getDescription(), "Description is null.");
         group.setDescription("");
-        response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        response = restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
         assertEquals(showGroup.getDescription(), response.getDescription(), "Description is not correct.");
     }
 
     @Test
-    void testPostWithDescriptionGreaterThan500() {
+    void testPutWithDescriptionGreaterThan500() {
         group.setDescription(new String(new char[501]).replace("\0", "a"));
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
                 .assertMsg("The description is too long.")
                 .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups");
+                .assertPath("/api/v1/group");
     }
 
     // CreatedDate
     @Test
-    void testPostWithInvalidCreatedDate() {
+    void testPutWithInvalidCreatedDate() {
         group.setCreatedDate("ayer");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
                 .assertMsg("The createdDate is invalid.")
                 .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups");
+                .assertPath("/api/v1/group");
     }
 
     @Test
-    void testPostWithNullOrEmptyCreatedDate() {
+    void testPutWithNullOrEmptyCreatedDate() {
         group.setCreatedDate(null);
-        ShowGroup response = restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
+        ShowGroup response = restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class).getBody();
         assertNotNull(response.getCreatedDate(), "CreatedDate is null.");
         group.setCreatedDate("");
-        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/groups", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
+        ManagerException.of(assertThrows(HttpClientErrorException.class, () -> restTemplate.exchange(uri + "/group", HttpMethod.PUT, new HttpEntity<>(group), ShowGroup.class)))
                 .assertMsg("The createdDate is invalid.")
                 .assertStatus("Bad Request")
-                .assertPath("/api/v1/groups");
+                .assertPath("/api/v1/group");
         assertEquals(showGroup.getCreatedDate(), response.getCreatedDate(), "CreatedDate is not correct.");
     }
 }
