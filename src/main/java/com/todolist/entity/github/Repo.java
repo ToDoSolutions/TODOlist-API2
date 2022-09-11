@@ -13,9 +13,12 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "name",
+        "description",
         "auto_init",
         "private",
         "gitignore_template",
+        "is_template",
+        "homepage"
 })
 @Generated("jsonschema2pojo")
 public class Repo {
@@ -30,24 +33,21 @@ public class Repo {
     private String description;
     @JsonProperty("auto_init")
     @Pattern(regexp = "^(true|false)$", message = "The auto_init is invalid.")
-    private String isAutoInit;
+    private Boolean isAutoInit;
     @JsonProperty("private")
     @Pattern(regexp = "^(true|false)$", message = "The private is invalid.")
-    private String isPrivate;
+    private Boolean isPrivate;
     @JsonProperty("gitignore_template")
     @Size(max = 100, message = "The gitignore_template is too long.")
     private String gitignoreTemplate;
     @JsonProperty("is_template")
     @Pattern(regexp = "^(true|false)$", message = "The is_template is invalid.")
-    private String isTemplate;
+    private Boolean isTemplate;
     @JsonProperty("homepage")
     @Size(max = 255, message = "The homepage is too long.")
     private String homepage;
 
     @JsonProperty("name")
-    @NotNull()
-    @NotBlank
-
     public String getName() {
         return name;
     }
@@ -58,22 +58,22 @@ public class Repo {
     }
 
     @JsonProperty("auto_init")
-    public String getAutoInit() {
+    public Boolean getAutoInit() {
         return isAutoInit;
     }
 
     @JsonProperty("auto_init")
-    public void setAutoInit(String isAutoInit) {
+    public void setAutoInit(Boolean isAutoInit) {
         this.isAutoInit = isAutoInit;
     }
 
     @JsonProperty("private")
-    public String getPrivate() {
+    public Boolean getPrivate() {
         return isPrivate;
     }
 
     @JsonProperty("private")
-    public void setPrivate(String isPrivate) {
+    public void setPrivate(Boolean isPrivate) {
         this.isPrivate = isPrivate;
     }
 
@@ -98,12 +98,12 @@ public class Repo {
     }
 
     @JsonProperty("is_template")
-    public String getTemplate() {
+    public Boolean getTemplate() {
         return isTemplate;
     }
 
     @JsonProperty("is_template")
-    public void setTemplate(String isTemplate) {
+    public void setTemplate(Boolean isTemplate) {
         this.isTemplate = isTemplate;
     }
 

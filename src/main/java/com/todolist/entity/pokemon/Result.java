@@ -14,12 +14,12 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class Result {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("name")
     private String name;
     @JsonProperty("url")
     private String url;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("name")
     public String getName() {

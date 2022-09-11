@@ -17,6 +17,8 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class AllPokemon {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("count")
     private Integer count;
     @JsonProperty("next")
@@ -25,8 +27,6 @@ public class AllPokemon {
     private Object previous;
     @JsonProperty("results")
     private List<Result> results = null;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("count")
     public Integer getCount() {

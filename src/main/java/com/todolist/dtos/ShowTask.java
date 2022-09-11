@@ -23,7 +23,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = "idTask")
+@EqualsAndHashCode(of = {"idTask"})
 public class ShowTask {
 
     public static final String ALL_ATTRIBUTES = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration";

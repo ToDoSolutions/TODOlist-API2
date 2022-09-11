@@ -5,6 +5,8 @@ import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.entity.UserTask;
+import com.todolist.exceptions.BadRequestException;
+import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.TaskRepository;
 import com.todolist.repositories.UserRepository;
 import com.todolist.repositories.UserTaskRepository;
@@ -12,7 +14,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,27 +58,13 @@ public class UserService {
 
     public List<Task> getTasksFromUser(User user) {
         return userTaskRepository.findByIdUser(user.getIdUser()).stream()
-                .map(userTask -> taskRepository.findById(userTask.getIdTask()).orElseThrow(() -> new RuntimeException("Task not found.")))
+                .map(userTask -> taskRepository.findById(userTask.getIdTask()).orElseThrow(() -> new NotFoundException("Task not found.")))
                 .toList();
     }
 
     public List<ShowTask> getShowTaskFromUser(User user) {
         return getTasksFromUser(user).stream().map(ShowTask::new).toList();
     }
-
-    /*
-    public List<Group> getGroupsFromUser(User user) {
-        return groupUserRepository.findByIdUser(user.getIdUser()).stream()
-                .map(groupUser -> groupRepository.findById(groupUser.getIdGroup()).orElseThrow(() -> new RuntimeException("Group not found.")))
-                .toList();
-    }
-     */
-
-    /*
-    public List<ShowGroup> getShowGroupsFromUser(User user) {
-        return getGroupsFromUser(user).stream().map(group -> new ShowGroup(group, groupService.getShowUserFromGroup(group))).collect(Collectors.toList());
-    }
-     */
 
     public void addTaskToUser(User user, Task task) {
         userTaskRepository.save(new UserTask(user.getIdUser(), task.getIdTask()));
@@ -88,17 +82,37 @@ public class UserService {
         userTaskRepository.deleteAll(userTask);
     }
 
-    /*
-    public void removeAllTasksFromUser(User user, Task task) {
-        List<UserTask> userTask = userTaskRepository.findByIdTaskAndIdUser(task.getIdTask(), user.getIdUser());
-        userTaskRepository.deleteAll(userTask);
+    public User updateUser(User oldUser, User user) {
+        Validator validator;
+        try {
+            validator = Validation.buildDefaultValidatorFactory().getValidator();
+        } catch (Exception e) {
+            throw new BadRequestException("Error building validator.");
+        }
+        if (oldUser == null)
+            throw new NotFoundException("The user with idUser " + user.getIdUser() + " does not exist.");
+        if (user.getName() != null && !user.getName().isEmpty())
+            oldUser.setName(user.getName());
+        if (user.getSurname() != null && !user.getSurname().isEmpty())
+            oldUser.setSurname(user.getSurname());
+        if (user.getEmail() != null && !user.getEmail().isEmpty())
+            oldUser.setEmail(user.getEmail());
+        if (user.getAvatar() != null && !user.getAvatar().isEmpty())
+            oldUser.setAvatar(user.getAvatar());
+        if (user.getBio() != null && !user.getBio().isEmpty())
+            oldUser.setBio(user.getBio());
+        if (user.getLocation() != null && !user.getLocation().isEmpty())
+            oldUser.setLocation(user.getLocation());
+        if (user.getUsername() != null && !user.getUsername().isEmpty())
+            oldUser.setUsername(user.getUsername());
+        if (!Objects.equals(user.getPassword(), oldUser.getPassword()))
+            throw new BadRequestException("The password is not required.");
+        if (user.getToken() != null && !user.getToken().isEmpty())
+            throw new BadRequestException("The token can't be updated with an UPDATE.");
+        Set<ConstraintViolation<User>> errors = validator.validate(oldUser);
+        if (!errors.isEmpty())
+            throw new ConstraintViolationException(errors);
+        return saveUser(oldUser);
     }
-     */
 
-    /*
-    public void removeUserFromAllGroups(User user) {
-        List<GroupUser> groupUser = groupUserRepository.findByIdUser(user.getIdUser());
-        groupUserRepository.deleteAll(groupUser);
-    }
-    */
 }

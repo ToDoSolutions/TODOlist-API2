@@ -16,20 +16,19 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import javax.validation.*;
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @RestController
+@RequestMapping("/api/v1")
 @Validated
 @AllArgsConstructor
 public class UserController {
-
-
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator(); // Arreglar algún día.
-
     private TaskService taskService;
 
     private UserService userService;
@@ -123,31 +122,7 @@ public class UserController {
 
     @PutMapping("/user") // PutTest
     public Map<String, Object> updateUser(@RequestBody @Valid User user) {
-        User oldUser = userService.findUserById(user.getIdUser());
-        if (oldUser == null)
-            throw new NotFoundException("The user with idUser " + user.getIdUser() + " does not exist.");
-        if (user.getName() != null && !user.getName().isEmpty())
-            oldUser.setName(user.getName());
-        if (user.getSurname() != null && !user.getSurname().isEmpty())
-            oldUser.setSurname(user.getSurname());
-        if (user.getEmail() != null && !user.getEmail().isEmpty())
-            oldUser.setEmail(user.getEmail());
-        if (user.getAvatar() != null && !user.getAvatar().isEmpty())
-            oldUser.setAvatar(user.getAvatar());
-        if (user.getBio() != null && !user.getBio().isEmpty())
-            oldUser.setBio(user.getBio());
-        if (user.getLocation() != null && !user.getLocation().isEmpty())
-            oldUser.setLocation(user.getLocation());
-        if (user.getUsername() != null && !user.getUsername().isEmpty())
-            oldUser.setUsername(user.getUsername());
-        if (!Objects.equals(user.getPassword(), oldUser.getPassword()))
-            throw new BadRequestException("The password is not required.");
-        if (user.getToken() != null && !user.getToken().isEmpty())
-            throw new BadRequestException("The token can't be updated with an UPDATE.");
-        Set<ConstraintViolation<User>> errors = validator.validate(oldUser);
-        if (!errors.isEmpty())
-            throw new ConstraintViolationException(errors);
-        oldUser = userService.saveUser(oldUser);
+        User oldUser = userService.updateUser(userService.findUserById(user.getIdUser()), user);
         return new ShowUser(oldUser, userService.getShowTaskFromUser(oldUser)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
 
@@ -213,6 +188,4 @@ public class UserController {
         user = userService.saveUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
     }
-
-
 }

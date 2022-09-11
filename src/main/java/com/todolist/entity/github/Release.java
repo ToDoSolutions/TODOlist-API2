@@ -31,6 +31,8 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class Release {
 
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonProperty("url")
     private String url;
     @JsonProperty("assets_url")
@@ -67,8 +69,6 @@ public class Release {
     private String zipballUrl;
     @JsonProperty("body")
     private String body;
-    @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("url")
     public String getUrl() {

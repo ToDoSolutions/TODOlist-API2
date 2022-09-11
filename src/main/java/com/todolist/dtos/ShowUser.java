@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = "idUser")
+@EqualsAndHashCode(of = {"idUser"})
 public class ShowUser {
     public static final String ALL_ATTRIBUTES = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks";
     private Long idUser;

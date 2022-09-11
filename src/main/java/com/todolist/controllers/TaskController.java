@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
+@RequestMapping("/api/v1")
 @Validated
 @AllArgsConstructor
 public class TaskController {
@@ -45,7 +46,7 @@ public class TaskController {
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
                                                  @RequestParam(defaultValue = "idTask") String order,
-                                                 @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fields,
+                                                 @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
                                                  @RequestParam(required = false) String title,
                                                  @RequestParam(required = false) String description,
                                                  @RequestParam(required = false) Status status,
@@ -59,8 +60,8 @@ public class TaskController {
         List<String> listFields = List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
         if (listFields.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
             throw new BadRequestException("The order is invalid.");
-        if (!(Arrays.stream(fields.split(",")).allMatch(field -> listFields.contains(field.toLowerCase()))))
-            throw new BadRequestException("The fields are invalid.");
+        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> listFields.contains(field.toLowerCase()))))
+            throw new BadRequestException("The task' fields are invalid.");
         List<ShowTask> result = Lists.newArrayList(), tasks = taskService.findAllShowTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
         if (limit == -1) limit = tasks.size();
         int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
@@ -79,18 +80,18 @@ public class TaskController {
                     (description == null || task.getDescription().contains(description)))
                 result.add(task);
         }
-        return result.stream().map(task -> task.getFields(fields)).toList();
+        return result.stream().map(task -> task.getFields(fieldsTask)).toList();
     }
 
     @GetMapping("/task/{idTask}") // GetSoloTest
     public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
-                                       @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
+                                       @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
         Task task = taskService.findTaskById(idTask);
         if (task == null)
             throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
-        if (!(Arrays.stream(fields.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
-            throw new BadRequestException("The fields are invalid.");
-        return new ShowTask(task).getFields(fields);
+        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
+            throw new BadRequestException("The task' fields are invalid.");
+        return new ShowTask(task).getFields(fieldsTask);
     }
 
     @PostMapping("/task") // PostTest

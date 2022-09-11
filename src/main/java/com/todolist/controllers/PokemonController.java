@@ -10,19 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.*;
-import javax.validation.constraints.Max;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @RestController
+@RequestMapping("/api/v1")
 @Validated
 public class PokemonController {
-
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator(); // Arreglar algún día.
     @Autowired
@@ -37,13 +38,13 @@ public class PokemonController {
     public List<Map<String, Object>> getAllPokemon(
             @RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
             @RequestParam(defaultValue = "1154") @Min(value = 0, message = "The limit must be positive.") Integer limit,
-                                        @RequestParam(required = false) NumberFilter hp,
-                                        @RequestParam(required = false) NumberFilter attack,
-                                        @RequestParam(required = false) NumberFilter defense,
-                                        @RequestParam(required = false) NumberFilter specialAttack,
-                                        @RequestParam(required = false) NumberFilter specialDefense,
-                                        @RequestParam(required = false) NumberFilter speed,
-                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
+            @RequestParam(required = false) NumberFilter hp,
+            @RequestParam(required = false) NumberFilter attack,
+            @RequestParam(required = false) NumberFilter defense,
+            @RequestParam(required = false) NumberFilter specialAttack,
+            @RequestParam(required = false) NumberFilter specialDefense,
+            @RequestParam(required = false) NumberFilter speed,
+            @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fields) {
         return pokemonService.findAllPokemon(limit, offset).stream()
                 .filter(pokemon -> {
                     var hp2 = pokemon.getStats().get(0).getBaseStat();

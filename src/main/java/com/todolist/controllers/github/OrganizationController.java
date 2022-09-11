@@ -1,15 +1,26 @@
 package com.todolist.controllers.github;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.todolist.dtos.ShowGroup;
+import com.todolist.services.github.OrganizationService;
+import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+// Si tiene pocas operaciones es debido a que tengo poca experiencia (por no decir ninguna) con las organizaciones de github.
+@RestController
+@RequestMapping("/api/v1/github")
+@Validated
+@AllArgsConstructor
 public class OrganizationController {
 
-    @Value("${github.api.url}")
-    private String startUrl;
+    private OrganizationService organizationService;
 
     // Get an organization orgs/{org}
-
-    // Get org from an user /users/{username}/orgs
-
-    // Get the repos from an organization orgs/{org} -> repos_url
+    @GetMapping("/orgs/{idGroup}")
+    public ShowGroup getOrganization(@PathVariable Long idGroup) {
+        return organizationService.turnOrganizationIntoShowGroup(organizationService.findById(idGroup));
+    }
 }

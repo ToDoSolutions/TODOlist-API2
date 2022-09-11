@@ -3,8 +3,11 @@ package com.todolist.controllers.github.repo;
 import com.radcortez.flyway.test.annotation.DataSource;
 import com.radcortez.flyway.test.annotation.FlywayTest;
 import com.todolist.TODOlistApplication;
+import com.todolist.dtos.ShowUser;
+import com.todolist.entity.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
 @FlywayTest(additionalLocations = "db/migration", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
@@ -23,5 +26,16 @@ public class DeleteTest {
     @BeforeEach
     void setUp() {
         restTemplate = new RestTemplate();
+        User user = new User();
+        user.setUsername("Mazetosan");
+        user.setPassword("1234");
+        user.setToken("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");
+        ShowUser showUser = restTemplate.postForObject(uri + "/user", user, ShowUser.class);
+        showUser = restTemplate.postForObject(uri + "github/user", user, ShowUser.class);
+        showUser = restTemplate.postForObject(uri + "/user/" + showUser.getIdUser() + "/task/1", null, ShowUser.class);
+        restTemplate.postForObject(uri + "/github/"))
     }
+
+    @Test
+    void testDeleteFine
 }

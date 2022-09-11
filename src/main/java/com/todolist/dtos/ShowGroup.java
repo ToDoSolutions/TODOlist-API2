@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = "idGroup")
+@EqualsAndHashCode(of = {"idGroup"})
 public class ShowGroup {
 
     public static final String ALL_ATTRIBUTES = "idGroup,name,description,createdDate,users,numTasks";
