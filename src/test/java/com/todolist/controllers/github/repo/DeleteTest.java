@@ -33,9 +33,6 @@ public class DeleteTest {
         ShowUser showUser = restTemplate.postForObject(uri + "/user", user, ShowUser.class);
         showUser = restTemplate.postForObject(uri + "github/user", user, ShowUser.class);
         showUser = restTemplate.postForObject(uri + "/user/" + showUser.getIdUser() + "/task/1", null, ShowUser.class);
-        restTemplate.postForObject(uri + "/github/"))
+        // restTemplate.postForObject(uri + "/github/");
     }
-
-    @Test
-    void testDeleteFine
 }

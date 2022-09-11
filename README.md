@@ -5,6 +5,9 @@
 <img src="src/main/resources/static/images/logo.gif" alt="TODOlist-API2" width="200" height="200" align="center">
 </div>
 
+To compile
+mvn package -Dmaven.test.skip
+
 # Index
 * [Introduction](#Introduction)
 * [Resources](#resources)
