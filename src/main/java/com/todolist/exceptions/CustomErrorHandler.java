@@ -10,14 +10,14 @@ import org.springframework.web.context.request.ServletWebRequest;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 @RestControllerAdvice
 public class CustomErrorHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> handleConstraintViolationException(ConstraintViolationException exception, ServletWebRequest webRequest) {
-        String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
-        System.out.println("ConstraintViolationException: " + message);
+        String message = new ArrayList<>(exception.getConstraintViolations()).get(0).getMessage();
         ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), message, webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }

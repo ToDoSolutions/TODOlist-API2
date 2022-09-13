@@ -16,7 +16,9 @@ import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -78,7 +80,7 @@ public class RepoService {
         if (user.getToken() != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + user.getToken());
-            repo = restTemplate.getForObject(url, TaskGitHub.class, headers);
+            repo  = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null, headers), TaskGitHub.class).getBody();
         } else
             repo = restTemplate.getForObject(url, TaskGitHub.class);
         Task task = turnTaskGitHubIntoTask(repo, finishedDate, priority, difficulty);
@@ -97,7 +99,7 @@ public class RepoService {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.postForObject(url, repo, TaskGitHub.class, headers);
+        restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(repo, headers), TaskGitHub.class);
         return repo;
     }
 
@@ -116,7 +118,8 @@ public class RepoService {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + user.getToken());
-        return restTemplate.postForObject(url, turnTaskIntoRepo(task, haveAutoInit, isPrivate, gitIgnoreTemplate, isTemplate, homepage), Repo.class, headers);
+        Repo repo = turnTaskIntoRepo(task, haveAutoInit, isPrivate, gitIgnoreTemplate, isTemplate, homepage);
+        return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(repo, headers), Repo.class).getBody();
         // Boolean haveAutoInit, Boolean isPrivate, String gitIgnoreTemplate, Boolean isTemplate, String homepage
     }
 
@@ -132,7 +135,7 @@ public class RepoService {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.put(url, repo, TaskGitHub.class, headers);
+        restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(null, headers), TaskGitHub.class);
         return repo;
     }
 
@@ -148,7 +151,7 @@ public class RepoService {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.delete(url, headers);
+        restTemplate.exchange(url, HttpMethod.DELETE, new HttpEntity<>(null, headers), TaskGitHub.class);
     }
 
     public ShowTask findOrganizationWithRepo(Long idGroup) {
@@ -157,7 +160,8 @@ public class RepoService {
             throw new NotFoundException("Group not found");
         String url = startUrl + "/orgs/" + group.getName() + "/repos";
         RestTemplate restTemplate = new RestTemplate();
-        return turnTaskGitHubIntoShowTask(restTemplate.getForObject(url, TaskGitHub.class), null, null, null);
+        TaskGitHub repo = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null), TaskGitHub.class).getBody();
+        return turnTaskGitHubIntoShowTask(repo, null, null, null);
     }
 
     public ShowTask turnTaskGitHubIntoShowTask(TaskGitHub taskGitHub, String finishedDate, Long priority, String difficulty) {

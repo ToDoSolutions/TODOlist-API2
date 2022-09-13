@@ -16,19 +16,19 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import javax.validation.Valid;
+import javax.validation.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
 @Validated
 @AllArgsConstructor
 public class UserController {
+
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator(); // Arreglar algún día.
     private TaskService taskService;
 
     private UserService userService;
@@ -176,14 +176,16 @@ public class UserController {
 
     @SuppressWarnings("unchecked")
     @PutMapping("/user/{idUser}/token") // TokenTest
-    public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser, ServletWebRequest request) {
+    public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser,
+                                           @RequestHeader("Authorization") String token) {
         User user = userService.findUserById(idUser);
         if (user == null)
             throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
-        String token = request.getHeader("Authorization");
+        System.out.println("token: " + token);
         if (token == null || token.isEmpty())
             throw new BadRequestException("The token is required.");
         if (token.contains("Bearer")) token = token.replace("Bearer", "").trim();
+        validator.validate(user);
         user.setToken(token);
         user = userService.saveUser(user);
         return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);

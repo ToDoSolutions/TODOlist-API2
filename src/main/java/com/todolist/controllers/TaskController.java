@@ -136,9 +136,7 @@ public class TaskController {
             oldTask.setPriority(task.getPriority());
         if (task.getDifficulty() != null && !Objects.equals(task.getDifficulty(), ""))
             oldTask.setDifficulty(task.getDifficulty());
-        Set<ConstraintViolation<Task>> errors = validator.validate(oldTask);
-        if (!errors.isEmpty())
-            throw new ConstraintViolationException(errors);
+        validator.validate(oldTask);
         ShowTask showTask = new ShowTask(oldTask);
         if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
             throw new BadRequestException("The startDate is must be before the finishedDate.");

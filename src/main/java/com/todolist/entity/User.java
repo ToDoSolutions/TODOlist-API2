@@ -58,6 +58,7 @@ public class User implements Serializable {
 
     @Column(name = "token")
     @Size(max = 50, message = "The token is too long.")
+    @Pattern(regexp = "ghp_[a-zA-Z0-9]{36}", message = "The token is invalid.")
     private String token;
 
     public User() {

@@ -60,8 +60,9 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.26</version>
         </dependency>
-         -->
+        -->
         <!-- En local -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>

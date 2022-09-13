@@ -8,6 +8,8 @@ import com.todolist.entity.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
 @FlywayTest(additionalLocations = "db/migration", value = @DataSource(url = "jdbc:mariadb://localhost:3306/todolist-api2", username = "root", password = "iissi$root"))
@@ -23,16 +25,28 @@ public class DeleteTest {
         TODOlistApplication.main(new String[]{});
     }
 
-    @BeforeEach
-    void setUp() {
-        restTemplate = new RestTemplate();
-        User user = new User();
-        user.setUsername("Mazetosan");
-        user.setPassword("1234");
-        user.setToken("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");
-        ShowUser showUser = restTemplate.postForObject(uri + "/user", user, ShowUser.class);
-        showUser = restTemplate.postForObject(uri + "github/user", user, ShowUser.class);
+
+        @BeforeEach
+        void setUp() {
+            restTemplate = new RestTemplate();
+            /*
+            User user = new User();
+            user.setUsername("Mazetosan");
+            user.setName("Marío");
+            user.setSurname("Zefilio");
+            user.setEmail("m4570n73@gmail.com");
+            user.setPassword("1234");
+            // user.setToken("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");
+            user.setAvatar("https://avatars.githubusercontent.com/u/76800003?v=4");
+            ShowUser showUser = restTemplate.postForObject(uri + "/user/", user, ShowUser.class);
         showUser = restTemplate.postForObject(uri + "/user/" + showUser.getIdUser() + "/task/1", null, ShowUser.class);
+        showUser = restTemplate.postForObject(uri + "/user/" + showUser.getIdUser() + "/token", null, ShowUser.class);
         // restTemplate.postForObject(uri + "/github/");
+        */
+    }
+
+    @Test
+    void delete() {
+        // restTemplate.delete(uri + "/github/repo/1");
     }
 }

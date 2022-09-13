@@ -7,6 +7,7 @@ import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -75,7 +76,7 @@ public class OwnerService {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + oldUser.getToken());
-        owner = restTemplate.postForEntity(url, owner, Owner.class, headers).getBody();
+        owner = restTemplate.postForEntity(url, new HttpEntity<>(owner, headers), Owner.class, headers).getBody();
         return owner;
     }
 

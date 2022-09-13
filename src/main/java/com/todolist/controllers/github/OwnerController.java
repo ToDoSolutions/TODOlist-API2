@@ -14,7 +14,7 @@ import javax.validation.constraints.Min;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/v1/github")
+@RequestMapping("/api/v1")
 @Validated
 public class OwnerController {
 

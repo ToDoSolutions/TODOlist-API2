@@ -1,7 +1,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- En la nube
--- USE `b8iyr7xai8wk75ismpbt`;
+-- USE `by0usznpejuytsr473ki`;
 
 -- En local
 USE `todolist-api2`;
@@ -52,7 +52,9 @@ VALUES ('https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', 'Ser
         'El ao shin que nunca salió', 'elForjadorDeLasEstrellas@riot.com', 'En el espacio picha', 'Aurelion', 'Sol',
         '1233456', 'elForjadorDeLasEstrellas'),
        ('https://pbs.twimg.com/media/FNgG3rCXEAEng6B.jpg', 'Fui sifu de Willy Wonka, el sabe todo gracias a mí',
-        'kingafrica@us.es', 'ESPAÑA', 'Paquito', 'El Chocolatero', '123456', 'kingafrica');
+        'kingafrica@us.es', 'ESPAÑA', 'Paquito', 'El Chocolatero', '123456', 'kingafrica'),
+        ('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfo5IccYOLz_strW3qMPijTDTc8w3k53dLxslb2ZNXMw&s',
+           'Pipoooooo', 'm4570n73@gmail.com', 'Desconocido', 'Marío', 'Zefilio', '123456', 'MaZeToSan');
 
 INSERT INTO `user_task` (`id_user`, `id_task`)
 VALUES (1, 1),
