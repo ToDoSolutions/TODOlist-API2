@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -15,5 +16,7 @@ public interface UserRepository extends JpaRepository<User, Serializable>, Pagin
     List<User> findAll();
 
     User findByIdUser(Long idUser);
+
+    Optional<User> findByUsername(String username);
 
 }

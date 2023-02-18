@@ -3,6 +3,8 @@ package com.todolist.entity.github;
 import com.fasterxml.jackson.annotation.*;
 
 import javax.annotation.Generated;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,3 +67,4 @@ public class Organization {
     }
 
 }
+
