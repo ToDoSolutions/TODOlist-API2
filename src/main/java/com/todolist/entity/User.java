@@ -61,6 +61,8 @@ public class User implements Serializable {
     @Pattern(regexp = "ghp_[a-zA-Z0-9]{36}", message = "The token is invalid.")
     private String token;
 
+    private String clockifyId;
+
     public User() {
         this.idUser = 0L;
     }

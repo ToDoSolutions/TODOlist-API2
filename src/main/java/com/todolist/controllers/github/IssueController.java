@@ -23,7 +23,13 @@ public class IssueController {
     @GetMapping("/issues/{username}/{repoName}")
     public ResponseEntity<Issue[]> getIssues(@PathVariable String username, @PathVariable String repoName) {
         Issue[] issues = issueService.findByUsernameAndRepo(username, repoName);
+        return ResponseEntity.ok().body(issues);
+    }
 
+    @GetMapping("/issues/{username}/{repoName}/md")
+    public ResponseEntity<Issue[]> getIssuesWithMarkdown(@PathVariable String username, @PathVariable String repoName) {
+        Issue[] issues = issueService.findByUsernameAndRepo(username, repoName);
+        // String markdown = markdownAdministrator.getMarkdown(issues);
         return ResponseEntity.ok().body(issues);
     }
 }

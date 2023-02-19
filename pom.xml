@@ -56,19 +56,6 @@
             <artifactId>guava</artifactId>
             <version>31.1-jre</version>
         </dependency>
-        <!-- En la nube
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.26</version>
-        </dependency>
-        -->
-        <!-- En local -->
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>3.0.6</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -123,9 +110,14 @@
             <version>2.13.4</version>
         </dependency>
         <dependency>
-            <groupId>net.steppschuh.markdowngenerator</groupId>
-            <artifactId>markdowngenerator</artifactId>
+            <groupId>com.github.Steppschuh</groupId>
+            <artifactId>Java-Markdown-Generator</artifactId>
             <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.27</version>
         </dependency>
     </dependencies>
     <build>
@@ -141,6 +133,10 @@
             <id>clojars</id>
             <name>Clojars</name>
             <url>https://repo.clojars.org/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 </project>

@@ -1,10 +1,10 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- En la nube
--- USE `by0usznpejuytsr473ki`;
+USE `by0usznpejuytsr473ki`;
 
 -- En local
-USE `todolist-api2`;
+-- USE `todolist-api2`;
 
 CREATE TABLE IF NOT EXISTS `group`
 (
@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS `task`
     `priority`      int(11)      DEFAULT NULL,
     `start_date`    varchar(255) NOT NULL,
     `status`        varchar(255) DEFAULT 'DRAFT',
-    `title`         varchar(255) NOT NULL
+    `title`         varchar(255) NOT NULL,
+    `work_space_id` varchar(255) DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -50,7 +51,8 @@ CREATE TABLE IF NOT EXISTS `user`
     `surname`  varchar(50)  NOT NULL,
     `username` varchar(50)  NOT NULL,
     `password` varchar(255) NOT NULL,
-    `token`    varchar(255) DEFAULT NULL
+    `token`    varchar(255) DEFAULT NULL,
+    `clockify_id` varchar(255) DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 

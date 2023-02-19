@@ -1,17 +1,16 @@
 package com.todolist.services.github;
 
+import com.todolist.component.FetchApiData;
 import com.todolist.entity.User;
 import com.todolist.entity.github.Issue;
 import com.todolist.entity.github.TaskGitHub;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.UserService;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
-@AllArgsConstructor
 public class IssueService {
 
     @Value("${github.api.url}")
@@ -19,6 +18,14 @@ public class IssueService {
 
     private final RepoService repoService;
     private final UserService userService;
+    private final FetchApiData fetchApiData;
+
+     @Autowired
+    public IssueService(RepoService repoService, UserService userService, FetchApiData fetchApiData) {
+        this.repoService = repoService;
+        this.userService = userService;
+        this.fetchApiData = fetchApiData;
+    }
 
 
     // Get all issues from a repo
@@ -27,8 +34,6 @@ public class IssueService {
         TaskGitHub task = repoService.findRepoByName(user.getIdUser(), repoName);
         if (task == null)
             throw new NotFoundException("Task not found");
-        String url = startUrl + "/repos/" + user.getName() + "/" + task.getName() + "/issues";
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.getForObject(url, Issue[].class);
+        return fetchApiData.getApiData(startUrl + "/repos/" + user.getName() + "/" + task.getName() + "/issues", Issue[].class);
     }
 }
