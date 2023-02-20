@@ -42,8 +42,10 @@ public class RepoService {
     // TODO: revisar si en el caso de que se utilice una autorización cuenta también los privados.
     public TaskGitHub findRepoByName(String username, String repoName) {
         User user = userService.findUserByUsername(username);
-        if (user == null)
-            throw new NotFoundException("User not found");
+        if (user == null) {
+            user = new User();
+            user.setUsername(username);
+        }
         String url = startUrl + "/repos/" + user.getUsername() + "/" + repoName;
         RestTemplate restTemplate = new RestTemplate();
         if (user.getToken() != null) {
@@ -57,8 +59,10 @@ public class RepoService {
 
     public TaskGitHub[] findAllRepos(String username) {
         User user = userService.findUserByUsername(username);
-        if (user == null)
-            throw new NotFoundException("User not found.");
+        if (user == null) {
+            user = new User();
+            user.setUsername(username);
+        }
         String url = startUrl + "/users/" + user.getUsername() + "/repos";
         RestTemplate restTemplate = new RestTemplate();
         if (user.getToken() != null) {
@@ -168,11 +172,17 @@ public class RepoService {
     }
 
     public Task turnTaskGitHubIntoTask(TaskGitHub taskGitHub, String finishedDate, Long priority, String difficulty) {
+        String status;
+        try {
+            status = getStatus(taskGitHub.getReleasesUrl());
+        } catch (Exception e) {
+            status = Status.UNKNOWN.toString();
+        }
         return Task.of(
                 taskGitHub.getName(),
                 taskGitHub.getDescription(),
                 taskGitHub.getCloneUrl(),
-                getStatus(taskGitHub.getReleasesUrl()),
+                status,
                 finishedDate,
                 taskGitHub.getCreatedAt().split("T")[0], priority, difficulty);
     }

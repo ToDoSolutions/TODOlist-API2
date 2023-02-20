@@ -7,7 +7,8 @@ public enum Status {
     IN_PROGRESS,
     IN_REVISION,
     DONE,
-    CANCELLED;
+    CANCELLED,
+    UNKNOWN;
 
     public static Status parse(String status) {
         String statusLowerCase = status.toLowerCase();
@@ -17,8 +18,9 @@ public enum Status {
             case "in_revision", "in revision" -> IN_REVISION;
             case "done" -> DONE;
             case "cancelled" -> CANCELLED;
+            case "unknown" -> UNKNOWN;
             default ->
-                    throw new BadRequestException("The status " + status + " is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled.");
+                    throw new BadRequestException("The status " + status + " is not valid and it should be one of the following -> draft - in_progress - in_revision - done - cancelled - unknown.");
         };
     }
 }

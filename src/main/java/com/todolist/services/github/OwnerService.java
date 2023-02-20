@@ -27,8 +27,10 @@ public class OwnerService {
     // findById(String userId)
     public Owner findByUsername(String username) {
         User oldUser = userService.findUserByUsername(username);
-        if (oldUser == null)
-            throw new NotFoundException("User not found");
+        if (oldUser == null) {
+            oldUser = new User();
+            oldUser.setUsername(username);
+        }
         String url = startUrl + "/users/" + oldUser.getUsername();
         RestTemplate restTemplate = new RestTemplate();
         Owner owner;

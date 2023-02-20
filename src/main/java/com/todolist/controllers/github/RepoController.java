@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,8 @@ public class RepoController {
     @GetMapping("/repos/{username}") // GetAllTest
     public List<Map<String, Object>> getAllRepos(@PathVariable String username,
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
-        return Arrays.stream(repoService.findAllRepos(username)).map(repo -> repoService.turnTaskGitHubIntoShowTask(repo, null, null, null).getFields(fieldsTask)).toList();
+        return Arrays.stream(repoService.findAllRepos(username)).map(repo -> repoService.turnTaskGitHubIntoShowTask(repo, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE), null, null)
+                .getFields(fieldsTask.replace("finishedDate", "").replace("priority", "").replace("difficulty", "").replace("duration", "").replace("idTask", ""))).toList();
     }
 
     // Obtener un repositorio de un usuario de GitHub (ya existente)
@@ -40,7 +43,8 @@ public class RepoController {
             @PathVariable String username,
             @PathVariable String repoName,
             @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
-        return repoService.turnTaskGitHubIntoShowTask(repoService.findRepoByName(username, repoName), null, null, null).getFields(fieldsTask);
+        return repoService.turnTaskGitHubIntoShowTask(repoService.findRepoByName(username, repoName), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE), null, null)
+                .getFields(fieldsTask.replace("finishedDate", "").replace("priority", "").replace("difficulty", "").replace("duration", "").replace("idTask",""));
     }
 
     // Subir información a GitHub.
