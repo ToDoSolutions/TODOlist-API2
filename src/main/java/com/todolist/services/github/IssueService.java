@@ -30,8 +30,8 @@ public class IssueService {
 
     // Get all issues from a repo
     public Issue[] findByUsernameAndRepo(String username, String repoName) {
-        User user = userService.findUserByName(username);
-        TaskGitHub task = repoService.findRepoByName(user.getIdUser(), repoName);
+        User user = userService.findUserByUsername(username);
+        TaskGitHub task = repoService.findRepoByName(user.getUsername(), repoName);
         if (task == null)
             throw new NotFoundException("Task not found");
         return fetchApiData.getApiData(startUrl + "/repos/" + user.getName() + "/" + task.getName() + "/issues", Issue[].class);

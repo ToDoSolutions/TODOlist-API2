@@ -25,8 +25,8 @@ public class OwnerService {
     private UserService userService;
 
     // findById(String userId)
-    public Owner findById(Long idUser) {
-        User oldUser = userService.findUserById(idUser);
+    public Owner findByUsername(String username) {
+        User oldUser = userService.findUserByUsername(username);
         if (oldUser == null)
             throw new NotFoundException("User not found");
         String url = startUrl + "/users/" + oldUser.getUsername();
@@ -59,14 +59,14 @@ public class OwnerService {
     }
 
     public User updateUser(User oldUser) {
-        Owner owner = findById(oldUser.getIdUser());
+        Owner owner = findByUsername(oldUser.getUsername());
         User newUser = turnOwnerIntoUser(owner, oldUser.getPassword());
         oldUser = userService.updateUser(oldUser, newUser);
         return oldUser;
     }
 
     public Owner updateOwner(User oldUser) {
-        Owner owner = findById(oldUser.getIdUser());
+        Owner owner = findByUsername(oldUser.getUsername());
         if (oldUser.getUsername() != null) owner.setLogin(oldUser.getUsername());
         if (oldUser.getAvatar() != null) owner.setAvatarUrl(oldUser.getAvatar());
         if (oldUser.getEmail() != null) owner.setEmail(oldUser.getEmail());

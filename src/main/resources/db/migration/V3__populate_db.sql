@@ -21,7 +21,8 @@ VALUES (1, 1),
 
 INSERT INTO `task` (`annotation`, `description`, `difficulty`, `finished_date`, `priority`, `start_date`,
                     `status`, `title`)
-VALUES ('Vacaciones', 'Quiero vacaciones', 'HARDCORE', '2020-01-31', 5, '2020-01-01', 'DRAFT', 'Vacaciones'),
+VALUES ('TODOlist-API2', '...', 'HARDCORE', '2020-01-31', 5, '2020-01-01', 'DRAFT', '...'),
+        ('Vacaciones', 'Quiero vacaciones', 'HARDCORE', '2020-01-31', 5, '2020-01-01', 'DRAFT', 'Vacaciones'),
        ('Quiero subir o mantenerme no bajar a hierro', 'Salir de bronce en el lol', 'I_WANT_TO_DIE', '2022-12-15', 5,
         '2021-01-01', 'IN_PROGRESS', 'Bronce'),
        ('Sin hueso pero con pepinillo', 'Comprar aceitunas sin hueso', 'MEDIUM', '2022-05-29', 2, '2022-05-19',
@@ -37,7 +38,9 @@ VALUES ('Vacaciones', 'Quiero vacaciones', 'HARDCORE', '2020-01-31', 5, '2020-01
         '2020-03-03', 'IN_PROGRESS', 'Comprar el pan.');
 
 INSERT INTO `user` (`avatar`, `bio`, `email`, `location`, `name`, `surname`, `password`, `username`)
-VALUES ('https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', 'Ser celestial, nacido para ayudar',
+VALUES ('https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', '...',
+        '...', 'mi casa', '...', '...', '123456', 'alesanfe'),
+        ('https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', 'Ser celestial, nacido para ayudar',
         'miscosama@gmail.com', 'mi casa', 'Misco', 'Jones', '123456', 'miscosama'),
        ('http://pm1.narvii.com/6120/9cd70762280f430ded8158c06c287e82b84d0101_00.jpg',
         'Nacío en un día en el que el sol brillo de tal manera que dislumbró a los imples mortales',

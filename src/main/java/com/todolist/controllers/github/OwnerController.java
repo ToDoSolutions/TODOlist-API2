@@ -27,14 +27,14 @@ public class OwnerController {
     /* OBTENER INFORMACIÓN Y MODIFICAR BASE DE DATOS */
 
     // Obtener usuario de GitHub (ya existente)
-    @GetMapping("/github/user/{idUser}") // GetSoloTest
-    public ShowUser getOwner(@PathVariable @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
-        return ownerService.turnOwnerIntoShowUser(ownerService.findById(idUser));
+    @GetMapping("/github/user/{username}") // GetSoloTest
+    public ShowUser getOwner(@PathVariable String username) {
+        return ownerService.turnOwnerIntoShowUser(ownerService.findByUsername(username));
     }
 
-    @PutMapping("/github/user/{idUser}") // PutTest
-    public ShowUser updateUser(@PathVariable @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
-        User oldUser = userService.findUserById(idUser);
+    @PutMapping("/github/user/{username}") // PutTest
+    public ShowUser updateUser(@PathVariable String username) {
+        User oldUser = userService.findUserByUsername(username);
         if (oldUser == null)
             throw new NotFoundException("User not found");
         return new ShowUser(ownerService.updateUser(oldUser), userService.getShowTaskFromUser(oldUser));
@@ -42,10 +42,10 @@ public class OwnerController {
 
     /* MODIFICAR USUARIOS DE GITHUB (pedir contraseña)*/
 
-    @PutMapping("/github/owner/{idUser}") // PutTest
-    public ShowUser updateOwner(@PathVariable @Min(value = 0, message = "The idUser must be positive.") Long idUser
+    @PutMapping("/github/owner/{username}") // PutTest
+    public ShowUser updateOwner(@PathVariable String username
             ,@RequestParam String password) {
-        User oldUser = userService.findUserById(idUser);
+        User oldUser = userService.findUserByUsername(username);
         if (oldUser == null)
             throw new NotFoundException("User not found");
         if (oldUser.getToken() == null)
