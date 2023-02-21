@@ -1,10 +1,8 @@
-package com.todolist.entity.github;
+package com.todolist.entity.autodoc.github;
 
 import com.fasterxml.jackson.annotation.*;
 
 import javax.annotation.Generated;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.HashMap;

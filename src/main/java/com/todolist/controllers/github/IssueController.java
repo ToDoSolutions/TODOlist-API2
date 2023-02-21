@@ -1,7 +1,7 @@
 package com.todolist.controllers.github;
 
 import com.todolist.component.MarkdownAdministrator;
-import com.todolist.entity.github.Issue;
+import com.todolist.entity.autodoc.github.Issue;
 import com.todolist.services.github.IssueService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.todolist.entity.clockify;
+package com.todolist.entity.autodoc.clockify;
 
 import com.fasterxml.jackson.annotation.*;
 

@@ -1,7 +1,7 @@
 package com.todolist.controllers.github;
 
 import com.todolist.dtos.ShowTask;
-import com.todolist.entity.github.Repo;
+import com.todolist.entity.autodoc.github.Repo;
 import com.todolist.services.UserService;
 import com.todolist.services.github.RepoService;
 import lombok.AllArgsConstructor;

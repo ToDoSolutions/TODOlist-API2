@@ -28,6 +28,10 @@ public class TaskService {
         return taskRepository.findById(idTask).orElse(null);
     }
 
+    public Task findTaskByTitle(String title) {
+        return taskRepository.findByTitle(title);
+    }
+
     public Task saveTask(Task task) {
         return taskRepository.save(task);
     }

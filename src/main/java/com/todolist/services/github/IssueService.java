@@ -2,8 +2,8 @@ package com.todolist.services.github;
 
 import com.todolist.component.FetchApiData;
 import com.todolist.entity.User;
-import com.todolist.entity.github.Issue;
-import com.todolist.entity.github.TaskGitHub;
+import com.todolist.entity.autodoc.github.Issue;
+import com.todolist.entity.autodoc.github.TaskGitHub;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

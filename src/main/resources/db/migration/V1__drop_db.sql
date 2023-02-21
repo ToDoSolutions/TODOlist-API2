@@ -1,8 +1,8 @@
 -- En la nube
-USE `by0usznpejuytsr473ki`;
+-- USE `by0usznpejuytsr473ki`;
 
 -- En local
--- USE `todolist-api2`;
+USE `todolist-api2`;
 
 SET
 FOREIGN_KEY_CHECKS=0;

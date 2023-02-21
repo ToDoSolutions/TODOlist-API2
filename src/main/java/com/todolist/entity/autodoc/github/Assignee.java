@@ -1,4 +1,4 @@
-package com.todolist.entity.github;
+package com.todolist.entity.autodoc.github;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

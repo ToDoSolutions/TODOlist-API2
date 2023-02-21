@@ -3,13 +3,12 @@ package com.todolist.services.github;
 import com.todolist.component.FetchApiData;
 import com.todolist.dtos.ShowGroup;
 import com.todolist.entity.Group;
-import com.todolist.entity.github.Organization;
+import com.todolist.entity.autodoc.github.Organization;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 
 @Service
