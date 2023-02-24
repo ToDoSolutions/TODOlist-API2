@@ -101,7 +101,7 @@ public class AutoDocService {
                     .addRow("Analista", employee.getSalaryByRole(Role.ANALYST) + "€")
                     .addRow("Tester", employee.getSalaryByRole(Role.TESTER) + "€")
                     .addRow("Diseñador", employee.getSalaryByRole(Role.MANAGER) + "€")
-                    .addRow("Gerente", employee.getSalaryByRole(Role.OPERATOR) + "€")
+                    .addRow("Operador", employee.getSalaryByRole(Role.OPERATOR) + "€")
                     .build().serialize());
             cost += employee.getSalary().values().stream().mapToDouble(i -> i).sum();
         }

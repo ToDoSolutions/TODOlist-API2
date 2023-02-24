@@ -1,11 +1,10 @@
-# Tabla de contenidos
----
-1. (**Tabla de revisión**)[#tabla-de-revisión]
-2. (**Resumen**)[#resumen]
-3. (**Introducción**)[#introducción]
-4. (**Análisis de requisitos**)[#análisis-de-requisitos]
-5. (**Conclusiones**)[#conclusiones]
-6. (**Bibliografía**)[#bibliografía]
+# Tabla de contenidos---
+1. **Tabla de revisión**
+2. **Resumen**
+3. **Introducción**
+4. **Análisis de requisitos**
+5. **Conclusiones**
+6. **Bibliografía**
 
 # Tabla de revisión {#tabla-de-revisión}
 ---
@@ -27,10 +26,10 @@ En resumen, el objetivo de este informe es ofrecer un análisis exhaustivo de lo
 
 # Análisis de requisitos {#análisis-de-requisitos}
 ### Enunciados
-- **AAA**-Obetener ISSUES de GitHUb.
-- **AAA**-Lograr una forma de vincular a los usuarios de GitHub con Clockify.
 - **AAA**-Definir un template para generar los documentos.
+- **AAA**-Obetener ISSUES de GitHUb.
 - **AAA**-Integrar la api de Clockify.
+- **AAA**-Lograr una forma de vincular a los usuarios de GitHub con Clockify.
 
 ### Análisis
 | ID  | Conclusiones              | Decisiones tomadas        |

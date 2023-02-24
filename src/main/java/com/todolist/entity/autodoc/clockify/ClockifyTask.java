@@ -168,7 +168,14 @@ public class ClockifyTask {
         LocalDateTime start = LocalDateTime.parse(getTimeInterval().getStart(), DateTimeFormatter.ISO_DATE_TIME);
         LocalDateTime end = LocalDateTime.parse(getTimeInterval().getEnd(), DateTimeFormatter.ISO_DATE_TIME);
         Duration difference = Duration.between(start, end);
-        duration += (difference.toSeconds()/3600.) + (difference.toMinutes()/60.) + difference.toHours() *  + difference.toDays() * 24;
+        System.out.println("difference = " + difference);
+        System.out.println("duration = " + duration + " hours");
+        System.out.println("difference.toSeconds() = " + difference.toSeconds());
+        System.out.println("difference.toMinutes() = " + difference.toMinutes());
+        System.out.println("difference.toHours() = " + difference.toHours());
+        System.out.println("difference.toDays() = " + difference.toDays());
+        duration += difference.toSeconds()/3600.;
+        System.out.println("duration = " + duration + " hours");
         double finalDuration = duration;
         roles.forEach(role -> employee.keepSalary(role, finalDuration));
         return duration;
