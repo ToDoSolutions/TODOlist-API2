@@ -54,7 +54,7 @@ public class AutoDocService {
         for (ClockifyTask task : clockifyTask) {
             Employee employee = findEmployeeClockifyTask(employees, task);
             List<Role> roles = task.getTagIds().stream().map(tagId -> clockifyService.getRoleFromClockify(repoName, tagId)).distinct().toList();
-            task.calculateSalary(roles, duration, employee);
+            duration += task.calculateSalary(roles, duration, employee);
             allRoles.addAll(roles);
         }
         return new TimeTask(issue.body, issue.title, duration, allRoles, employees);

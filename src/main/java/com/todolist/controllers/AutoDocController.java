@@ -67,7 +67,6 @@ public class AutoDocController {
             times.
                     addRow(employee.getName(), "", "", "", "", "", employee.getSalary().entrySet().stream().map(entry -> entry.getKey() + ": " + entry.getValue() + "€").reduce((s, s2) -> s + ", " + s2).orElse(""));
         }
-
         FileWriter fileWriter = new FileWriter("out/table.md");
         fileWriter.write(output);
         fileWriter.close();

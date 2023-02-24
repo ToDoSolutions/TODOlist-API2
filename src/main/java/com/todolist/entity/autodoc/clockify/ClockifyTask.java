@@ -170,10 +170,7 @@ public class ClockifyTask {
         Duration difference = Duration.between(start, end);
         duration += (difference.toSeconds()/3600.) + (difference.toMinutes()/60.) + difference.toHours() *  + difference.toDays() * 24;
         double finalDuration = duration;
-        return roles.stream().mapToDouble(role -> {
-                    employee.keepSalary(role, finalDuration);
-                    return  role.getFinalSalary(finalDuration);
-                }
-        ).sum();
+        roles.forEach(role -> employee.keepSalary(role, finalDuration));
+        return duration;
     }
 }
