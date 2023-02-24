@@ -3,12 +3,17 @@ package com.todolist.services;
 import com.todolist.component.FetchApiData;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
+import com.todolist.entity.autodoc.Role;
 import com.todolist.entity.autodoc.clockify.ClockifyTask;
+import com.todolist.entity.autodoc.clockify.Tag;
 import com.todolist.exceptions.NotFoundException;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class ClockifyService {
@@ -38,5 +43,19 @@ public class ClockifyService {
         if (user == null)
             throw new NotFoundException("User not found");
         return fetchApiData.getApiDataWithToken(startUrl + "/workspaces/" + task.getWorkSpaceId() + "/user/" + user.getClockifyId() + "/time-entries", ClockifyTask[].class, new Pair("X-Api-Key", token));
+    }
+
+    public Tag getTagFromClockify(String repoName, String tagId) {
+        Task task = taskService.findTaskByTitle(repoName);
+        if (task == null)
+            throw new NotFoundException("Task not found");
+        if (tagId == null)
+            return new Tag();
+
+        return fetchApiData.getApiDataWithToken(startUrl + "/workspaces/" + task.getWorkSpaceId() + "/tags/" + tagId, Tag.class, new Pair("X-Api-Key", token));
+    }
+
+    public Role getRoleFromClockify(String repoName, String roleId) {
+        return Role.parseTag(getTagFromClockify(repoName, roleId));
     }
 }

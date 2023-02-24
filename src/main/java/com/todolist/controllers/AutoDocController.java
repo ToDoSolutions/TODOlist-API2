@@ -1,13 +1,17 @@
 package com.todolist.controllers;
 
+import com.todolist.entity.autodoc.Role;
 import com.todolist.entity.autodoc.TimeTask;
 import com.todolist.services.AutoDocService;
+import net.steppschuh.markdowngenerator.table.Table;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -29,8 +33,25 @@ public class AutoDocController {
 
     // TODO: Crear un endpoint para obtener el markdown
     @RequestMapping("/{repoName}/{username}/md")
-    public ResponseEntity<List<TimeTask>> getAutoDocMd(@PathVariable String repoName, @PathVariable String username) {
-        return ResponseEntity.ok(autoDocService.autoDoc(repoName, username));
+    public ResponseEntity getAutoDocMd(@PathVariable String repoName, @PathVariable String username) throws IOException {
+        List<TimeTask> timeTasks = autoDocService.autoDoc(repoName, username);
+        Table.Builder tableBuilder = new Table.Builder()
+                .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
+                .addRow("Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real");
+        for (TimeTask timeTask : timeTasks) {
+            tableBuilder.addRow(timeTask.getTitle(), timeTask.getDescription(), timeTask.getUsernames().stream().reduce((s, s2) -> s + ", " + s2).orElse("")
+                    , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
+                    , timeTask.getDuration());
+        }
+        FileWriter fileWriter = new FileWriter("table.md");
+        fileWriter.write(tableBuilder.build().serialize());
+        fileWriter.close();
+        System.out.println(tableBuilder.build().serialize());
+        // Guardar la tabla en un archivo.
+
+
+
+        return ResponseEntity.ok().build();
     }
 
     // TODO: Crear un endpoint para obtener el pdf
