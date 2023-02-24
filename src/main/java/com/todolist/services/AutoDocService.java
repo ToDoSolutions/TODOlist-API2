@@ -13,10 +13,7 @@ import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
 import net.steppschuh.markdowngenerator.text.heading.Heading;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,7 +63,7 @@ public class AutoDocService {
     public List<Employee> getEmployees(List<TimeTask> timeTasks) {
         List<Employee> employeesTime = timeTasks.stream().flatMap(timeTask -> timeTask.getEmployees().stream()).toList();
         List<Employee> employees = Lists.newArrayList();
-        for (Employee employeeTime: employeesTime) {
+        for (Employee employeeTime : employeesTime) {
             Employee employee = employees.stream().filter(employee1 -> employee1.getName().equals(employeeTime.getName())).findFirst().orElse(null);
             if (employee == null)
                 employees.add(employeeTime);
@@ -76,25 +73,29 @@ public class AutoDocService {
         return employees;
     }
 
-    public String getPlanning(String repoName, String username) {
-        List<TimeTask> timeTasks = autoDoc(repoName, username);
+    public String[] getPlanning(String repoName, String username, String individual) {
+        List<TimeTask> timeTasks;
+        if (Objects.equals(individual, "all"))
+            timeTasks = autoDoc(repoName, username);
+        else
+            timeTasks = autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
         List<Employee> employees = getEmployees(timeTasks);
-        Table.Builder times = new Table.Builder()
+        Table.Builder taskTable = new Table.Builder()
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                 .addRow("Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste");
         // Obtenemos la tabla con los costes de cada tarea.
         for (TimeTask timeTask : timeTasks) {
-            times.addRow(timeTask.getTitle(), timeTask.getDescription(), timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
+            taskTable.addRow(timeTask.getTitle(), timeTask.getDescription(), timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
                     , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
                     , timeTask.getDuration()
                     , timeTask.getCost() + "€");
         }
-        StringBuilder output = new StringBuilder(times.build().serialize());
+        StringBuilder personalTable = new StringBuilder();
+        double cost = 0;
         // Obtenemos la tabla para los empleados.
-
         for (Employee employee : employees) {
-            output.append("\n").append(new Heading(employee.getName(), 3)).append("\n");
-            output.append(new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
+            personalTable.append("\n").append(new Heading(employee.getName(), 3)).append("\n");
+            personalTable.append(new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                     .addRow("Rol", "Coste")
                     .addRow("Desarrollador", employee.getSalaryByRole(Role.DEVELOPER) + "€")
                     .addRow("Analista", employee.getSalaryByRole(Role.ANALYST) + "€")
@@ -102,14 +103,17 @@ public class AutoDocService {
                     .addRow("Diseñador", employee.getSalaryByRole(Role.MANAGER) + "€")
                     .addRow("Gerente", employee.getSalaryByRole(Role.OPERATOR) + "€")
                     .build().serialize());
-            times.
-                    addRow(employee.getName(), "", "", "", "", "", employee.getSalary().entrySet().stream().map(entry -> entry.getKey() + ": " + entry.getValue() + "€").reduce((s, s2) -> s + ", " + s2).orElse(""));
+            cost += employee.getSalary().values().stream().mapToDouble(i -> i).sum();
         }
-        return output.toString();
+        return new String[]{taskTable.build().serialize(), personalTable.toString(), cost + "€"};
     }
 
-    public String getAnalysis(String repoName, String username) {
-        List<TimeTask> timeTasks = autoDoc(repoName, username);
+    public String getAnalysis(String repoName, String username, String individual) {
+        List<TimeTask> timeTasks;
+        if (Objects.equals(individual, "all"))
+            timeTasks = autoDoc(repoName, username);
+        else
+            timeTasks = autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
         StringBuilder output = new StringBuilder(new Heading("Enunciados", 3).toString()).append("\n");
         Table.Builder table = new Table.Builder()
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)

@@ -1,6 +1,5 @@
 package com.todolist.entity.autodoc;
 
-import com.todolist.entity.autodoc.Role;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,11 +18,10 @@ public class Employee {
     public Employee(String name, String clockifyId) {
         this.name = name;
         this.clockifyId = clockifyId;
+        this.salary = new HashMap<>();
     }
 
     public void keepSalary(Role role, double hours) {
-        if (salary == null)
-            salary = new HashMap<>();
         if (salary.containsKey("role"))
             salary.put(role, salary.get(role) + role.getFinalSalary(hours));
         else
@@ -31,10 +29,8 @@ public class Employee {
     }
 
     public void updateSalary(Employee employee) {
-        if (salary == null)
-            salary = new HashMap<>();
-        if (employee.getSalary() != null)
-            for (Role role : employee.getSalary().keySet())
+
+        for (Role role : employee.getSalary().keySet())
                 if (salary.containsKey(role))
                     salary.put(role, salary.get(role) + employee.getSalary().get(role));
                 else

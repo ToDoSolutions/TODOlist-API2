@@ -122,13 +122,6 @@
             <artifactId>mariadb-java-client</artifactId>
             <version>3.0.6</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>com.vladsch.flexmark</groupId>
-            <artifactId>flexmark-all</artifactId>
-            <version>0.64.0</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>

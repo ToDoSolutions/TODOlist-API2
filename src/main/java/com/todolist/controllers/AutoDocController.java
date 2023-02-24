@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 @Controller
@@ -32,36 +32,31 @@ public class AutoDocController {
 
     // TODO: Crear un endpoint para obtener el markdown
     @RequestMapping("/planning/{repoName}/{username}/md")
-    public ResponseEntity getPlanningMd(@PathVariable String repoName, @PathVariable String username) throws IOException {
-        String output = autoDocService.getPlanning(repoName, username);
+    public ResponseEntity getPlanning(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = "all") String individual) throws IOException {
+        String[] output = autoDocService.getPlanning(repoName, username, individual);
+        File file = new File("templates/planning.txt");
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String text =reader.lines().reduce((s, s2) -> s + s2 + "\n").get();
+        reader.close();
+        String newContent = text.replace("{content0}", output[0]);
+        newContent = newContent.replace("{content1}", output[1]);
+        newContent = newContent.replace("{content2}", output[2]);
         FileWriter fileWriter = new FileWriter("out/planning.md");
-        fileWriter.write(output.toString());
+        fileWriter.write(newContent);
         fileWriter.close();
-        return ResponseEntity.ok().build();
-    }
-
-    // TODO: Crear un endpoint para obtener el pdf
-    @RequestMapping("/planning/{repoName}/{username}/pdf")
-    public ResponseEntity getPlanningPdf(@PathVariable String repoName, @PathVariable String username) throws IOException {
-        String output = autoDocService.getPlanning(repoName, username);
-        System.out.println(output);
-        FileWriter fileWriter = new FileWriter("out/planning.md");
-        fileWriter.write(output.toString());
-        fileWriter.close();
-
-        //Converter converter = new Converter("out/table.md");
-        //PdfConvertOptions options = new PdfConvertOptions();
-        //converter.convert("out/table.pdf", options);
-
-
         return ResponseEntity.ok().build();
     }
 
     @RequestMapping("/analysis/{repoName}/{username}/md")
-    public ResponseEntity getAnalysisMd(@PathVariable String repoName, @PathVariable String username) throws IOException {
-        String output = autoDocService.getAnalysis(repoName, username);
+    public ResponseEntity getAnalysis(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = "all") String individual) throws IOException {
+        String output = autoDocService.getAnalysis(repoName, username, individual);
+        File file = new File("templates/analysis.txt");
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String text =reader.lines().reduce((s, s2) -> s + s2 + "\n").get();
+        reader.close();
+        String newContent = text.replace("{content}", output);
         FileWriter fileWriter = new FileWriter("out/analysis.md");
-        fileWriter.write(output.toString());
+        fileWriter.write(newContent);
         fileWriter.close();
         return ResponseEntity.ok().build();
     }
