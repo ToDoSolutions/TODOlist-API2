@@ -51,24 +51,24 @@ public class AutoDocController {
                     , timeTask.getDuration()
                     , timeTask.getCost() + "€");
         }
-        String output = times.build().serialize();
+        StringBuilder output = new StringBuilder(times.build().serialize());
         // Obtenemos la tabla para los empleados.
 
         for (Employee employee : employees) {
-            output += "\n" + new Heading(employee.getName(), 2) + "\n";
-            output += new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
+            output.append("\n").append(new Heading(employee.getName(), 3)).append("\n");
+            output.append(new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                     .addRow("Rol", "Coste")
                     .addRow("Desarrollador", employee.getSalaryByRole(Role.DEVELOPER) + "€")
                     .addRow("Analista", employee.getSalaryByRole(Role.ANALYST) + "€")
                     .addRow("Tester", employee.getSalaryByRole(Role.TESTER) + "€")
                     .addRow("Diseñador", employee.getSalaryByRole(Role.MANAGER) + "€")
                     .addRow("Gerente", employee.getSalaryByRole(Role.OPERATOR) + "€")
-                    .build().serialize();
+                    .build().serialize());
             times.
                     addRow(employee.getName(), "", "", "", "", "", employee.getSalary().entrySet().stream().map(entry -> entry.getKey() + ": " + entry.getValue() + "€").reduce((s, s2) -> s + ", " + s2).orElse(""));
         }
         FileWriter fileWriter = new FileWriter("out/table.md");
-        fileWriter.write(output);
+        fileWriter.write(output.toString());
         fileWriter.close();
         return ResponseEntity.ok().build();
     }
