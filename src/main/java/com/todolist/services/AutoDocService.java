@@ -1,6 +1,8 @@
 package com.todolist.services;
 
+import com.google.common.collect.Lists;
 import com.todolist.entity.User;
+import com.todolist.entity.autodoc.Employee;
 import com.todolist.entity.autodoc.Role;
 import com.todolist.entity.autodoc.TimeTask;
 import com.todolist.entity.autodoc.clockify.ClockifyTask;
@@ -32,40 +34,46 @@ public class AutoDocService {
     }
 
     public List<TimeTask> autoDoc(String repoName, String username) {
-        Issue[] issues = issueService.findByUsernameAndRepo(username, repoName);
-        ClockifyTask[] clockifyTasks = clockifyService.getTaskFromWorkspace(repoName, username);
-        Map<Issue, ClockifyTask[]> map = Stream.of(issues).collect(
+        Map<Issue, ClockifyTask[]> map = groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName));
+        return map.entrySet().stream().map(entry -> createTimeTask(entry, repoName)).toList();
+    }
+
+    public Map<Issue, ClockifyTask[]> groupIssuesWithHisTime(Issue[] issues, ClockifyTask[] clockifyTasks) {
+        return Stream.of(issues).collect(
                 Collectors.toMap(issue -> issue, issue -> Stream.of(clockifyTasks).filter(clockifyTask -> clockifyTask.getDescription().contains(issue.title)).toArray(ClockifyTask[]::new))
         );
-        return map.entrySet().stream().map(entry -> {
-            TimeTask timeTask = new TimeTask();
-            Issue issue = entry.getKey();
-            ClockifyTask[] clockifyTask = entry.getValue();
-            timeTask.setDescription(issue.body);
-            timeTask.setTitle(issue.title);
-            double duration = 0;
-            double cost = 0;
-            Set<Role> allRoles = new HashSet<>();
-            for (ClockifyTask task : clockifyTask) {
-                List<Role> roles = task.getTagIds().stream().map(tagId -> clockifyService.getRoleFromClockify(repoName, tagId)).distinct().toList();
-                LocalDateTime start = LocalDateTime.parse(task.getTimeInterval().getStart(), DateTimeFormatter.ISO_DATE_TIME);
-                LocalDateTime end = LocalDateTime.parse(task.getTimeInterval().getEnd(), DateTimeFormatter.ISO_DATE_TIME);
-                Duration difference = Duration.between(start, end);
-                duration += (difference.toSeconds()/3600.) + (difference.toMinutes()/60.) + difference.toHours() *  + difference.toDays() * 24;
-                double finalDuration = duration;
-                cost += roles.stream().mapToDouble(role -> role.getFinalSalary(finalDuration)).sum();
-                allRoles.addAll(roles);
-            }
-            timeTask.setDuration(duration);
-            timeTask.setCost(cost);
-            timeTask.setRoles(allRoles);
-            timeTask.setUsernames(issue.assignees.stream().map(
-                    owner -> {
-                        User user = userService.findUserByUsername(owner.getLogin());
-                        return user.getName() + " " + user.getSurname();
-                    }
-            ).toList());
-            return timeTask;
-        }).toList();
+    }
+
+    public TimeTask createTimeTask(Map.Entry<Issue, ClockifyTask[]> entry, String repoName) {
+        Issue issue = entry.getKey();
+        ClockifyTask[] clockifyTask = entry.getValue();
+        double duration = 0;
+        Set<Role> allRoles = new HashSet<>();
+        List<User> users = issue.assignees.stream().map(issueService::getUserAssignedToIssue).toList();
+        List<Employee> employees = users.stream().map(user -> new Employee(user.getFullName(), user.getClockifyId())).toList();
+        for (ClockifyTask task : clockifyTask) {
+            Employee employee = findEmployeeClockifyTask(employees, task);
+            List<Role> roles = task.getTagIds().stream().map(tagId -> clockifyService.getRoleFromClockify(repoName, tagId)).distinct().toList();
+            task.calculateSalary(roles, duration, employee);
+            allRoles.addAll(roles);
+        }
+        return new TimeTask(issue.body, issue.title, duration, allRoles, employees);
+    }
+
+    public Employee findEmployeeClockifyTask(List<Employee> employees, ClockifyTask clockifyTask) {
+        return employees.stream().filter(employee -> employee.getClockifyId().equals(clockifyTask.getUserId())).findFirst().orElse(null);
+    }
+
+    public List<Employee> getEmployees(List<TimeTask> timeTasks) {
+        List<Employee> employeesTime = timeTasks.stream().flatMap(timeTask -> timeTask.getEmployees().stream()).toList();
+        List<Employee> employees = Lists.newArrayList();
+        for (Employee employeeTime: employeesTime) {
+            Employee employee = employees.stream().filter(employee1 -> employee1.getName().equals(employeeTime.getName())).findFirst().orElse(null);
+            if (employee == null)
+                employees.add(employeeTime);
+            else
+                employee.updateSalary(employeeTime);
+        }
+        return employees;
     }
 }

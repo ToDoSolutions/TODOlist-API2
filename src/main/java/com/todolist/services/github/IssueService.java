@@ -3,6 +3,7 @@ package com.todolist.services.github;
 import com.todolist.component.FetchApiData;
 import com.todolist.entity.User;
 import com.todolist.entity.autodoc.github.Issue;
+import com.todolist.entity.autodoc.github.Owner;
 import com.todolist.entity.autodoc.github.TaskGitHub;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.UserService;
@@ -35,5 +36,9 @@ public class IssueService {
         if (task == null)
             throw new NotFoundException("Task not found");
         return fetchApiData.getApiData(startUrl + "/repos/" + user.getUsername() + "/" + task.getName() + "/issues", Issue[].class);
+    }
+
+    public User getUserAssignedToIssue(Owner owner) {
+        return userService.findUserByUsername(owner.getLogin());
     }
 }

@@ -23,13 +23,7 @@ public class ClockifyController {
     // Get all task from an workspace
     @GetMapping("/{repoName}/{username}/time-entries")
     public ResponseEntity<ClockifyTask[]> getTaskFromWorkspace(@PathVariable String repoName, @PathVariable String username) {
-        return ResponseEntity.ok(clockifyService.getTaskFromWorkspace(repoName, username));
-    }
-
-    @GetMapping("/{workspaceId}/{clockifyId}/time-entries/md")
-    public ClockifyTask[] getTaskFromWorkspaceWithMarkdown(@PathVariable String workspaceId, @PathVariable String clockifyId) {
-        // Devolver un markdown con los datos de las tareas.
-        return clockifyService.getTaskFromWorkspace(workspaceId, clockifyId);
+        return ResponseEntity.ok(clockifyService.getTaskFromWorkspace(repoName));
     }
 
 

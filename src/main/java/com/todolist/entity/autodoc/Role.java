@@ -22,7 +22,6 @@ public enum Role {
 
     public static Role parseTag(Tag tag) {
         String name = tag.getName().toUpperCase();
-        System.out.println( name == null);
         return switch (name) {
             case "OPERATOR" -> OPERATOR;
             case "TESTER" -> TESTER;

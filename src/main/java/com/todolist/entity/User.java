@@ -79,4 +79,8 @@ public class User implements Serializable {
         user.setPassword(password);
         return user;
     }
+
+    public String getFullName() {
+        return name + " " + surname;
+    }
 }

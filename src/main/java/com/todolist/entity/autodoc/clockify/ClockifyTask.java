@@ -1,9 +1,14 @@
 package com.todolist.entity.autodoc.clockify;
 
 import com.fasterxml.jackson.annotation.*;
+import com.todolist.entity.autodoc.Employee;
+import com.todolist.entity.autodoc.Role;
 
 import javax.annotation.Generated;
 import javax.validation.Valid;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,5 +162,18 @@ public class ClockifyTask {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public double calculateSalary(List<Role> roles, Double duration, Employee employee) {
+        LocalDateTime start = LocalDateTime.parse(getTimeInterval().getStart(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime end = LocalDateTime.parse(getTimeInterval().getEnd(), DateTimeFormatter.ISO_DATE_TIME);
+        Duration difference = Duration.between(start, end);
+        duration += (difference.toSeconds()/3600.) + (difference.toMinutes()/60.) + difference.toHours() *  + difference.toDays() * 24;
+        double finalDuration = duration;
+        return roles.stream().mapToDouble(role -> {
+                    employee.keepSalary(role, finalDuration);
+                    return  role.getFinalSalary(finalDuration);
+                }
+        ).sum();
     }
 }

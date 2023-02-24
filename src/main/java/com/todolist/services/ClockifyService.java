@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class ClockifyService {
@@ -35,13 +36,24 @@ public class ClockifyService {
     }
 
     // Get all task from an workspace
-    public ClockifyTask[] getTaskFromWorkspace(String repoName, String username) {
+    public ClockifyTask[] getTaskFromWorkspace(String repoName) {
+        Task task = taskService.findTaskByTitle(repoName);
+        if (task == null)
+            throw new NotFoundException("Task not found");
+       return userService.findUsersWithTask(task)
+                .stream()
+                .map(user -> fetchApiData.getApiDataWithToken(startUrl + "/workspaces/" + task.getWorkSpaceId() + "/user/" + user.getClockifyId() + "/time-entries", ClockifyTask[].class, new Pair("X-Api-Key", token)))
+               .flatMap(Stream::of).toArray(ClockifyTask[]::new);
+    }
+
+    // Get task for a user in a workspace
+    public ClockifyTask[] getTaskForAUserFromWorkspace(String repoName, String username) {
         Task task = taskService.findTaskByTitle(repoName);
         if (task == null)
             throw new NotFoundException("Task not found");
         User user = userService.findUserByUsername(username);
         if (user == null)
-            throw new NotFoundException("User not found");
+            throw new NotFoundException("Username not found");
         return fetchApiData.getApiDataWithToken(startUrl + "/workspaces/" + task.getWorkSpaceId() + "/user/" + user.getClockifyId() + "/time-entries", ClockifyTask[].class, new Pair("X-Api-Key", token));
     }
 
