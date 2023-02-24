@@ -36,21 +36,17 @@ public class AutoDocController {
     public ResponseEntity getAutoDocMd(@PathVariable String repoName, @PathVariable String username) throws IOException {
         List<TimeTask> timeTasks = autoDocService.autoDoc(repoName, username);
         Table.Builder tableBuilder = new Table.Builder()
-                .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                .addRow("Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real");
+                .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
+                .addRow("Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste");
         for (TimeTask timeTask : timeTasks) {
             tableBuilder.addRow(timeTask.getTitle(), timeTask.getDescription(), timeTask.getUsernames().stream().reduce((s, s2) -> s + ", " + s2).orElse("")
                     , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
-                    , timeTask.getDuration());
+                    , timeTask.getDuration()
+                    , timeTask.getCost() + "€");
         }
-        FileWriter fileWriter = new FileWriter("table.md");
+        FileWriter fileWriter = new FileWriter("out/table.md");
         fileWriter.write(tableBuilder.build().serialize());
         fileWriter.close();
-        System.out.println(tableBuilder.build().serialize());
-        // Guardar la tabla en un archivo.
-
-
-
         return ResponseEntity.ok().build();
     }
 

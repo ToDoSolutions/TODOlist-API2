@@ -1,0 +1,6 @@
+| Título                                                              | Descripción | Responsables             | Rol      | Tiempo planificado | Tiempo real          | Coste                |
+| ------------------------------------------------------------------- | ----------- | ------------------------ | -------- | ------------------ | -------------------- | -------------------- |
+| Definir un template para generar los documentos.                    |             |                          |          | x                  | 0.0                  | 0.0€                 |
+| Lograr una forma de vincular a los usuarios de GitHub con Clockify. |             |                          |          | x                  | 0.0                  | 0.0€                 |
+| Integrar la api de Clockify.                                        | Knodioda    | Alejandro Santiago Félix | OPERATOR | x                  | 0.001388888888888889 | 0.03888888888888889€ |
+| Obetener ISSUES de GitHUb.                                          |             |                          |          | x                  | 0.0                  | 0.0€                 |
