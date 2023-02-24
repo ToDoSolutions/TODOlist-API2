@@ -1,11 +1,9 @@
 package com.todolist.entity.autodoc;
 
-import com.todolist.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -13,7 +11,7 @@ import java.util.Set;
 public class TimeTask {
 
     private String description;
-
+    private String conlusion;
     private String decision;
     private double duration;
     private Set<Role> roles;
@@ -22,7 +20,14 @@ public class TimeTask {
     private List<Employee> employees;
 
     public TimeTask(String body, String title, double duration,Set<Role> allRoles, List<Employee> employees) {
-        this.description = body;
+        if (body != null && body.contains("\r\n\r\n") && body.split("\r\n\r\n").length == 3) {
+            String[] text = body.split("\r\n\r\n");
+            this.description = text[0];
+            this.conlusion = text[1];
+            this.decision = text[2];
+        } else {
+            this.description = body;
+        }
         this.title = title;
         this.duration = duration;
         this.roles = allRoles;

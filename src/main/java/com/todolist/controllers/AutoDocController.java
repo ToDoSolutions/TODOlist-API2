@@ -1,12 +1,8 @@
 package com.todolist.controllers;
 
-import com.google.common.collect.Lists;
-import com.todolist.entity.autodoc.Employee;
-import com.todolist.entity.autodoc.Role;
+
 import com.todolist.entity.autodoc.TimeTask;
 import com.todolist.services.AutoDocService;
-import net.steppschuh.markdowngenerator.table.Table;
-import net.steppschuh.markdowngenerator.text.heading.Heading;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/v1/autodoc")
@@ -37,46 +31,39 @@ public class AutoDocController {
     }
 
     // TODO: Crear un endpoint para obtener el markdown
-    @RequestMapping("/{repoName}/{username}/md")
-    public ResponseEntity getAutoDocMd(@PathVariable String repoName, @PathVariable String username) throws IOException {
-        List<TimeTask> timeTasks = autoDocService.autoDoc(repoName, username);
-        List<Employee> employees = autoDocService.getEmployees(timeTasks);
-        Table.Builder times = new Table.Builder()
-                .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                .addRow("Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste");
-        // Obtenemos la tabla con los costes de cada tarea.
-        for (TimeTask timeTask : timeTasks) {
-            times.addRow(timeTask.getTitle(), timeTask.getDescription(), timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
-                    , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
-                    , timeTask.getDuration()
-                    , timeTask.getCost() + "€");
-        }
-        StringBuilder output = new StringBuilder(times.build().serialize());
-        // Obtenemos la tabla para los empleados.
-
-        for (Employee employee : employees) {
-            output.append("\n").append(new Heading(employee.getName(), 3)).append("\n");
-            output.append(new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                    .addRow("Rol", "Coste")
-                    .addRow("Desarrollador", employee.getSalaryByRole(Role.DEVELOPER) + "€")
-                    .addRow("Analista", employee.getSalaryByRole(Role.ANALYST) + "€")
-                    .addRow("Tester", employee.getSalaryByRole(Role.TESTER) + "€")
-                    .addRow("Diseñador", employee.getSalaryByRole(Role.MANAGER) + "€")
-                    .addRow("Gerente", employee.getSalaryByRole(Role.OPERATOR) + "€")
-                    .build().serialize());
-            times.
-                    addRow(employee.getName(), "", "", "", "", "", employee.getSalary().entrySet().stream().map(entry -> entry.getKey() + ": " + entry.getValue() + "€").reduce((s, s2) -> s + ", " + s2).orElse(""));
-        }
-        FileWriter fileWriter = new FileWriter("out/table.md");
+    @RequestMapping("/planning/{repoName}/{username}/md")
+    public ResponseEntity getPlanningMd(@PathVariable String repoName, @PathVariable String username) throws IOException {
+        String output = autoDocService.getPlanning(repoName, username);
+        FileWriter fileWriter = new FileWriter("out/planning.md");
         fileWriter.write(output.toString());
         fileWriter.close();
         return ResponseEntity.ok().build();
     }
 
     // TODO: Crear un endpoint para obtener el pdf
-    @RequestMapping("/{repoName}/{username}/pdf")
-    public ResponseEntity<List<TimeTask>> getAutoDocPdf(@PathVariable String repoName, @PathVariable String username) {
-        return ResponseEntity.ok(autoDocService.autoDoc(repoName, username));
+    @RequestMapping("/planning/{repoName}/{username}/pdf")
+    public ResponseEntity getPlanningPdf(@PathVariable String repoName, @PathVariable String username) throws IOException {
+        String output = autoDocService.getPlanning(repoName, username);
+        System.out.println(output);
+        FileWriter fileWriter = new FileWriter("out/planning.md");
+        fileWriter.write(output.toString());
+        fileWriter.close();
+
+        //Converter converter = new Converter("out/table.md");
+        //PdfConvertOptions options = new PdfConvertOptions();
+        //converter.convert("out/table.pdf", options);
+
+
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/analysis/{repoName}/{username}/md")
+    public ResponseEntity getAnalysisMd(@PathVariable String repoName, @PathVariable String username) throws IOException {
+        String output = autoDocService.getAnalysis(repoName, username);
+        FileWriter fileWriter = new FileWriter("out/analysis.md");
+        fileWriter.write(output.toString());
+        fileWriter.close();
+        return ResponseEntity.ok().build();
     }
 
 
