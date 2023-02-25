@@ -50,17 +50,16 @@ Durante el desarrollo del entregable se han llevado a cabo ciertas tareas las cu
 
 ## Coste personal
 ---
-| Título                                                                    | Descripción                                                                                                          | Responsables             | Rol      | Tiempo planificado | Tiempo real | Coste  |
-| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------ | -------- | ------------------ | ----------- | ------ |
-| AAA - Lograr una forma de vincular a los usuarios de GitHub con Clockify. | AAAAAAAAAAAAAAAAAAAAAAAA.                                                                                            |                          |          | x                  | 0.0         | 0.0€   |
-| AAA - Integrar la api de Clockify.                                        | AAAAAAAAAAAAAAAAAAAAAAAA.                                                                                            | Alejandro Santiago Félix | OPERATOR | x                  | 8.15        | 163.0€ |
-| En el GetAll de user el NumberFilter de taskCompleted no fufa.            |                                                                                                                      |                          |          | x                  | 0.0         | 0.0€   |
-| Validar actualizaciones en el update.                                     | Probablemente la mejor solución es utilizar mi propia notación.                                                      |                          |          | x                  | 0.0         | 0.0€   |
-| AAA - Obetener ISSUES de GitHUb.                                          | AAAAAAAAAAAAAAAAAAAAAAAA.                                                                                            |                          |          | x                  | 0.0         | 0.0€   |
+| Título                                                                    | Descripción                                                                                                        | Responsables             | Rol      | Tiempo planificado | Tiempo real | Coste  |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------ | -------- | ------------------ | ----------- | ------ |
+| AAA - Definir un template para generar los documentos.                    | AAAAAAAAAAAAAAAAAAAAAAAA.                                                                                          |                          |          | x                  | 0.0         | 0.0€   |
+| AAA - Obetener ISSUES de GitHUb.                                          | AAAAAAAAAAAAAAAAAAAAAAAA.                                                                                          |                          |          | x                  | 0.0         | 0.0€   |
 | Arreglar algún día el offset.                                             | El problema está en la siguiente página.
-https://es.stackoverflow.com/questions/543369/why-the-offset-is-negative
- |                          |          | x                  | 0.0         | 0.0€   |
-| AAA - Definir un template para generar los documentos.                    | AAAAAAAAAAAAAAAAAAAAAAAA.                                                                                            |                          |          | x                  | 0.0         | 0.0€   |
+https://es.stackoverflow.com/questions/543369/why-the-offset-is-negative |                          |          | x                  | 0.0         | 0.0€   |
+| AAA - Lograr una forma de vincular a los usuarios de GitHub con Clockify. | AAAAAAAAAAAAAAAAAAAAAAAA.                                                                                          |                          |          | x                  | 0.0         | 0.0€   |
+| En el GetAll de user el NumberFilter de taskCompleted no fufa.            |                                                                                                                    |                          |          | x                  | 0.0         | 0.0€   |
+| Validar actualizaciones en el update.                                     | Probablemente la mejor solución es utilizar mi propia notación.                                                    |                          |          | x                  | 0.0         | 0.0€   |
+| AAA - Integrar la api de Clockify.                                        | AAAAAAAAAAAAAAAAAAAAAAAA.                                                                                          | Alejandro Santiago Félix | OPERATOR | x                  | 8.15        | 163.0€ |
 
 ## Presupesto
 ---

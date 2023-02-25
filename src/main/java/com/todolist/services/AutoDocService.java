@@ -85,7 +85,7 @@ public class AutoDocService {
                 .addRow("Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste");
         // Obtenemos la tabla con los costes de cada tarea.
         for (TimeTask timeTask : timeTasks) {
-            taskTable.addRow(timeTask.getTitle(), timeTask.getDescription(), timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
+            taskTable.addRow(timeTask.getTitle().trim(), timeTask.getDescription() != null ? timeTask.getDescription().trim(): null, timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
                     , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
                     , timeTask.getDuration()
                     , timeTask.getCost() + "€");
