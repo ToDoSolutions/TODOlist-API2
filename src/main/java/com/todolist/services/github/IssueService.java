@@ -35,7 +35,7 @@ public class IssueService {
         TaskGitHub task = repoService.findRepoByName(user.getUsername(), repoName);
         if (task == null)
             throw new NotFoundException("Task not found");
-        return fetchApiData.getApiData(startUrl + "/repos/" + user.getUsername() + "/" + task.getName() + "/issues", Issue[].class);
+        return fetchApiData.getApiData(startUrl + "/repos/" + user.getUsername() + "/" + task.getName() + "/issues?state=all", Issue[].class);
     }
 
     public User getUserAssignedToIssue(Owner owner) {
