@@ -36,7 +36,7 @@ public class AutoDocController {
         String[] output = autoDocService.getPlanning(repoName, username, individual);
         File file = new File("templates/planning.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
-        String text =reader.lines().reduce((s, s2) -> s + s2 + "\n").get();
+        String text =reader.lines().reduce((s, s2) -> s + "\n" + s2).get();
         reader.close();
         String newContent = text.replace("{content0}", output[0]);
         newContent = newContent.replace("{content1}", output[1]);
@@ -52,7 +52,7 @@ public class AutoDocController {
         String output = autoDocService.getAnalysis(repoName, username, individual);
         File file = new File("templates/analysis.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
-        String text =reader.lines().reduce((s, s2) -> s + s2 + "\n").get();
+        String text =reader.lines().reduce((s, s2) -> s + "\n" + s2).get();
         reader.close();
         String newContent = text.replace("{content}", output);
         FileWriter fileWriter = new FileWriter("out/analysis.md");

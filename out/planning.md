@@ -1,4 +1,5 @@
-# Tabla de contenidos---
+# Tabla de contenidos
+---
 1. **Tabla de revisión**
 2. **Resumen**
 3. **Introducción**
@@ -52,9 +53,9 @@ Durante el desarrollo del entregable se han llevado a cabo ciertas tareas las cu
 | Título                                                                    | Descripción               | Responsables             | Rol      | Tiempo planificado | Tiempo real | Coste  |
 | ------------------------------------------------------------------------- | ------------------------- | ------------------------ | -------- | ------------------ | ----------- | ------ |
 | AAA - Integrar la api de Clockify.                                        | AAAAAAAAAAAAAAAAAAAAAAAA. | Alejandro Santiago Félix | OPERATOR | x                  | 8.15        | 163.0€ |
-| AAA - Obetener ISSUES de GitHUb.                                          | AAAAAAAAAAAAAAAAAAAAAAAA. |                          |          | x                  | 0.0         | 0.0€   |
 | AAA - Definir un template para generar los documentos.                    | AAAAAAAAAAAAAAAAAAAAAAAA. |                          |          | x                  | 0.0         | 0.0€   |
 | AAA - Lograr una forma de vincular a los usuarios de GitHub con Clockify. | AAAAAAAAAAAAAAAAAAAAAAAA. |                          |          | x                  | 0.0         | 0.0€   |
+| AAA - Obetener ISSUES de GitHUb.                                          | AAAAAAAAAAAAAAAAAAAAAAAA. |                          |          | x                  | 0.0         | 0.0€   |
 
 ## Presupesto
 ---
@@ -76,7 +77,7 @@ Amortización lineal = $\frac{Valor\ inicial}{Vida\ útil\ estimada}$
 | Analista      | 0.0€   |
 | Tester        | 0.0€   |
 | Diseñador     | 0.0€   |
-| Gerente       | 163.0€ |
+| Operador      | 163.0€ |
 
 |Tipo de coste|Coste total|
 |:-|:-|
@@ -91,5 +92,4 @@ Tras la finalización del proyecto y el análisis retrospectivo del tiempo emple
 # Bibliografía
 ---
 - https://www.becas-santander.com/es/blog/formula-de-amortizacion.html
-
 
