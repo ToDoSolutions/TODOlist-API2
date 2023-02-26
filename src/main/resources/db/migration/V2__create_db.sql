@@ -1,10 +1,10 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- En la nube
--- USE `by0usznpejuytsr473ki`;
+USE `todolist-db2`;
 
 -- En local
-USE `todolist-api2`;
+-- USE `todolist-api2`;
 
 CREATE TABLE IF NOT EXISTS `group`
 (
@@ -19,9 +19,7 @@ CREATE TABLE IF NOT EXISTS `group_user`
 (
     `id_group_user` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `id_group`      bigint(20),
-    `id_user`       bigint(20),
-    FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE,
-    FOREIGN KEY (`id_group`) REFERENCES `group` (`id_group`) ON DELETE CASCADE
+    `id_user`       bigint(20)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -60,9 +58,7 @@ CREATE TABLE IF NOT EXISTS `user_task`
 (
     `id_user_task` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `id_user`      bigint(20),
-    `id_task`      bigint(20),
-    FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE,
-    FOREIGN KEY (`id_task`) REFERENCES `task` (`id_task`) ON DELETE CASCADE
+    `id_task`      bigint(20)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 

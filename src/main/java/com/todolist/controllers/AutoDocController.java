@@ -4,6 +4,9 @@ package com.todolist.controllers;
 import com.todolist.entity.autodoc.TimeTask;
 import com.todolist.services.AutoDocService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,10 +44,11 @@ public class AutoDocController {
         String newContent = text.replace("{content0}", output[0]);
         newContent = newContent.replace("{content1}", output[1]);
         newContent = newContent.replace("{content2}", output[2]);
-        FileWriter fileWriter = new FileWriter("out/planning.md");
-        fileWriter.write(newContent);
-        fileWriter.close();
-        return ResponseEntity.ok().build();
+        String fileName= individual.equals("all") ? "planning_group.md" : "planning_" + individual.toLowerCase().replace(" ", "_") + ".md";
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.parseMediaType("application/octet-stream"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(newContent);
     }
 
     @RequestMapping("/analysis/{repoName}/{username}/md")
@@ -55,10 +59,11 @@ public class AutoDocController {
         String text =reader.lines().reduce((s, s2) -> s + "\n" + s2).get();
         reader.close();
         String newContent = text.replace("{content}", output);
-        FileWriter fileWriter = new FileWriter("out/analysis.md");
-        fileWriter.write(newContent);
-        fileWriter.close();
-        return ResponseEntity.ok().build();
+        String fileName = individual.equals("all") ? "analysis_group.md" : "analysis_" + individual.toLowerCase().replace(" ", "_") + ".md";
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.parseMediaType("application/octet-stream"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(newContent);
     }
 
 

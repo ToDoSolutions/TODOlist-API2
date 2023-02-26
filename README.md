@@ -1,5 +1,5 @@
 <div align="center">
-<h1><a href="https://todolist-api2.herokuapp.com">TODOlist-API2<a></h1>
+<h1><a href="https://todolist-api2-379012.ew.r.appspot.com/">TODOlist-API2<a></h1>
 </div>
 <div align="center">
 <img src="src/main/resources/static/images/logo.gif" alt="TODOlist-API2" width="200" height="200" align="center">
@@ -11,7 +11,7 @@
 * [Operations](https://github.com/alesanfe/TODOlist-API2/wiki)
 
 # Introduction
-To check out URIs and request bodies, refer to our [SwaggerHub Page](https://localhost:8080/swagger-ui/).
+To check out URIs and request bodies, refer to our [SwaggerHub Page](https://todolist-api2-379012.ew.r.appspot.com/swagger-ui/).
 Using the interactive documentation you will be able to check out URIs, response and request bodies...etc.
 
 # Resources

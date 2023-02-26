@@ -1,10 +1,10 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- En la nube
--- USE `by0usznpejuytsr473ki`;
+USE `todolist-db2`;
 
 -- En local
-USE `todolist-api2`;
+-- USE `todolist-api2`;
 
 INSERT INTO `group` (`created_date`, `description`, `name`)
 VALUES ('2006-10-12', 'Solo quieren ver el mundo arder', 'Pepe'),
@@ -39,7 +39,7 @@ VALUES ('...', '...', 'HARDCORE', '2020-01-31', 5, '2020-01-01', 'DRAFT', 'TODOl
 
 INSERT INTO `user` (`avatar`, `bio`, `email`, `location`, `name`, `surname`, `password`, `username`, `token`, `clockify_id`)
 VALUES ('https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', '...',
-        '...', 'mi casa', 'Alejandro', 'Santiago Félix', '123456', 'alesanfe' , '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', '6346cc6798d3761140bf88d2'),
+        '...', 'mi casa', 'Alejandro', 'Santiago Félix', '123456', 'alesanfe' , '...', '6346cc6798d3761140bf88d2'),
         ('https://es.web.img3.acsta.net/pictures/17/05/19/13/05/463219.jpg', 'Ser celestial, nacido para ayudar',
         'miscosama@gmail.com', 'mi casa', 'Misco', 'Jones', '123456', 'miscosama', 'null', 'null'),
        ('http://pm1.narvii.com/6120/9cd70762280f430ded8158c06c287e82b84d0101_00.jpg',
