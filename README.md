@@ -5,16 +5,13 @@
 <img src="src/main/resources/static/images/logo.gif" alt="TODOlist-API2" width="200" height="200" align="center">
 </div>
 
-To compile
-mvn package -Dmaven.test.skip
-
 # Index
 * [Introduction](#Introduction)
 * [Resources](#resources)
 * [Operations](https://github.com/alesanfe/TODOlist-API2/wiki)
 
 # Introduction
-To check out URIs and request bodies, refer to our [SwaggerHub Page](https://todolist-api2.herokuapp.com/swagger-ui/).
+To check out URIs and request bodies, refer to our [SwaggerHub Page](https://localhost:8080/swagger-ui/).
 Using the interactive documentation you will be able to check out URIs, response and request bodies...etc.
 
 # Resources

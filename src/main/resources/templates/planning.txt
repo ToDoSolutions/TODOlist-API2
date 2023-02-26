@@ -10,6 +10,7 @@
 # Resumen
 ---
 En este documento se va a llevar a cabo un análisis anticipado sobre los costes del proyecto.
+
 Para ello, se van a detallar las tareas requeridas en el entregable, junto con la información más relevante de las mismas. Posteriormente se va a elaborar una estimación de los costes personales en función de las horas estimadas de cada miembro, teniendo en cuenta su rol, además se calculará la amortización basada en un período de tres años.
 
 # Introducción
@@ -19,6 +20,7 @@ Tras llevar a cabo una reunión de grupo analizando los requisitos necesarios pa
 # Contenido
 ---
 El contenido de este reporte se va a dividir en tres partes: En primer lugar los costes fijos del equipamiento.En segundo lugar las tareas comunes, que son aquellas que se tienen que realizar en todos los entregables y que se basan en la organización del mismo. Por otra parte las tareas específicas, que son aquellas que se requieren en cada de los entregables, las cuales han sido representadas en una tabla que recoge tanto las tareas grupales (Task X(G)), como las tareas individuales (Task X(IX)). Finalmente el presupuesto, en donde se calcula en función de los distintos roles de cada miembro del equipo, respecto a las horas realizadas por estos, más los costes fijos teniendo en cuenta la amortización.
+
 A cada uno de los integrantes del grupo se les ha asignado un número de estudiante el cual les representara a lo largo de todas las entregas:
 1. Francisco de Asís Rosso Ramírez
 2. Maria Vico Martin
@@ -79,5 +81,6 @@ Tras la finalización del proyecto y el análisis retrospectivo del tiempo emple
 # Bibliografía
 ---
 - https://www.becas-santander.com/es/blog/formula-de-amortizacion.html
+- https://github.com/alesanfe/TODOlist-API2
 
 

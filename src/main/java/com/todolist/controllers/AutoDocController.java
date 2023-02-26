@@ -34,7 +34,7 @@ public class AutoDocController {
     @RequestMapping("/planning/{repoName}/{username}/md")
     public ResponseEntity getPlanning(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = "all") String individual) throws IOException {
         String[] output = autoDocService.getPlanning(repoName, username, individual);
-        File file = new File("templates/planning.txt");
+        File file = new File("src/main/resources/templates/planning.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String text =reader.lines().reduce((s, s2) -> s + "\n" + s2).get();
         reader.close();
@@ -50,7 +50,7 @@ public class AutoDocController {
     @RequestMapping("/analysis/{repoName}/{username}/md")
     public ResponseEntity getAnalysis(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = "all") String individual) throws IOException {
         String output = autoDocService.getAnalysis(repoName, username, individual);
-        File file = new File("templates/analysis.txt");
+        File file = new File("src/main/resources/templates/analysis.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String text =reader.lines().reduce((s, s2) -> s + "\n" + s2).get();
         reader.close();
