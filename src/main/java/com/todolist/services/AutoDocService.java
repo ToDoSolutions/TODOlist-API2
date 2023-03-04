@@ -119,7 +119,7 @@ public class AutoDocService {
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                 .addRow("ID", "Conclusiones", "Decisiones tomadas");
         for (TimeTask timeTask : timeTasks) {
-            String[] text = timeTask.getTitle().split("-");
+            String[] text = timeTask.getTitle().split(":");
             String id = text[0].trim();
             String body = text[1].trim();
             output.append("- ").append(new BoldText(id)).append("-").append(body).append("\n");

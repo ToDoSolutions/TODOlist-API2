@@ -109,19 +109,20 @@
             <artifactId>jackson-datatype-jdk8</artifactId>
             <version>2.13.4</version>
         </dependency>
-        <!-- En la nube -->
+        <!-- En la nube
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.26</version>
         </dependency>
-        <!-- En local
+        -->
+        <!-- En local -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>3.0.6</version>
         </dependency>
-        -->
+
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>

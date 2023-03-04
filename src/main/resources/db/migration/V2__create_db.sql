@@ -1,10 +1,10 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- En la nube
-USE `todolist-db2`;
+-- USE `todolist-db2`;
 
 -- En local
--- USE `todolist-api2`;
+USE `todolist-api2`;
 
 CREATE TABLE IF NOT EXISTS `group`
 (

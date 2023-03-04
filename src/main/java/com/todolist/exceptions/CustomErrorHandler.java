@@ -11,6 +11,7 @@ import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @RestControllerAdvice
 public class CustomErrorHandler {
@@ -34,6 +35,7 @@ public class CustomErrorHandler {
     public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException exception, ServletWebRequest webRequest) {
         String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
         System.out.println("NotFoundException: " + message);
+        System.out.println(Arrays.stream(exception.getStackTrace()).map(StackTraceElement::toString).reduce("", (a, b) -> a + "" + b));
         ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), message, webRequest.getRequest().getRequestURI(), HttpStatus.NOT_FOUND.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
