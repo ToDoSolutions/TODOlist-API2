@@ -164,20 +164,11 @@ public class ClockifyTask {
         this.additionalProperties.put(name, value);
     }
 
-    public double calculateSalary(List<Role> roles, Double duration, Employee employee) {
+    public Duration calculateSalary(List<Role> roles, Duration duration, Employee employee) {
         LocalDateTime start = LocalDateTime.parse(getTimeInterval().getStart(), DateTimeFormatter.ISO_DATE_TIME);
         LocalDateTime end = LocalDateTime.parse(getTimeInterval().getEnd(), DateTimeFormatter.ISO_DATE_TIME);
         Duration difference = Duration.between(start, end);
-        System.out.println("difference = " + difference);
-        System.out.println("duration = " + duration + " hours");
-        System.out.println("difference.toSeconds() = " + difference.toSeconds());
-        System.out.println("difference.toMinutes() = " + difference.toMinutes());
-        System.out.println("difference.toHours() = " + difference.toHours());
-        System.out.println("difference.toDays() = " + difference.toDays());
-        duration += difference.toSeconds()/3600.;
-        System.out.println("duration = " + duration + " hours");
-        double finalDuration = duration;
-        roles.forEach(role -> employee.keepSalary(role, finalDuration));
-        return duration;
+        roles.forEach(role -> employee.keepSalary(role, difference));
+        return difference;
     }
 }

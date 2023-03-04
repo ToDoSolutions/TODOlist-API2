@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +22,9 @@ public class Employee {
         this.salary = new HashMap<>();
     }
 
-    public void keepSalary(Role role, double hours) {
-        if (salary.containsKey("role"))
+    public void keepSalary(Role role, Duration duration) {
+        double hours = duration.toMinutes() / 60.;
+        if (salary.containsKey(role))
             salary.put(role, salary.get(role) + role.getFinalSalary(hours));
         else
             salary.put(role, role.getFinalSalary(hours));

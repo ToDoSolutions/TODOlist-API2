@@ -13,6 +13,7 @@ import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
 import net.steppschuh.markdowngenerator.text.heading.Heading;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,14 +44,14 @@ public class AutoDocService {
     public TimeTask createTimeTask(Map.Entry<Issue, ClockifyTask[]> entry, String repoName) {
         Issue issue = entry.getKey();
         ClockifyTask[] clockifyTask = entry.getValue();
-        double duration = 0;
+        Duration duration = Duration.ZERO;
         Set<Role> allRoles = new HashSet<>();
         List<User> users = issue.assignees.stream().map(issueService::getUserAssignedToIssue).toList();
         List<Employee> employees = users.stream().map(user -> new Employee(user.getFullName(), user.getClockifyId())).toList();
         for (ClockifyTask task : clockifyTask) {
             Employee employee = findEmployeeClockifyTask(employees, task);
             List<Role> roles = task.getTagIds().stream().map(tagId -> clockifyService.getRoleFromClockify(repoName, tagId)).distinct().toList();
-            duration += task.calculateSalary(roles, duration, employee);
+            duration = duration.plus(task.calculateSalary(roles, duration, employee));
             allRoles.addAll(roles);
         }
         return new TimeTask(issue.body, issue.title, duration, allRoles, employees);
@@ -87,8 +88,8 @@ public class AutoDocService {
         for (TimeTask timeTask : timeTasks) {
             taskTable.addRow(timeTask.getTitle().trim(), timeTask.getDescription() != null ? timeTask.getDescription().trim().replace("\n",""): null, timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
                     , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
-                    , timeTask.getDuration()
-                    , timeTask.getCost() + "€");
+                    , timeTask.getDuration().toHours() + " horas y " + timeTask.getDuration().toMinutes() % 60 + " minutos"
+                    , Math.round(timeTask.getCost()*100)/100. + "€");
         }
         StringBuilder personalTable = new StringBuilder();
         double cost = 0;
