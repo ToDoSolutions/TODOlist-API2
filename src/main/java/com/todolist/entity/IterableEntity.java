@@ -8,7 +8,7 @@ import java.util.stream.StreamSupport;
 public class IterableEntity<T> implements Iterable<T> {
 
     private final int end;
-    public List<T> elements;
+    public final List<T> elements;
     private int start;
 
     public IterableEntity(List<T> elements, Integer limit, Integer offset) {

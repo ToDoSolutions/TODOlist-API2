@@ -9,7 +9,7 @@ import java.util.Map;
 public class Label {
 
     @JsonIgnore
-    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<>();
 
     public Object id;
     public String node_id;

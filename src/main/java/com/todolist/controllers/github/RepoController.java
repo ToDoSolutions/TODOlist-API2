@@ -47,7 +47,7 @@ public class RepoController {
     // Obtener repositorios de un usuario de GitHub (ya existentes)
     @GetMapping("/repos/{username}") // GetAllTest
     public List<Map<String, Object>> getAllRepos(@PathVariable String username,
-                                                 @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
+                                                 @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask) {
         return Arrays.stream(repoService.findAllRepos(username))
                 .map(repo -> dtoManager.getShowTaskAsJsonWithOutTimes(gitHubConverter.turnTaskGitHubIntoTask(repo, LocalDate.now(), null, null), fieldsTask))
                 .toList();
@@ -58,7 +58,7 @@ public class RepoController {
     public Map<String, Object> getRepo(
             @PathVariable String username,
             @PathVariable String repoName,
-            @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
+            @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask) {
 
         return dtoManager.getShowTaskAsJsonWithOutTimes(gitHubConverter.turnTaskGitHubIntoTask(repoService.findRepoByName(username, repoName), LocalDate.now(), null, null), fieldsTask);
     }
@@ -87,7 +87,7 @@ public class RepoController {
     }
 
     // Crear un repositorio de un usuario de GitHub (ya existente)
-    @PostMapping("/user/{idUser}/repo") // PostTest
+    @PostMapping("/user/{username}/repo") // PostTest
     public Repo addRepo(
             @RequestBody @Valid Repo createRepo,
             @PathVariable String username,

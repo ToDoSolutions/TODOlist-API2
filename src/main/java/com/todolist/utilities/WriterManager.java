@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Function;
 
 
@@ -17,7 +18,8 @@ public class WriterManager {
     public WriterManager(String template) throws IOException {
         File file = new File(template);
         BufferedReader reader = new BufferedReader(new FileReader(file));
-        this.input = reader.lines().reduce((s, s2) -> s + "\n" + s2).get();
+        Optional<String> text = reader.lines().reduce((s, s2) -> s + "\n" + s2);
+        text.ifPresent(s -> this.input = s);
         reader.close();
     }
 

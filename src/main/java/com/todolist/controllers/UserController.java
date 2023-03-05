@@ -7,12 +7,11 @@ import com.todolist.entity.IterableEntity;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
-import com.todolist.exceptions.NotFoundException;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
 import com.todolist.utilities.Order;
-import com.todolist.utilities.Predicate;
+import com.todolist.utilities.Predicator;
 import com.todolist.validators.FieldValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +63,8 @@ public class UserController {
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive.") Integer limit,
                                                  @RequestParam(defaultValue = "+idUser") Order order,
-                                                 @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
-                                                 @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,
+                                                 @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
+                                                 @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES_STRING) String fieldsUser,
                                                  @RequestParam(required = false) String name,
                                                  @RequestParam(required = false) String surname,
                                                  @RequestParam(required = false) @Email(message = "The email is invalid.") String email,
@@ -77,20 +76,20 @@ public class UserController {
         List<User> users = userService.findAllUsers(order.getSort());
         List<User> result = new IterableEntity<>(users, limit, offset)
                 .stream().filter(user -> Objects.nonNull(user) &&
-                        Predicate.isNullOrValid(name, user.getName().equals(name)) &&
-                        Predicate.isNullOrValid(surname, user.getSurname().equals(surname)) &&
-                        Predicate.isNullOrValid(email, user.getEmail().equals(email)) &&
-                        Predicate.isNullOrValid(location, user.getLocation().equals(location)) &&
-                        Predicate.isNullOrValid(taskCompleted, taskCompleted.isValid(userService.getTaskCompleted(user))) &&
-                        Predicate.isNullOrValid(bio, user.getBio().contains(bio)) &&
-                        Predicate.isNullOrValid(avatar, user.getAvatar().equals(avatar))).toList();
+                        Predicator.isNullOrValid(name, n -> user.getName().equals(n)) &&
+                        Predicator.isNullOrValid(surname, s -> user.getSurname().equals(s)) &&
+                        Predicator.isNullOrValid(email, e -> user.getEmail().equals(e)) &&
+                        Predicator.isNullOrValid(location, l -> user.getLocation().equals(l)) &&
+                        Predicator.isNullOrValid(taskCompleted, t -> t.isValid(userService.getTaskCompleted(user))) &&
+                        Predicator.isNullOrValid(bio, b -> user.getBio().contains(b)) &&
+                        Predicator.isNullOrValid(avatar, a -> user.getAvatar().equals(a))).toList();
         return result.stream().map(user -> dtoManager.getShowUserAsJson(user, fieldsUser, fieldsTask)).toList();
     }
 
     @GetMapping("/user/{idUser}") // GetSoloTest
     public Map<String, Object> getUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser,
-                                       @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
-                                       @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
+                                       @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
+                                       @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES_STRING) String fieldsUser) {
         User user = userService.findUserById(idUser);
         fieldValidator.userFieldValidate(fieldsUser);
         fieldValidator.taskFieldValidate(fieldsTask);

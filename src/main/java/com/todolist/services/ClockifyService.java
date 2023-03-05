@@ -37,12 +37,12 @@ public class ClockifyService {
         this.userService = userService;
     }
 
-    // Get all task from an workspace
+    // Get all task from a workspace
     public ClockifyTask[] getTaskFromWorkspace(String repoName) {
         Task task = taskService.findTaskByTitle(repoName);
         return userService.findUsersWithTask(task)
                 .stream()
-                .map(user -> fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair(X_API_KEY, token)))
+                .map(user -> fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair<>(X_API_KEY, token)))
                 .flatMap(Stream::of).toArray(ClockifyTask[]::new);
     }
 
@@ -50,14 +50,14 @@ public class ClockifyService {
     public ClockifyTask[] getTaskForAUserFromWorkspace(String repoName, String username) {
         Task task = taskService.findTaskByTitle(repoName);
         User user = userService.findUserByUsername(username);
-        return fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair(X_API_KEY, token));
+        return fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair<>(X_API_KEY, token));
     }
 
     public Tag getTagFromClockify(String repoName, String tagId) {
         Task task = taskService.findTaskByTitle(repoName);
         if (tagId == null)
             return new Tag();
-        return fetchApiData.getApiDataWithToken(tagsUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(TAG_ID, tagId), Tag.class, new Pair(X_API_KEY, token));
+        return fetchApiData.getApiDataWithToken(tagsUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(TAG_ID, tagId), Tag.class, new Pair<>(X_API_KEY, token));
     }
 
     public Role getRoleFromClockify(String repoName, String roleId) {

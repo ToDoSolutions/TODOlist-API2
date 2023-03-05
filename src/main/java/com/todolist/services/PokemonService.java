@@ -18,6 +18,11 @@ import java.util.Objects;
 @Service
 public class PokemonService {
 
+    public static final String VERY_EASY = "easy peasy lemon squeezy, take one pokeball";
+    public static final String EASY = "mmmh, you will nead some pokeballs";
+    public static final String MEDIUM = "uffff, you must take a great a amount of superballs";
+    public static final String DIFFICULT = "Yisus, if you do not catch dozens of super balls, you will not be able to catch it.";
+    public static final String VERY_DIFFICULT = "LMFAO, take the entire Pokemon Center in your bag";
     @Value("${pokemon.api.url}")
     private String startUrl;
 
@@ -49,17 +54,21 @@ public class PokemonService {
                 getPokemonDifficulty(pokemon));
     }
 
+    public Task parsePokemon(Pokemon pokemon) {
+        return parsePokemon(null, null, null, null, 0, pokemon);
+    }
+
     private String getPokemonAnnotation(Pokemon pokemon) {
         if (getAvgStats(pokemon) < 50) {
-            return "easy peasy lemon squeezy, take one pokeball";
+            return VERY_EASY;
         } else if (getAvgStats(pokemon) < 100) {
-            return "mmmh, you will nead some pokeballs";
+            return EASY;
         } else if (getAvgStats(pokemon) < 150) {
-            return "uffff, you must take a great a amount of superballs";
+            return MEDIUM;
         } else if (getAvgStats(pokemon) < 200) {
-            return "Yisus, if you do not catch dozens of super balls, you will not be able to catch it.";
+            return DIFFICULT;
         } else {
-            return "LMFAO, take the entire Pokemon Center in your bag";
+            return VERY_DIFFICULT;
         }
     }
 
@@ -83,9 +92,12 @@ public class PokemonService {
     public List<Pokemon> findAllPokemon(Integer limit, Integer offset) {
         RestTemplate restTemplate = new RestTemplate();
         AllPokemon response = restTemplate.getForObject(startUrl + "/pokemon?limit=" + limit + "&offset=" + offset, AllPokemon.class);
-        return response.getResults().stream()
-                .map(url -> restTemplate.getForObject(url.getUrl(), Pokemon.class))
-                .filter(Objects::nonNull)
-                .toList();
+        if (response != null) {
+            return response.getResults().stream()
+                    .map(url -> restTemplate.getForObject(url.getUrl(), Pokemon.class))
+                    .filter(Objects::nonNull)
+                    .toList();
+        }
+        return null;
     }
 }

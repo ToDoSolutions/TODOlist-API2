@@ -11,7 +11,7 @@ import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import com.todolist.utilities.Order;
-import com.todolist.utilities.Predicate;
+import com.todolist.utilities.Predicator;
 import com.todolist.validators.task.DateTaskValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class TaskController {
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
                                                  @RequestParam(defaultValue = "+idTask") Order order,
-                                                 @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
+                                                 @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
                                                  @RequestParam(required = false) String title,
                                                  @RequestParam(required = false) String description,
                                                  @RequestParam(required = false) Status status,
@@ -63,25 +63,25 @@ public class TaskController {
                                                  @RequestParam(required = false) NumberFilter priority,
                                                  @RequestParam(required = false) Difficulty difficulty,
                                                  @RequestParam(required = false) NumberFilter duration) {
-        order.validateOrder(ShowTask.ALL_ATTRIBUTES);
+        order.validateOrder(fieldsTask);
         List<Task> tasks = taskService.findAllTasks(order.getSort());
         List<Task> result = new IterableEntity<>(tasks, limit, offset)
                 .stream().filter(task -> Objects.nonNull(task) &&
-                        Predicate.isNullOrValid(title, task.getTitle().contains(title)) &&
-                        Predicate.isNullOrValid(status, task.getStatus() == status) &&
-                        Predicate.isNullOrValid(startDate, startDate.isValid(task.getStartDate())) &&
-                        Predicate.isNullOrValid(finishedDate, finishedDate.isValid(task.getFinishedDate())) &&
-                        Predicate.isNullOrValid(priority, priority.isValid(task.getPriority())) &&
-                        Predicate.isNullOrValid(difficulty, task.getDifficulty() == difficulty) &&
-                        Predicate.isNullOrValid(duration, duration.isValid(task.getDuration())) &&
-                        Predicate.isNullOrValid(annotation, task.getAnnotation().contains(annotation)) &&
-                        Predicate.isNullOrValid(description, task.getDescription().contains(description))).toList();
+                        Predicator.isNullOrValid(title, t -> task.getTitle().contains(t)) &&
+                        Predicator.isNullOrValid(status, s -> task.getStatus() == s) &&
+                        Predicator.isNullOrValid(startDate, s -> s.isValid(task.getStartDate())) &&
+                        Predicator.isNullOrValid(finishedDate, f -> f.isValid(task.getFinishedDate())) &&
+                        Predicator.isNullOrValid(priority, p -> p.isValid(task.getPriority())) &&
+                        Predicator.isNullOrValid(difficulty, d -> task.getDifficulty() == d) &&
+                        Predicator.isNullOrValid(duration, d -> d.isValid(task.getDuration())) &&
+                        Predicator.isNullOrValid(annotation, a -> task.getAnnotation().contains(a)) &&
+                        Predicator.isNullOrValid(description, d -> task.getDescription().contains(d))).toList();
         return result.stream().map(task -> dtoManager.getShowTaskAsJson(task, fieldsTask)).toList();
     }
 
     @GetMapping("/task/{idTask}") // GetSoloTest
     public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
-                                       @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
+                                       @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask) {
         Task task = taskService.findTaskById(idTask);
         return dtoManager.getShowTaskAsJson(task, fieldsTask);
     }

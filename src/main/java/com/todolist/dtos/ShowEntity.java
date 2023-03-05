@@ -8,13 +8,10 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public abstract class ShowEntity {
 
-    public static final String COMMA = ",";
-
-    protected Map<String, Object> getFields(String fields, List<String> allAttributes) {
+    protected Map<String, Object> toJson(String fields, List<String> allAttributes) {
 
         List<String> attributesNotNeeded = allAttributes.stream().map(String::trim).filter(attribute -> !fields.contains(attribute.toLowerCase())).toList();
         ObjectMapper mapper = new ObjectMapper()

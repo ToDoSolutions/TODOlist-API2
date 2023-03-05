@@ -52,7 +52,7 @@ public class ClockifyTask {
     private String workspaceId;
     @JsonIgnore
     @Valid
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     @JsonProperty("billable")
     public String getBillable() {

@@ -24,7 +24,7 @@ public class TimeInterval {
     private String start;
     @JsonIgnore
     @Valid
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     @JsonProperty("duration")
     public String getDuration() {

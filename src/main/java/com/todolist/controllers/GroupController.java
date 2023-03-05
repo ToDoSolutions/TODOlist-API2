@@ -9,14 +9,13 @@ import com.todolist.entity.IterableEntity;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
-import com.todolist.exceptions.NotFoundException;
 import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
 import com.todolist.utilities.Order;
-import com.todolist.utilities.Predicate;
+import com.todolist.utilities.Predicator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -52,18 +51,17 @@ public class GroupController {
     @DeleteMapping("/group/{idGroup}") // DeleteTest
     public Map<String, Object> deleteGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null) throw new NotFoundException("The group with idGroup " + idGroup + " does not exist.");
         groupService.deleteGroup(group);
-        return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowGroupAsJson(group);
     }
 
     @GetMapping("/groups") // GetAllTest
     public List<Map<String, Object>> getAllGroups(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                   @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
                                                   @RequestParam(defaultValue = "+idGroup") Order order,
-                                                  @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES) String fieldsGroup,
-                                                  @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,
-                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
+                                                  @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES_STRING) String fieldsGroup,
+                                                  @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES_STRING) String fieldsUser,
+                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
                                                   @RequestParam(required = false) String name,
                                                   @RequestParam(required = false) String description,
                                                   @RequestParam(required = false) NumberFilter numTasks,
@@ -72,18 +70,18 @@ public class GroupController {
         List<Group> groups = groupService.findAllGroups(order.getSort());
         List<Group> result = new IterableEntity<>(groups, limit, offset)
                 .stream().filter(group -> Objects.nonNull(group) &&
-                        Predicate.isNullOrValid(name, group.getName().equals(name)) &&
-                        Predicate.isNullOrValid(description, group.getDescription().equals(description)) &&
-                        Predicate.isNullOrValid(numTasks, numTasks.isValid(groupService.getNumTasks(group))) &&
-                        Predicate.isNullOrValid(createdDate, createdDate.isValid(group.getCreatedDate()))).toList();
+                        Predicator.isNullOrValid(name, n -> group.getName().equals(n)) &&
+                        Predicator.isNullOrValid(description, d -> group.getDescription().equals(d)) &&
+                        Predicator.isNullOrValid(numTasks, n -> n.isValid(groupService.getNumTasks(group))) &&
+                        Predicator.isNullOrValid(createdDate, c -> c.isValid(group.getCreatedDate()))).toList();
         return result.stream().map(group -> dtoManager.getShowGroupAsJson(group, fieldsGroup, fieldsUser, fieldsTask)).toList();
     }
 
     @GetMapping("/group/{idGroup}") // GetSoloTest
     public Map<String, Object> getGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
-                                        @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES) String fieldsGroup,
-                                        @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,
-                                        @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
+                                        @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES_STRING) String fieldsGroup,
+                                        @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES_STRING) String fieldsUser,
+                                        @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask) {
         Group group = groupService.findGroupById(idGroup);
         return dtoManager.getShowGroupAsJson(group, fieldsGroup, fieldsUser, fieldsTask);
     }
@@ -91,7 +89,7 @@ public class GroupController {
     @PostMapping("/group") // PostTest
     public Map<String, Object> addGroup(@RequestBody @Valid Group group) {
         group = groupService.saveGroup(group);
-        return new ShowGroup(group, groupService.getShowUserFromGroup(group)).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowGroupAsJson(group);
     }
 
     @PutMapping("/group") // PutTest

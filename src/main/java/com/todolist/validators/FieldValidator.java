@@ -7,22 +7,26 @@ import com.todolist.exceptions.BadRequestException;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class FieldValidator {
 
     public void taskFieldValidate(String fieldsTask) {
-        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
+        List<String> lowerAll = ShowTask.ALL_ATTRIBUTES.stream().map(String::toLowerCase).toList();
+        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> lowerAll.contains(field.toLowerCase()))))
             throw new BadRequestException("The tasks' fields are invalid.");
     }
 
     public void userFieldValidate(String fieldsUser) {
-        if (!(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
+        List<String> lowerAll = ShowUser.ALL_ATTRIBUTES.stream().map(String::toLowerCase).toList();
+        if (!(Arrays.stream(fieldsUser.split(",")).allMatch(field -> lowerAll.contains(field.toLowerCase()))))
             throw new BadRequestException("The users' fields are invalid.");
     }
 
     public void groupFieldValidate(String fieldsGroup) {
-        if (!(Arrays.stream(fieldsGroup.split(",")).allMatch(field -> ShowGroup.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
+        List<String> lowerAll = ShowGroup.ALL_ATTRIBUTES.stream().map(String::toLowerCase).toList();
+        if (!(Arrays.stream(fieldsGroup.split(",")).allMatch(field -> lowerAll.contains(field.toLowerCase()))))
             throw new BadRequestException("The groups' fields are invalid.");
     }
 }

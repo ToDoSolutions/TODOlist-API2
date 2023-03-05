@@ -12,7 +12,7 @@ import java.util.Set;
 public class TimeTask {
 
     private String description;
-    private String conlusion;
+    private String conclusion;
     private String decision;
     private Duration duration;
     private Set<Role> roles;
@@ -24,7 +24,7 @@ public class TimeTask {
         if (body != null && body.contains("\r\n\r\n") && body.split("\r\n\r\n").length == 3) {
             String[] text = body.split("\r\n\r\n");
             this.description = text[0];
-            this.conlusion = text[1];
+            this.conclusion = text[1];
             this.decision = text[2];
         } else {
             this.description = body;

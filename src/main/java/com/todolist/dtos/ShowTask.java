@@ -1,11 +1,6 @@
 package com.todolist.dtos;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.todolist.entity.Task;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,15 +10,15 @@ import lombok.ToString;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = {"idTask"})
+@EqualsAndHashCode(of = {"idTask"}, callSuper = false)
 public class ShowTask extends ShowEntity{
 
-    public static final List<String> ALL_ATTRIBUTES = List.of("idTask","title","description","status","finishedDate","startDate","annotation","priority","difficulty","duration");
+    public static final List<String> ALL_ATTRIBUTES = List.of("idTask", "title", "description", "status", "finishedDate", "startDate", "annotation", "priority", "difficulty", "duration");
+    public static final String ALL_ATTRIBUTES_STRING = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration";
 
     private Long idTask;
     private String title, description, annotation;
@@ -47,12 +42,13 @@ public class ShowTask extends ShowEntity{
         this.difficulty = task.getDifficulty();
     }
 
-    public Map<String, Object> getFields(String fields) {
-        return getFields(fields, ALL_ATTRIBUTES);
+    public Map<String, Object> toJson(String fields) {
+        return toJson(fields, ALL_ATTRIBUTES);
     }
 
-    public Map<String, Object> getFields() {
-        return getFields(getFieldsAsString());
+
+    public Map<String, Object> toJson() {
+        return toJson(getFieldsAsString());
     }
 
     public static String getFieldsAsString() {

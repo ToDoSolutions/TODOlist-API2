@@ -13,8 +13,8 @@ public class Order {
     private final String field;
 
     public Order(Character direction, String field) {
-        this.direction = direction.equals('+') ? Sort.Direction.ASC : Sort.Direction.DESC;
-        this.field = field;
+        this.direction = direction.equals('-') ? Sort.Direction.DESC : Sort.Direction.ASC;
+        this.field = field.trim();
     }
 
     @Override

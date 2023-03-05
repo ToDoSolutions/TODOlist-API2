@@ -34,15 +34,16 @@ public class DTOManager {
 
     public Map<String, Object> getShowTaskAsJson(Task task, String fieldsTask) {
         fieldValidator.taskFieldValidate(fieldsTask);
-        return getShowTask(task).getFields(fieldsTask);
+        return getShowTask(task).toJson(fieldsTask);
     }
 
     public Map<String, Object> getShowTaskAsJson(Task task) {
-        return getShowTask(task).getFields();
+        System.out.println("getShowTaskAsJson");
+        return getShowTask(task).toJson();
     }
 
     public Map<String, Object> getShowTaskAsJsonWithOutTimes(Task task, String fieldsTask) {
-        return getShowTask(task).getFields(fieldsTask.replace("finishedDate", "").replace("priority", "").replace("difficulty", "").replace("duration", "").replace("idTask", ""));
+        return getShowTask(task).toJson(fieldsTask.replace("finishedDate", "").replace("priority", "").replace("difficulty", "").replace("duration", "").replace("idTask", ""));
     }
 
     public ShowUser getShowUser(User user) {
@@ -52,16 +53,16 @@ public class DTOManager {
     public Map<String, Object> getShowUserAsJson(User user, String fieldsUser, String fieldsTask) {
         fieldValidator.userFieldValidate(fieldsUser);
         fieldValidator.taskFieldValidate(fieldsTask);
-        return getShowUser(user).getFields(fieldsUser, fieldsTask);
+        return getShowUser(user).toJson(fieldsUser, fieldsTask);
     }
 
     public Map<String, Object> getShowUserAsJson(User user, String fieldsUser) {
         fieldValidator.userFieldValidate(fieldsUser);
-        return getShowUser(user).getFields(fieldsUser);
+        return getShowUser(user).toJson(fieldsUser);
     }
 
     public Map<String, Object> getShowUserAsJson(User user) {
-        return getShowUser(user).getFields();
+        return getShowUser(user).toJson();
     }
 
     public ShowGroup getShowGroup(Group group) {
@@ -72,22 +73,22 @@ public class DTOManager {
         fieldValidator.groupFieldValidate(fieldsGroup);
         fieldValidator.userFieldValidate(fieldsUser);
         fieldValidator.taskFieldValidate(fieldsTask);
-        return getShowGroup(group).getFields(fieldsGroup, fieldsUser, fieldsTask);
+        return getShowGroup(group).toJson(fieldsGroup, fieldsUser, fieldsTask);
     }
 
     public Map<String, Object> getShowGroupAsJson(Group group, String fieldsGroup, String fieldsUser) {
         fieldValidator.groupFieldValidate(fieldsGroup);
         fieldValidator.userFieldValidate(fieldsUser);
-        return getShowGroup(group).getFields(fieldsGroup, fieldsUser);
+        return getShowGroup(group).toJson(fieldsGroup, fieldsUser);
     }
 
     public Map<String, Object> getShowGroupAsJson(Group group, String fieldsGroup) {
         fieldValidator.groupFieldValidate(fieldsGroup);
-        return getShowGroup(group).getFields(fieldsGroup);
+        return getShowGroup(group).toJson(fieldsGroup);
     }
 
     public Map<String, Object> getShowGroupAsJson(Group group) {
-        return getShowGroup(group).getFields();
+        return getShowGroup(group).toJson();
     }
 
 

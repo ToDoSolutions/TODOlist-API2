@@ -29,10 +29,7 @@ public class RepoService {
     private final UserService userService;
     private final TaskService taskService;
     private final GitHubConverter gitHubConverter;
-    @Autowired
     private final FetchApiData fetchApiData;
-    @Value("${github.api.url}")
-    private String startUrl;
     @Value("${github.api.url.repos.all}")
     private String allReposUrl;
     @Value("${github.api.url.repos.one}")

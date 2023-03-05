@@ -12,6 +12,18 @@ import java.util.Objects;
 @Getter
 public class ManagerException {
 
+    public static final String MSG = "msg";
+    public static final String PATH = "path";
+    public static final String STATUS = "status";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String LEFT_KEY = "{";
+    public static final String RIGHT_KEY = "}";
+    public static final String EMPTY = "";
+    public static final String SLASH = "\"";
+    public static final String COMMA = ",";
+    public static final String TWO_POINTS = ":";
+    public static final String NO_INFORMATION = "No information";
+    public static final String ERROR = "error";
     private LocalDate timestamp;
     private String msg;
     private String path;
@@ -22,27 +34,27 @@ public class ManagerException {
         Map<String, String> info;
         System.out.println("exception: " + exception);
         try {
-            info = new HashMap<>(Splitter.on(",")
-                    .withKeyValueSeparator(":")
-                    .split(exception.getResponseBodyAsString().replace("{", "").replace("}", "").replace("\"", "")));
-            this.timestamp = LocalDate.parse(info.get("timestamp"));
-            this.msg = info.get("msg").trim();
-            this.path = info.get("path").trim();
-            this.status = info.get("status").trim();
+            info = new HashMap<>(Splitter.on(COMMA)
+                    .withKeyValueSeparator(TWO_POINTS)
+                    .split(exception.getResponseBodyAsString().replace(LEFT_KEY, EMPTY).replace(RIGHT_KEY, EMPTY).replace(SLASH, EMPTY)));
+            this.timestamp = LocalDate.parse(info.get(TIMESTAMP));
+            this.msg = info.get(MSG).trim();
+            this.path = info.get(PATH).trim();
+            this.status = info.get(STATUS).trim();
         } catch (Exception e) {
-            info = new HashMap<>(Splitter.on(",")
-                    .withKeyValueSeparator(":")
+            info = new HashMap<>(Splitter.on(COMMA)
+                    .withKeyValueSeparator(TWO_POINTS)
                     .split(
                             exception.getResponseBodyAsString()
-                                    .replace("{", "")
-                                    .replace("}", "")
-                                    .replace("\"", "")
+                                    .replace(LEFT_KEY, EMPTY)
+                                    .replace(RIGHT_KEY, EMPTY)
+                                    .replace(SLASH, EMPTY)
                                     .substring(40)
                     ));
             this.timestamp = LocalDate.now();
-            this.msg = "No information";
-            this.path = info.get("path");
-            this.status = info.get("error");
+            this.msg = NO_INFORMATION;
+            this.path = info.get(PATH);
+            this.status = info.get(ERROR);
         }
     }
 
