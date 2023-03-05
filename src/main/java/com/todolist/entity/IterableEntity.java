@@ -2,6 +2,8 @@ package com.todolist.entity;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class IterableEntity<T> implements Iterable<T>{
 
@@ -38,5 +40,9 @@ public class IterableEntity<T> implements Iterable<T>{
     @Override
     public Iterator<T> iterator() {
         return new IteratorEntity(this);
+    }
+
+    public Stream<T> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 }

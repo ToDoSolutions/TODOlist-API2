@@ -14,6 +14,7 @@ public class PlanningTable {
 
     public static final Object[] HEADER_PLANNING = {"Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste"};
     public static final String JUMP_LINE = "\n";
+    public static final String EURO = "€";
 
     public Table getTaskTable(List<TimeTask> timeTasks) {
         Table.Builder taskTable = new Table.Builder()
@@ -23,7 +24,7 @@ public class PlanningTable {
             taskTable.addRow(timeTask.getTitle().trim(), timeTask.getDescription() != null ? timeTask.getDescription().trim().replace(JUMP_LINE, "") : null, timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
                     , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
                     , timeTask.getDuration().toHours() + " horas y " + timeTask.getDuration().toMinutes() % 60 + " minutos"
-                    , Math.round(timeTask.getCost() * 100) / 100. + "€");
+                    , Math.round(timeTask.getCost() * 100) / 100. + EURO);
         }
         return taskTable.build();
     }
@@ -31,11 +32,11 @@ public class PlanningTable {
     public Table getEmployeeTable(Employee employee) {
         return new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                 .addRow("Rol", "Coste")
-                .addRow("Desarrollador", employee.getSalaryByRole(Role.DEVELOPER) + "€")
-                .addRow("Analista", employee.getSalaryByRole(Role.ANALYST) + "€")
-                .addRow("Tester", employee.getSalaryByRole(Role.TESTER) + "€")
-                .addRow("Diseñador", employee.getSalaryByRole(Role.MANAGER) + "€")
-                .addRow("Operador", employee.getSalaryByRole(Role.OPERATOR) + "€")
+                .addRow("Desarrollador", employee.getSalaryByRole(Role.DEVELOPER) + EURO)
+                .addRow("Analista", employee.getSalaryByRole(Role.ANALYST) + EURO)
+                .addRow("Tester", employee.getSalaryByRole(Role.TESTER) + EURO)
+                .addRow("Diseñador", employee.getSalaryByRole(Role.MANAGER) + EURO)
+                .addRow("Operador", employee.getSalaryByRole(Role.OPERATOR) + EURO)
                 .build();
     }
 

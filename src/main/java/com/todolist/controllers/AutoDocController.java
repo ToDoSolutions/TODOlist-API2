@@ -44,7 +44,6 @@ public class AutoDocController {
         return autoDocService.autoDoc(repoName, username);
     }
 
-    // TODO: Crear un endpoint para obtener el markdown
     @RequestMapping("/planning/{repoName}/{username}/md")
     public ResponseEntity<String> getPlanning(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = ALL) String individual) throws IOException {
         String[] output = autoDocService.getPlanning(repoName, username, individual);

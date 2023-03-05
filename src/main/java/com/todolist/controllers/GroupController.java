@@ -16,6 +16,8 @@ import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
 import com.todolist.entity.IterableEntity;
+import com.todolist.utilities.Order;
+import com.todolist.utilities.Predicate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -58,7 +60,7 @@ public class GroupController {
     @GetMapping("/groups") // GetAllTest
     public List<Map<String, Object>> getAllGroups(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                   @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
-                                                  @RequestParam(defaultValue = "idGroup") String order,
+                                                  @RequestParam(defaultValue = "+idGroup") Order order,
                                                   @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES) String fieldsGroup,
                                                   @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,
                                                   @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
@@ -66,23 +68,14 @@ public class GroupController {
                                                   @RequestParam(required = false) String description,
                                                   @RequestParam(required = false) NumberFilter numTasks,
                                                   @RequestParam(required = false) DateFilter createdDate) {
-        String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        List<String> fieldsGroupList = List.of(ShowGroup.ALL_ATTRIBUTES.toLowerCase().split(","));
-        // Extraer en un validador.
-        if (fieldsGroupList.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
-            throw new BadRequestException("The order is invalid.");
-        //
-        List<Group> result = Lists.newArrayList(),
-                groups = groupService.findAllGroups(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
-        IterableEntity<Group> iterableEntity = new IterableEntity(groups, limit, offset);
-        for (Group group : iterableEntity) {
-            if (group != null &&
-                    (name == null || group.getName().equals(name)) &&
-                    (description == null || group.getDescription().equals(description)) &&
-                    (numTasks == null || numTasks.isValid(groupService.getNumTasks(group))) &&
-                    (createdDate == null || createdDate.isValid(group.getCreatedDate())))
-                result.add(group);
-        }
+        order.validateOrder(fieldsGroup);
+        List<Group> groups = groupService.findAllGroups(order.getSort());
+        List<Group> result = new IterableEntity<>(groups, limit, offset)
+                .stream().filter(group -> Objects.nonNull(group) &&
+                        Predicate.isNullOrValid(name, group.getName().equals(name)) &&
+                        Predicate.isNullOrValid(description, group.getDescription().equals(description)) &&
+                        Predicate.isNullOrValid(numTasks, numTasks.isValid(groupService.getNumTasks(group))) &&
+                        Predicate.isNullOrValid(createdDate, createdDate.isValid(group.getCreatedDate()))).toList();
         return result.stream().map(group -> dtoManager.getShowGroupAsJson(group, fieldsGroup, fieldsUser, fieldsTask)).toList();
     }
 

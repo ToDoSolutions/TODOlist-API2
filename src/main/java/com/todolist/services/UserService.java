@@ -1,14 +1,11 @@
 package com.todolist.services;
 
 import com.todolist.dtos.ShowTask;
-import com.todolist.dtos.ShowUser;
 import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.entity.UserTask;
-import com.todolist.exceptions.BadRequestException;
 import com.todolist.exceptions.NotFoundException;
-import com.todolist.repositories.TaskRepository;
 import com.todolist.repositories.UserRepository;
 import com.todolist.repositories.UserTaskRepository;
 import lombok.AllArgsConstructor;
@@ -16,14 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -38,7 +28,7 @@ public class UserService {
     private UserTaskRepository userTaskRepository;
 
     @Transactional(readOnly = true)
-    public List<User> findAllShowUsers(Sort sort) {
+    public List<User> findAllUsers(Sort sort) {
         return userRepository.findAll(sort);
     }
 

@@ -1,9 +1,9 @@
 package com.todolist.controllers;
 
-import com.google.common.collect.Lists;
 import com.todolist.component.DTOManager;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
+import com.todolist.entity.IterableEntity;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
@@ -11,7 +11,8 @@ import com.todolist.exceptions.NotFoundException;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import com.todolist.entity.IterableEntity;
+import com.todolist.utilities.Order;
+import com.todolist.utilities.Predicate;
 import com.todolist.validators.FieldValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -64,7 +66,7 @@ public class UserController {
     @GetMapping("/users") // GetAllTest
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive.") Integer limit,
-                                                 @RequestParam(defaultValue = "idUser") String order,
+                                                 @RequestParam(defaultValue = "+idUser") Order order,
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask,
                                                  @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES) String fieldsUser,
                                                  @RequestParam(required = false) String name,
@@ -74,24 +76,17 @@ public class UserController {
                                                  @RequestParam(required = false) String bio,
                                                  @RequestParam(required = false) String location,
                                                  @RequestParam(required = false) NumberFilter taskCompleted) {
-        String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
-        List<String> listUserFields = List.of(ShowUser.ALL_ATTRIBUTES.toLowerCase().split(","));
-        if (listUserFields.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
-            throw new BadRequestException("The order is invalid.");
-        List<User> result = Lists.newArrayList(),
-                users = userService.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
-        IterableEntity<User> iterableEntity = new IterableEntity<>(users, limit, offset);
-        for (User user : iterableEntity) {
-            if (user != null &&
-                    (name == null || user.getName().equals(name)) &&
-                    (surname == null || user.getSurname().equals(surname)) &&
-                    (email == null || user.getEmail().equals(email)) &&
-                    (location == null || user.getLocation().equals(location)) &&
-                    (taskCompleted == null || taskCompleted.isValid(userService.getTaskCompleted(user))) &&
-                    (bio == null || user.getBio().contains(bio)) &&
-                    (avatar == null || user.getAvatar().equals(avatar)))
-                result.add(user);
-        }
+        order.validateOrder(fieldsUser);
+        List<User> users = userService.findAllUsers(order.getSort());
+        List<User> result = new IterableEntity<>(users, limit, offset)
+                .stream().filter(user -> Objects.nonNull(user) &&
+                        Predicate.isNullOrValid(name, user.getName().equals(name)) &&
+                        Predicate.isNullOrValid(surname, user.getSurname().equals(surname)) &&
+                        Predicate.isNullOrValid(email, user.getEmail().equals(email)) &&
+                        Predicate.isNullOrValid(location, user.getLocation().equals(location)) &&
+                        Predicate.isNullOrValid(taskCompleted, taskCompleted.isValid(userService.getTaskCompleted(user))) &&
+                        Predicate.isNullOrValid(bio, user.getBio().contains(bio)) &&
+                        Predicate.isNullOrValid(avatar, user.getAvatar().equals(avatar))).toList();
         return result.stream().map(user -> dtoManager.getShowUserAsJson(user, fieldsUser, fieldsTask)).toList();
     }
 
