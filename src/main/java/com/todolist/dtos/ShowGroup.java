@@ -12,7 +12,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,9 +21,11 @@ import java.util.stream.Stream;
 @Setter
 @ToString
 @EqualsAndHashCode(of = {"idGroup"})
-public class ShowGroup {
+public class ShowGroup extends ShowEntity{
 
-    public static final String ALL_ATTRIBUTES = "idGroup,name,description,createdDate,users,numTasks";
+    public static final List<String> ALL_ATTRIBUTES = List.of("idGroup","name","description","createdDate","users","numTasks");
+    public static final String COMMMA = ",";
+    public static final String USERS = "users";
     private Long idGroup;
     private String name;
     private String description;
@@ -52,17 +53,27 @@ public class ShowGroup {
     }
 
     public Map<String, Object> getFields(String fieldsGroup, String fieldsUser, String fieldsTask) {
-        List<String> attributes = Stream.of(fieldsGroup.split(",")).map(attribute -> attribute.trim().toLowerCase()).toList();
-        List<String> attributesNotNeeded = Stream.of(ALL_ATTRIBUTES.split(",")).map(String::trim).filter(attribute -> !attributes.contains(attribute.toLowerCase())).toList();
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        Map<String, Object> map = mapper.convertValue(this, Map.class);
-        for (String attribute : attributesNotNeeded) map.remove(attribute);
-        if (attributes.contains("users"))
-            map.put("users", getUsers().stream().map(task -> task.getFields(fieldsUser, fieldsTask)).toList());
+        Map<String, Object> map = getFields(fieldsGroup, ALL_ATTRIBUTES);
+        List<String> attributes = Stream.of(fieldsGroup.split(COMMMA)).map(attribute -> attribute.trim().toLowerCase()).toList();
+        if (attributes.contains(USERS))
+            map.put(USERS, getUsers().stream().map(task -> task.getFields(fieldsUser, fieldsTask)).toList());
         return map;
     }
+
+    public Map<String, Object> getFields(String fieldsGroup, String fieldsUser) {
+        return getFields(fieldsGroup, fieldsUser, ShowTask.ALL_ATTRIBUTES.toString());
+    }
+
+    public Map<String, Object> getFields(String fieldsGroup) {
+        return getFields(fieldsGroup, ShowUser.getFieldsAsString(), ShowTask.getFieldsAsString());
+    }
+
+    public Map<String, Object>getFields() {
+        return getFields(getFieldsAsString(), ShowUser.getFieldsAsString(), ShowTask.getFieldsAsString());
+    }
+
+    public static String getFieldsAsString() {
+        return ALL_ATTRIBUTES.toString().replace("[", "").replace("]", "");
+    }
+
 }

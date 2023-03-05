@@ -34,7 +34,7 @@ public class AnalysisTable {
         Table.Builder table = new Table.Builder()
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                 .addRow(HEADER_ANALYSIS);
-        for (TimeTask timeTask: timeTasks) {
+        for (TimeTask timeTask : timeTasks) {
             String[] text = timeTask.getTitle().split(SEPARATOR_ID);
             String id = text[0].trim();
             table.addRow(id, timeTask.getConlusion().trim(), timeTask.getDecision().trim());

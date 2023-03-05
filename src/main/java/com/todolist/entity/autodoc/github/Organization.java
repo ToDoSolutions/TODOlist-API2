@@ -54,6 +54,7 @@ public class Organization {
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;

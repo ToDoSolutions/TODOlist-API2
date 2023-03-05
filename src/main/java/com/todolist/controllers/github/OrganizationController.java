@@ -1,6 +1,5 @@
 package com.todolist.controllers.github;
 
-import com.todolist.dtos.ShowGroup;
 import com.todolist.entity.autodoc.github.Organization;
 import com.todolist.services.github.OrganizationService;
 import lombok.AllArgsConstructor;

@@ -16,10 +16,6 @@ public enum Role {
         this.salary = i;
     }
 
-    public double getFinalSalary(double hours) {
-        return hours * salary;
-    }
-
     public static Role parseTag(Tag tag) {
         String name = tag.getName().toUpperCase();
         return switch (name) {
@@ -30,5 +26,9 @@ public enum Role {
             case "ANALYST" -> ANALYST;
             default -> throw new IllegalStateException("Unexpected value: " + name);
         };
+    }
+
+    public double getFinalSalary(double hours) {
+        return hours * salary;
     }
 }

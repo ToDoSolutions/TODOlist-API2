@@ -3,7 +3,6 @@ package com.todolist.controllers.github;
 import com.todolist.entity.autodoc.github.Issue;
 import com.todolist.services.github.IssueService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

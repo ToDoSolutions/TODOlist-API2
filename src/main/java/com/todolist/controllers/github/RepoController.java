@@ -17,8 +17,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +59,7 @@ public class RepoController {
             @PathVariable String username,
             @PathVariable String repoName,
             @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
-        
+
         return dtoManager.getShowTaskAsJsonWithOutTimes(gitHubConverter.turnTaskGitHubIntoTask(repoService.findRepoByName(username, repoName), LocalDate.now(), null, null), fieldsTask);
     }
 
@@ -104,15 +102,14 @@ public class RepoController {
             @PathVariable String username,
             @PathVariable long idTask,
             @RequestParam String password,
-            @RequestParam(defaultValue = "true") @Pattern(regexp ="^(?)(true|false)$") Boolean haveAutoInit,
-            @RequestParam(defaultValue = "false") @Pattern(regexp ="^(?)(true|false)$") Boolean isPrivate,
+            @RequestParam(defaultValue = "true") @Pattern(regexp = "^(?)(true|false)$") Boolean haveAutoInit,
+            @RequestParam(defaultValue = "false") @Pattern(regexp = "^(?)(true|false)$") Boolean isPrivate,
             @RequestParam(required = false) String gitIgnoreTemplate,
-            @RequestParam(defaultValue = "false") @Pattern(regexp ="^(?)(true|false)$") Boolean isTemplate,
+            @RequestParam(defaultValue = "false") @Pattern(regexp = "^(?)(true|false)$") Boolean isTemplate,
             @RequestParam(required = false) String homepage, BindingResult bindingResult) {
         gitHubUserAuthenticatedValidator.validateGitHubUserAuthenticated(password, userService.findUserByUsername(username), bindingResult);
         return repoService.saveRepo(username, idTask, haveAutoInit, isPrivate, gitIgnoreTemplate, isTemplate, homepage);
     }
-
 
 
     // Actualizar un repositorio de un usuario de GitHub (ya existente)

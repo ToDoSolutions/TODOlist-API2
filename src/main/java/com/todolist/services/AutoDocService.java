@@ -112,6 +112,6 @@ public class AutoDocService {
         if (Objects.equals(individual, ALL))
             return autoDoc(repoName, username);
         else
-            return  autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
+            return autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
     }
 }

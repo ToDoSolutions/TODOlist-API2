@@ -19,8 +19,10 @@ import java.util.stream.Stream;
 @Setter
 @ToString
 @EqualsAndHashCode(of = {"idUser"})
-public class ShowUser {
-    public static final String ALL_ATTRIBUTES = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks";
+public class ShowUser extends ShowEntity {
+    public static final List<String> ALL_ATTRIBUTES = List.of("idUser", "name", "surname", "email", "avatar", "bio", "location", "taskCompleted", "tasks");
+    public static final String TASKS = "tasks";
+    public static final String COMMA = ",";
     private Long idUser;
     private String name;
     private String surname;
@@ -44,22 +46,23 @@ public class ShowUser {
         this.tasks = tasks;
     }
 
-    public Long getTaskCompleted() {
-        return getTasks().stream().filter(task -> task.getStatus().equals(Status.DONE)).count();
+    public Map<String, Object> getFields(String fieldsUser, String fieldsTask) {
+        Map<String, Object> map = getFields(fieldsUser, ALL_ATTRIBUTES);
+        List<String> attributes = Stream.of(fieldsUser.split(COMMA)).map(attribute -> attribute.trim().toLowerCase()).toList();
+        if (attributes.contains(TASKS))
+            map.put(TASKS, getTasks().stream().map(task -> task.getFields(fieldsTask)).toList());
+        return map;
     }
 
-    public Map<String, Object> getFields(String fieldsUser, String fieldsTask) {
-        List<String> attributes = Stream.of(fieldsUser.split(",")).map(attribute -> attribute.trim().toLowerCase()).toList();
-        List<String> attributesNotNeeded = Stream.of(ALL_ATTRIBUTES.split(",")).map(String::trim).filter(attribute -> !attributes.contains(attribute.toLowerCase())).toList();
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        Map<String, Object> map = mapper.convertValue(this, Map.class);
-        for (String attribute : attributesNotNeeded) map.remove(attribute);
-        if (attributes.contains("tasks"))
-            map.put("tasks", getTasks().stream().map(task -> task.getFields(fieldsTask)).toList());
-        return map;
+    public Map<String, Object> getFields(String fieldsUser) {
+        return getFields(fieldsUser, ShowTask.getFieldsAsString());
+    }
+
+    public Map<String, Object> getFields() {
+        return getFields(getFieldsAsString(), ShowTask.getFieldsAsString());
+    }
+
+    public static String getFieldsAsString() {
+        return ShowUser.ALL_ATTRIBUTES.toString().replace("[", "").replace("]", "");
     }
 }

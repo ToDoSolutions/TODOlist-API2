@@ -14,14 +14,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class IssueService {
 
-    @Value("${github.api.url}")
-    private String startUrl;
-
     private final RepoService repoService;
     private final UserService userService;
     private final FetchApiData fetchApiData;
+    @Value("${github.api.url}")
+    private String startUrl;
 
-     @Autowired
+    @Autowired
     public IssueService(RepoService repoService, UserService userService, FetchApiData fetchApiData) {
         this.repoService = repoService;
         this.userService = userService;

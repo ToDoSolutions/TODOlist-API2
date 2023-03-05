@@ -13,20 +13,17 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
-import static java.time.temporal.ChronoUnit.DAYS;
 
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode(of = {"idTask"})
-public class ShowTask {
+public class ShowTask extends ShowEntity{
 
-    public static final String ALL_ATTRIBUTES = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration";
+    public static final List<String> ALL_ATTRIBUTES = List.of("idTask","title","description","status","finishedDate","startDate","annotation","priority","difficulty","duration");
 
     private Long idTask;
     private String title, description, annotation;
@@ -51,15 +48,14 @@ public class ShowTask {
     }
 
     public Map<String, Object> getFields(String fields) {
-        List<String> attributes = Stream.of(fields.split(",")).map(attribute -> attribute.trim().toLowerCase()).toList();
-        List<String> attributesNotNeeded = Stream.of(ALL_ATTRIBUTES.split(",")).map(String::trim).filter(attribute -> !attributes.contains(attribute.toLowerCase())).toList();
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        Map<String, Object> map = mapper.convertValue(this, Map.class);
-        for (String attribute : attributesNotNeeded) map.remove(attribute);
-        return map;
+        return getFields(fields, ALL_ATTRIBUTES);
+    }
+
+    public Map<String, Object> getFields() {
+        return getFields(getFieldsAsString());
+    }
+
+    public static String getFieldsAsString() {
+        return ALL_ATTRIBUTES.toString().replace("[", "").replace("]", "");
     }
 }

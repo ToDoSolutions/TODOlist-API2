@@ -4,17 +4,14 @@ import com.todolist.component.DTOManager;
 import com.todolist.component.GitHubConverter;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
-import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.UserService;
 import com.todolist.services.github.OwnerService;
 import com.todolist.validators.user.GitHubUserAuthenticatedValidator;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1")

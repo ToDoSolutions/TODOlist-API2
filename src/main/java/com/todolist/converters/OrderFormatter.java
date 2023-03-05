@@ -1,14 +1,11 @@
 package com.todolist.converters;
 
-import com.todolist.exceptions.BadRequestException;
 import com.todolist.utilities.Order;
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.util.List;
 import java.util.Locale;
-import java.util.stream.Stream;
 
 @Component
 public class OrderFormatter implements Formatter<Order> {

@@ -5,16 +5,12 @@ import com.todolist.entity.autodoc.TimeTask;
 import com.todolist.services.AutoDocService;
 import com.todolist.utilities.WriterManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -47,7 +43,7 @@ public class AutoDocController {
     @RequestMapping("/planning/{repoName}/{username}/md")
     public ResponseEntity<String> getPlanning(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = ALL) String individual) throws IOException {
         String[] output = autoDocService.getPlanning(repoName, username, individual);
-        String fileName= individual.equals(ALL) ? PLANNING_GROUP : PLANNING_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE));
+        String fileName = individual.equals(ALL) ? PLANNING_GROUP : PLANNING_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE));
         return new WriterManager(TEMPLATES_PLANNING)
                 .map(s -> s.replace("{content0}", output[0]))
                 .map(s -> s.replace("{content1}", output[1]))

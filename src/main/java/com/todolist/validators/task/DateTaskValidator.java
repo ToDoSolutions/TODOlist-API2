@@ -1,7 +1,6 @@
 package com.todolist.validators.task;
 
 import com.todolist.entity.Task;
-import com.todolist.exceptions.BadRequestException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

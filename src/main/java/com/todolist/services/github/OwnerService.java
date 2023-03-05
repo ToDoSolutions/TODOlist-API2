@@ -2,7 +2,6 @@ package com.todolist.services.github;
 
 import com.todolist.component.FetchApiData;
 import com.todolist.component.GitHubConverter;
-import com.todolist.dtos.ShowUser;
 import com.todolist.entity.User;
 import com.todolist.entity.autodoc.github.Owner;
 import com.todolist.services.UserService;
@@ -21,16 +20,13 @@ public class OwnerService {
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER = "Bearer ";
     public static final String[] IGNORED_PROPERTIES = {"id", "password", "tasks", "token"};
-    @Value("${github.api.url}")
-    private String startUrl;
-
-    @Value("${github.api.url.user}")
-    private String userUrl;
-
-
     private final UserService userService;
     private final FetchApiData fetchApiData;
     private final GitHubConverter gitHubConverter;
+    @Value("${github.api.url}")
+    private String startUrl;
+    @Value("${github.api.url.user}")
+    private String userUrl;
 
 
     @Autowired

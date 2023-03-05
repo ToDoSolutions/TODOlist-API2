@@ -1,7 +1,5 @@
 package com.todolist.services;
 
-import com.todolist.dtos.ShowGroup;
-import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.*;
 import com.todolist.exceptions.BadRequestException;

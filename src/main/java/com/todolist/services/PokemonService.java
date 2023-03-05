@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,8 +42,8 @@ public class PokemonService {
         return Task.of("Catch: " + pokemon.getName(), "Type pokemon: " + types, getPokemonAnnotation(pokemon), status,
                 finishedDate == null ?
                         startDate == null ?
-                                LocalDate.now().plusDays(days):
-                                startDate.plusDays(days):
+                                LocalDate.now().plusDays(days) :
+                                startDate.plusDays(days) :
                         finishedDate,
                 startDate == null ? LocalDate.now() : startDate, priority,
                 getPokemonDifficulty(pokemon));

@@ -1,22 +1,20 @@
 package com.todolist.controllers;
 
-import com.google.common.collect.Lists;
 import com.todolist.component.DTOManager;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
+import com.todolist.entity.IterableEntity;
 import com.todolist.entity.Task;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
-import com.todolist.entity.IterableEntity;
 import com.todolist.utilities.Order;
 import com.todolist.utilities.Predicate;
 import com.todolist.validators.task.DateTaskValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 

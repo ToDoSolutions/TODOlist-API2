@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 @Getter
 public class Order {
 
-    private Sort.Direction direction;
-    private String field;
+    private final Sort.Direction direction;
+    private final String field;
 
     public Order(Character direction, String field) {
         this.direction = direction.equals('+') ? Sort.Direction.ASC : Sort.Direction.DESC;

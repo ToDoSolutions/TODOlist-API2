@@ -33,10 +33,10 @@ public class Employee {
     public void updateSalary(Employee employee) {
 
         for (Role role : employee.getSalary().keySet())
-                if (salary.containsKey(role))
-                    salary.put(role, salary.get(role) + employee.getSalary().get(role));
-                else
-                    salary.put(role, employee.getSalary().get(role));
+            if (salary.containsKey(role))
+                salary.put(role, salary.get(role) + employee.getSalary().get(role));
+            else
+                salary.put(role, employee.getSalary().get(role));
     }
 
     public double getSalaryByRole(Role role) {

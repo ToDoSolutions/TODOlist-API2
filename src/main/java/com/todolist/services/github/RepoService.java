@@ -14,11 +14,7 @@ import com.todolist.services.UserService;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 
@@ -29,28 +25,22 @@ public class RepoService {
     public static final String REPO_NAME = "{repoName}";
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER = "Bearer ";
-    @Value("${github.api.url}")
-    private String startUrl;
-
-    @Value("${github.api.url.repos.all}")
-    private String allReposUrl;
-
-    @Value("${github.api.url.repos.one}")
-    private String oneRepoUrl;
-
-    @Value("${github.api.url.repos.authenticated}")
-    private String authenticatedRepoUrl;
-
-    @Value("${github.api.url.repos.organization}")
-    private String organizationRepoUrl;
-
-
-    private final GroupService  groupService;
+    private final GroupService groupService;
     private final UserService userService;
     private final TaskService taskService;
     private final GitHubConverter gitHubConverter;
     @Autowired
     private final FetchApiData fetchApiData;
+    @Value("${github.api.url}")
+    private String startUrl;
+    @Value("${github.api.url.repos.all}")
+    private String allReposUrl;
+    @Value("${github.api.url.repos.one}")
+    private String oneRepoUrl;
+    @Value("${github.api.url.repos.authenticated}")
+    private String authenticatedRepoUrl;
+    @Value("${github.api.url.repos.organization}")
+    private String organizationRepoUrl;
 
     @Autowired
     public RepoService(GroupService groupService, UserService userService, TaskService taskService, GitHubConverter gitHubConverter, FetchApiData fetchApiData) {

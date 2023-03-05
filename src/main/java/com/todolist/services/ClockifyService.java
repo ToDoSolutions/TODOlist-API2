@@ -20,18 +20,15 @@ public class ClockifyService {
     public static final String CLOCKIFY_ID = "{clockifyId}";
     public static final String TAG_ID = "{tagId}";
     public static final String X_API_KEY = "X-Api-Key";
-    @Value("${clockify.api.url.entries}")
-    private String entriesUrl;
-
-    @Value("${clockify.api.url.tags}")
-    private String tagsUrl;
-
-    @Value("${clockify.api.token}")
-    private String token;
-
     private final FetchApiData fetchApiData;
     private final TaskService taskService;
     private final UserService userService;
+    @Value("${clockify.api.url.entries}")
+    private String entriesUrl;
+    @Value("${clockify.api.url.tags}")
+    private String tagsUrl;
+    @Value("${clockify.api.token}")
+    private String token;
 
     @Autowired
     public ClockifyService(FetchApiData fetchApiData, TaskService taskService, UserService userService) {
@@ -43,10 +40,10 @@ public class ClockifyService {
     // Get all task from an workspace
     public ClockifyTask[] getTaskFromWorkspace(String repoName) {
         Task task = taskService.findTaskByTitle(repoName);
-       return userService.findUsersWithTask(task)
+        return userService.findUsersWithTask(task)
                 .stream()
                 .map(user -> fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair(X_API_KEY, token)))
-               .flatMap(Stream::of).toArray(ClockifyTask[]::new);
+                .flatMap(Stream::of).toArray(ClockifyTask[]::new);
     }
 
     // Get task for a user in a workspace

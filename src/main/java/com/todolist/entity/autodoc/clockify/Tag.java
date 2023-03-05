@@ -11,10 +11,10 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "id",
-    "name",
-    "workspaceId",
-    "archived"
+        "id",
+        "name",
+        "workspaceId",
+        "archived"
 })
 @Generated("jsonschema2pojo")
 public class Tag {

@@ -38,7 +38,7 @@ public class DTOManager {
     }
 
     public Map<String, Object> getShowTaskAsJson(Task task) {
-        return getShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
+        return getShowTask(task).getFields();
     }
 
     public Map<String, Object> getShowTaskAsJsonWithOutTimes(Task task, String fieldsTask) {
@@ -57,11 +57,11 @@ public class DTOManager {
 
     public Map<String, Object> getShowUserAsJson(User user, String fieldsUser) {
         fieldValidator.userFieldValidate(fieldsUser);
-        return getShowUser(user).getFields(fieldsUser, ShowTask.ALL_ATTRIBUTES);
+        return getShowUser(user).getFields(fieldsUser);
     }
 
     public Map<String, Object> getShowUserAsJson(User user) {
-        return getShowUser(user).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return getShowUser(user).getFields();
     }
 
     public ShowGroup getShowGroup(Group group) {
@@ -78,16 +78,16 @@ public class DTOManager {
     public Map<String, Object> getShowGroupAsJson(Group group, String fieldsGroup, String fieldsUser) {
         fieldValidator.groupFieldValidate(fieldsGroup);
         fieldValidator.userFieldValidate(fieldsUser);
-        return getShowGroup(group).getFields(fieldsGroup, fieldsUser, ShowTask.ALL_ATTRIBUTES);
+        return getShowGroup(group).getFields(fieldsGroup, fieldsUser);
     }
 
     public Map<String, Object> getShowGroupAsJson(Group group, String fieldsGroup) {
         fieldValidator.groupFieldValidate(fieldsGroup);
-        return getShowGroup(group).getFields(fieldsGroup, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return getShowGroup(group).getFields(fieldsGroup);
     }
 
     public Map<String, Object> getShowGroupAsJson(Group group) {
-        return getShowGroup(group).getFields(ShowGroup.ALL_ATTRIBUTES, ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return getShowGroup(group).getFields();
     }
 
 

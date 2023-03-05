@@ -16,7 +16,6 @@ import com.todolist.utilities.Predicate;
 import com.todolist.validators.FieldValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -57,10 +56,8 @@ public class UserController {
     @DeleteMapping("/user/{idUser}") // DeleteTest
     public Map<String, Object> deleteUser(@PathVariable("idUser") @Min(value = 0, message = "The idGroup must be positive.") Long idUser) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
         userService.deleteUser(user);
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowUserAsJson(user);
     }
 
     @GetMapping("/users") // GetAllTest
