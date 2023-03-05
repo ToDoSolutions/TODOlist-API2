@@ -37,8 +37,8 @@ public class AutoDocService {
     }
 
     public List<TimeTask> autoDoc(String repoName, String username) {
-        Map<Issue, ClockifyTask[]> map = groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName));
-        return map.entrySet().stream().map(entry -> createTimeTask(entry, repoName)).toList();
+        Map<Issue, ClockifyTask[]> map = groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName, username));
+        return map.entrySet().stream().map(entry -> createTimeTask(entry, repoName, username)).toList();
     }
 
     public Map<Issue, ClockifyTask[]> groupIssuesWithHisTime(Issue[] issues, ClockifyTask[] clockifyTasks) {
@@ -47,7 +47,7 @@ public class AutoDocService {
         );
     }
 
-    public TimeTask createTimeTask(Map.Entry<Issue, ClockifyTask[]> entry, String repoName) {
+    public TimeTask createTimeTask(Map.Entry<Issue, ClockifyTask[]> entry, String repoName, String username) {
         Issue issue = entry.getKey();
         ClockifyTask[] clockifyTask = entry.getValue();
         Duration duration = Duration.ZERO;
@@ -56,7 +56,7 @@ public class AutoDocService {
         List<Employee> employees = users.stream().map(user -> new Employee(user.getFullName(), user.getClockifyId())).toList();
         for (ClockifyTask task : clockifyTask) {
             Employee employee = findEmployeeClockifyTask(employees, task);
-            List<Role> roles = task.getTagIds().stream().map(tagId -> clockifyService.getRoleFromClockify(repoName, tagId)).distinct().toList();
+            List<Role> roles = task.getTagIds().stream().map(tagId -> clockifyService.getRoleFromClockify(repoName, username, tagId)).distinct().toList();
             duration = duration.plus(task.calculateSalary(roles, duration, employee));
             allRoles.addAll(roles);
         }

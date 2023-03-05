@@ -1,9 +1,5 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
--- En la nube
--- USE `todolist-db2`;
-
--- En local
 USE `todolist-api2`;
 
 INSERT INTO `task` (`annotation`, `description`, `difficulty`, `finished_date`, `priority`, `start_date`,

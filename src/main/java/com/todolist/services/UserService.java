@@ -48,6 +48,12 @@ public class UserService {
     }
 
     @Transactional
+    public Task findTaskByTitle(String username, String title) {
+        User user = findUserByUsername(username);
+        return getTasksFromUser(user).stream().filter(task -> task.getTitle().equals(title)).findFirst().orElseThrow(() -> new NotFoundException("The task with title " + title + " does not exist."));
+    }
+
+    @Transactional
     public User saveUser(User user) {
         return userRepository.save(user);
     }

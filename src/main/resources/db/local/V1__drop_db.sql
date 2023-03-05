@@ -1,7 +1,3 @@
--- En la nube
--- USE `todolist-db2`;
-
--- En local
 USE `todolist-api2`;
 
 SET

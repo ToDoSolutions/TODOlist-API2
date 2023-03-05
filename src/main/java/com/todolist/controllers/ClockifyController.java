@@ -23,7 +23,7 @@ public class ClockifyController {
     // Get all task from a workspace
     @GetMapping("/{repoName}/{username}/time-entries")
     public ResponseEntity<ClockifyTask[]> getTaskFromWorkspace(@PathVariable String repoName, @PathVariable String username) {
-        return ResponseEntity.ok(clockifyService.getTaskFromWorkspace(repoName));
+        return ResponseEntity.ok(clockifyService.getTaskFromWorkspace(repoName, username));
     }
 
 

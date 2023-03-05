@@ -38,29 +38,23 @@ public class ClockifyService {
     }
 
     // Get all task from a workspace
-    public ClockifyTask[] getTaskFromWorkspace(String repoName) {
-        Task task = taskService.findTaskByTitle(repoName);
+    public ClockifyTask[] getTaskFromWorkspace(String repoName, String username) {
+
+        Task task = userService.findTaskByTitle(username, repoName);
         return userService.findUsersWithTask(task)
                 .stream()
                 .map(user -> fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair<>(X_API_KEY, token)))
                 .flatMap(Stream::of).toArray(ClockifyTask[]::new);
     }
 
-    // Get task for a user in a workspace
-    public ClockifyTask[] getTaskForAUserFromWorkspace(String repoName, String username) {
-        Task task = taskService.findTaskByTitle(repoName);
-        User user = userService.findUserByUsername(username);
-        return fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair<>(X_API_KEY, token));
-    }
-
-    public Tag getTagFromClockify(String repoName, String tagId) {
-        Task task = taskService.findTaskByTitle(repoName);
+    public Tag getTagFromClockify(String repoName, String username, String tagId) {
+        Task task = userService.findTaskByTitle(username, repoName);
         if (tagId == null)
             return new Tag();
         return fetchApiData.getApiDataWithToken(tagsUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(TAG_ID, tagId), Tag.class, new Pair<>(X_API_KEY, token));
     }
 
-    public Role getRoleFromClockify(String repoName, String roleId) {
-        return Role.parseTag(getTagFromClockify(repoName, roleId));
+    public Role getRoleFromClockify(String repoName, String username, String roleId) {
+        return Role.parseTag(getTagFromClockify(repoName, username, roleId));
     }
 }

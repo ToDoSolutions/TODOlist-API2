@@ -34,11 +34,6 @@ public class TaskService {
         return taskRepository.findById(idTask).orElseThrow(() -> new NotFoundException("The task with idTask " + idTask + " does not exist."));
     }
 
-    @Transactional(readOnly = true)
-    public Task findTaskByTitle(String title) {
-        return taskRepository.findByTitle(title).orElseThrow(() -> new NotFoundException("The task with title " + title + " does not exist."));
-    }
-
     @Transactional
     public Task saveTask(Task task) {
         if (task.getStartDate() == null)
