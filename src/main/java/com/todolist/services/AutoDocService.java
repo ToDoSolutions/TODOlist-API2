@@ -1,6 +1,8 @@
 package com.todolist.services;
 
 import com.google.common.collect.Lists;
+import com.todolist.component.AnalysisTable;
+import com.todolist.component.PlanningTable;
 import com.todolist.entity.User;
 import com.todolist.entity.autodoc.Employee;
 import com.todolist.entity.autodoc.Role;
@@ -8,9 +10,6 @@ import com.todolist.entity.autodoc.TimeTask;
 import com.todolist.entity.autodoc.clockify.ClockifyTask;
 import com.todolist.entity.autodoc.github.Issue;
 import com.todolist.services.github.IssueService;
-import net.steppschuh.markdowngenerator.table.Table;
-import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
-import net.steppschuh.markdowngenerator.text.heading.Heading;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -21,17 +20,20 @@ import java.util.stream.Stream;
 @Service
 public class AutoDocService {
 
-    public static final Object[] HEADER_PLANNING = {"Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste"};
-    public static final Object[] HEADER_ANALYSIS = {"ID", "Conclusiones", "Decisiones tomadas"};
-    public static final String SEPARATOR_ID = ":";
-    public static final String JUMP_LINE = "\n";
+
+    public static final String ALL = "all";
+    public static final String EURO = "€";
     private final ClockifyService clockifyService;
     private final IssueService issueService;
+    private final PlanningTable planningTable;
+    private final AnalysisTable analysisTable;
 
 
-    public AutoDocService(ClockifyService clockifyService, IssueService issueService) {
+    public AutoDocService(ClockifyService clockifyService, IssueService issueService, PlanningTable planningTable, AnalysisTable analysisTable) {
         this.clockifyService = clockifyService;
         this.issueService = issueService;
+        this.planningTable = planningTable;
+        this.analysisTable = analysisTable;
     }
 
     public List<TimeTask> autoDoc(String repoName, String username) {
@@ -79,58 +81,37 @@ public class AutoDocService {
     }
 
     public String[] getPlanning(String repoName, String username, String individual) {
-        List<TimeTask> timeTasks;
-        if (Objects.equals(individual, "all"))
-            timeTasks = autoDoc(repoName, username);
-        else
-            timeTasks = autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
+        List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username);
         List<Employee> employees = getEmployees(timeTasks);
-        Table.Builder taskTable = new Table.Builder()
-                .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                .addRow(HEADER_PLANNING);
-        // Obtenemos la tabla con los costes de cada tarea.
-        for (TimeTask timeTask : timeTasks) {
-            taskTable.addRow(timeTask.getTitle().trim(), timeTask.getDescription() != null ? timeTask.getDescription().trim().replace(JUMP_LINE,""): null, timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
-                    , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
-                    , timeTask.getDuration().toHours() + " horas y " + timeTask.getDuration().toMinutes() % 60 + " minutos"
-                    , Math.round(timeTask.getCost()*100)/100. + "€");
-        }
-        StringBuilder personalTable = new StringBuilder();
-        double cost = 0;
+
+        // Obtenemos la tabla para las tareas.
+        String taskTable = planningTable.getTaskTable(timeTasks).serialize();
+
         // Obtenemos la tabla para los empleados.
-        for (Employee employee : employees) {
-            personalTable.append(JUMP_LINE).append(new Heading(employee.getName(), 3)).append(JUMP_LINE);
-            personalTable.append(new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                    .addRow("Rol", "Coste")
-                    .addRow("Desarrollador", employee.getSalaryByRole(Role.DEVELOPER) + "€")
-                    .addRow("Analista", employee.getSalaryByRole(Role.ANALYST) + "€")
-                    .addRow("Tester", employee.getSalaryByRole(Role.TESTER) + "€")
-                    .addRow("Diseñador", employee.getSalaryByRole(Role.MANAGER) + "€")
-                    .addRow("Operador", employee.getSalaryByRole(Role.OPERATOR) + "€")
-                    .build().serialize());
-            cost += employee.getSalary().values().stream().mapToDouble(i -> i).sum();
-        }
-        return new String[]{taskTable.build().serialize(), personalTable.toString(), cost + "€"};
+        String personalTable = planningTable.getAllEmployeeTables(employees);
+
+        // Obtenemos el coste total.
+        double cost = employees.stream().mapToDouble(employee -> employee.getSalary().values().stream().mapToDouble(i -> i).sum()).sum();
+
+        return new String[]{taskTable, personalTable, cost + EURO};
     }
 
     public String getAnalysis(String repoName, String username, String individual) {
-        List<TimeTask> timeTasks;
-        if (Objects.equals(individual, "all"))
-            timeTasks = autoDoc(repoName, username);
-        else
-            timeTasks = autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
-        StringBuilder output = new StringBuilder(new Heading("Enunciados", 3).toString()).append(JUMP_LINE);
-        Table.Builder table = new Table.Builder()
-                .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                .addRow(HEADER_ANALYSIS);
-        for (TimeTask timeTask : timeTasks) {
-            String[] text = timeTask.getTitle().split(SEPARATOR_ID);
-            String id = text[0].trim();
-            String body = text[1].trim();
-            output.append("- ").append(new BoldText(id)).append("-").append(body).append(JUMP_LINE);
-            table.addRow(id, timeTask.getConlusion().trim(), timeTask.getDecision().trim());
-        }
-        output.append(JUMP_LINE).append(new Heading("Análisis", 3)).append(JUMP_LINE).append(table.build().serialize());
+        List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username);
+
+        // Obtenemos los enunciados.
+        StringBuilder output = analysisTable.getStatements(timeTasks);
+
+        // Obtenemos la tabla con los análisis.
+        output.append(analysisTable.getAnalysis(timeTasks));
+
         return output.toString();
+    }
+
+    private List<TimeTask> getTimeTasks(String individual, String repoName, String username) {
+        if (Objects.equals(individual, ALL))
+            return autoDoc(repoName, username);
+        else
+            return  autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
     }
 }

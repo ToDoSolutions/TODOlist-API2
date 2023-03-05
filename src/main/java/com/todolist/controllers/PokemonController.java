@@ -8,7 +8,6 @@ import com.todolist.filters.NumberFilter;
 import com.todolist.services.PokemonService;
 import com.todolist.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolation;
@@ -28,9 +27,9 @@ public class PokemonController {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator(); // Arreglar algún día.
 
-    private TaskService taskService;
+    private final TaskService taskService;
 
-    private PokemonService pokemonService;
+    private final PokemonService pokemonService;
 
 
     @Autowired

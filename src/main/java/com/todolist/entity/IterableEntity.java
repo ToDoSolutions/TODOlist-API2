@@ -7,7 +7,7 @@ public class IterableEntity<T> implements Iterable<T>{
 
     public List<T> elements;
     private int start;
-    private int end;
+    private final int end;
 
     public IterableEntity(List<T> elements, Integer limit, Integer offset) {
         if (limit == -1) limit = elements.size();
@@ -18,7 +18,7 @@ public class IterableEntity<T> implements Iterable<T>{
 
     private class IteratorEntity implements Iterator<T> {
 
-        private IterableEntity<T> iterableEntity;
+        private final IterableEntity<T> iterableEntity;
 
         public IteratorEntity(IterableEntity<T> iterableEntity) {
             this.iterableEntity = iterableEntity;
