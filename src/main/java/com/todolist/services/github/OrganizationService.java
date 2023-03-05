@@ -17,6 +17,9 @@ public class OrganizationService {
     @Value("${github.api.url}")
     private String startUrl;
 
+    @Value("${github.api.url.orgs}")
+    private String orgsUrl;
+
 
     private final GroupService groupService;
     private final FetchApiData fetchApiData;
@@ -31,18 +34,8 @@ public class OrganizationService {
     // findById()
     public Organization findById(Long idGroup) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null)
-            throw new NotFoundException("Group not found");
-        return fetchApiData.getApiData(startUrl + "/orgs/" + group.getName(), Organization.class);
-    }
-
-    public Group turnOrganizationIntoGroup(Organization organization) {
-        return Group.of(organization.getLogin(), organization.getDescription(), organization.getCreatedAt());
-    }
-
-    public ShowGroup turnOrganizationIntoShowGroup(Organization organization) {
-        Group group = turnOrganizationIntoGroup(organization);
-        return new ShowGroup(group, groupService.getShowUserFromGroup(group));
+        String url = orgsUrl.replace("{groupName}", group.getName());
+        return fetchApiData.getApiData(url, Organization.class);
     }
     // Update an organization -> https://api.github.com/orgs/:org
 

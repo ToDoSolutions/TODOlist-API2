@@ -1,17 +1,18 @@
 package com.todolist.entity;
 
+import com.todolist.dtos.Difficulty;
+import com.todolist.dtos.Status;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 
-@Table(name = "task")
+import static java.time.temporal.ChronoUnit.DAYS;
+
 @Entity
 @Getter
 @Setter
@@ -20,40 +21,38 @@ public class Task implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id_task")
     private Long idTask;
 
-    @Column(name = "title")
     @Size(max = 50, message = "The title is too long.")
+    @NotBlank(message = "The title is required.")
+    @NotNull(message = "The title is required.")
     private String title;
 
-    @Column(name = "description")
     @Size(max = 200, message = "The description is too long.")
+    @NotBlank(message = "The description is required.")
+    @NotNull(message = "The description is required.")
     private String description;
 
-    @Column(name = "annotation")
     @Size(max = 50, message = "The annotation is too long.")
     private String annotation;
 
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-    @Column(name = "finished_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate must be in format yyyy-MM-dd.")
-    private String finishedDate;
+    @NotBlank(message = "The finishedDate is required.")
+    @NotNull(message = "The finishedDate is required.")
+    private LocalDate finishedDate;
 
-    @Column(name = "start_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate must be in format yyyy-MM-dd.")
-    private String startDate;
+    private LocalDate startDate;
 
-    @Column(name = "priority")
     @Max(value = 5, message = "The priority must be between 0 and 5.")
     @Min(value = 0, message = "The priority must be between 0 and 5.")
     private Long priority;
 
-    @Column(name = "difficulty")
-    // @Pattern(regexp = "[Ss][Ll][Ee][Ee][Pp]|[Ee][Aa][Ss][Yy]|[Mm][Ee][Dd][Ii][Uu][Mm]|[Hh][Aa][Rr][Dd]|[Hh][Aa][Rr][Dd][Cc][Oo][Rr][Ee]|[Ii][_ ][Ww][Aa][Nn][Tt][_ ][Tt][Oo][_ ][Dd][Ii][Ee]", message = "The difficulty is invalid.")
-    private String difficulty;
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
 
     private String workSpaceId;
 
@@ -61,7 +60,7 @@ public class Task implements Serializable {
         this.idTask = 0L;
     }
 
-    public static Task of(String title, String description, String annotation, String status, String finishedDate, String startDate, Long priority, String difficulty) {
+    public static Task of(String title, String description, String annotation, Status status, LocalDate finishedDate, LocalDate startDate, Long priority, Difficulty difficulty) {
         Task task = new Task();
         task.setTitle(title);
         task.setDescription(description);
@@ -72,5 +71,9 @@ public class Task implements Serializable {
         task.setPriority(priority);
         task.setDifficulty(difficulty);
         return task;
+    }
+
+    public long getDuration() {
+        return DAYS.between(startDate, finishedDate);
     }
 }

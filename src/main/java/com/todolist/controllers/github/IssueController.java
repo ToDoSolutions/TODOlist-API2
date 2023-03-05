@@ -19,14 +19,12 @@ public class IssueController {
     private final IssueService issueService;
 
     @GetMapping("/issues/{username}/{repoName}")
-    public ResponseEntity<Issue[]> getIssues(@PathVariable String username, @PathVariable String repoName) {
-        Issue[] issues = issueService.findByUsernameAndRepo(username, repoName);
-        return ResponseEntity.ok().body(issues);
+    public Issue[] getIssues(@PathVariable String username, @PathVariable String repoName) {
+        return issueService.findByUsernameAndRepo(username, repoName);
     }
 
     @GetMapping("/issues/{username}/{repoName}/md")
-    public ResponseEntity<Issue[]> getIssuesWithMarkdown(@PathVariable String username, @PathVariable String repoName) {
-        Issue[] issues = issueService.findByUsernameAndRepo(username, repoName);
-        return ResponseEntity.ok().body(issues);
+    public Issue[] getIssuesWithMarkdown(@PathVariable String username, @PathVariable String repoName) {
+        return issueService.findByUsernameAndRepo(username, repoName);
     }
 }

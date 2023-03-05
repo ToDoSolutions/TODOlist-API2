@@ -1,16 +1,22 @@
 package com.todolist.controllers.github;
 
+import com.todolist.component.DTOManager;
+import com.todolist.component.GitHubConverter;
+import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
+import com.todolist.entity.Task;
 import com.todolist.entity.autodoc.github.Repo;
 import com.todolist.services.UserService;
 import com.todolist.services.github.RepoService;
-import lombok.AllArgsConstructor;
-import org.springframework.validation.annotation.Validated;
+import com.todolist.validators.user.GitHubUserAuthenticatedValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -19,13 +25,24 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/github")
-@Validated
-@AllArgsConstructor
 public class RepoController {
 
 
-    private RepoService repoService;
-    private UserService userService;
+    private final RepoService repoService;
+    private final UserService userService;
+    private final GitHubUserAuthenticatedValidator gitHubUserAuthenticatedValidator;
+    private final DTOManager dtoManager;
+    private final GitHubConverter gitHubConverter;
+
+
+    @Autowired
+    public RepoController(RepoService repoService, UserService userService, GitHubUserAuthenticatedValidator gitHubUserAuthenticatedValidator, DTOManager dtoManager, GitHubConverter gitHubConverter) {
+        this.repoService = repoService;
+        this.userService = userService;
+        this.gitHubUserAuthenticatedValidator = gitHubUserAuthenticatedValidator;
+        this.dtoManager = dtoManager;
+        this.gitHubConverter = gitHubConverter;
+    }
 
     /* OBTENER INFORMACIÓN Y MODIFICAR BASE DE DATOS */
 
@@ -33,8 +50,9 @@ public class RepoController {
     @GetMapping("/repos/{username}") // GetAllTest
     public List<Map<String, Object>> getAllRepos(@PathVariable String username,
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
-        return Arrays.stream(repoService.findAllRepos(username)).map(repo -> repoService.turnTaskGitHubIntoShowTask(repo, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE), null, null)
-                .getFields(fieldsTask.replace("finishedDate", "").replace("priority", "").replace("difficulty", "").replace("duration", "").replace("idTask", ""))).toList();
+        return Arrays.stream(repoService.findAllRepos(username))
+                .map(repo -> dtoManager.getShowTaskAsJsonWithOutTimes(gitHubConverter.turnTaskGitHubIntoTask(repo, LocalDate.now(), null, null), fieldsTask))
+                .toList();
     }
 
     // Obtener un repositorio de un usuario de GitHub (ya existente)
@@ -43,8 +61,8 @@ public class RepoController {
             @PathVariable String username,
             @PathVariable String repoName,
             @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
-        return repoService.turnTaskGitHubIntoShowTask(repoService.findRepoByName(username, repoName), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE), null, null)
-                .getFields(fieldsTask.replace("finishedDate", "").replace("priority", "").replace("difficulty", "").replace("duration", "").replace("idTask",""));
+        
+        return dtoManager.getShowTaskAsJsonWithOutTimes(gitHubConverter.turnTaskGitHubIntoTask(repoService.findRepoByName(username, repoName), LocalDate.now(), null, null), fieldsTask);
     }
 
     // Subir información a GitHub.
@@ -52,9 +70,10 @@ public class RepoController {
     public Map<String, Object> addTask(@PathVariable String username,
                                        @PathVariable String repoName,
                                        @RequestParam(required = false) @Max(value = 5, message = "The priority must be between 0 and 5.") Long priority,
-                                       @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") String finishedDate,
-                                       @RequestParam(required = false) String difficulty) {
-        return repoService.saveTask(username, repoName, finishedDate, priority, difficulty).getFields(ShowTask.ALL_ATTRIBUTES);
+                                       @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.") LocalDate finishedDate,
+                                       @RequestParam(required = false) Difficulty difficulty) {
+        Task task = repoService.saveTask(username, repoName, finishedDate, priority, difficulty);
+        return dtoManager.getShowTaskAsJson(task);
     }
 
     /* MODIFICAR REPOS DE GITHUB*/
@@ -64,8 +83,9 @@ public class RepoController {
     public void deleteRepo(
             @PathVariable String username,
             @PathVariable String repoName,
-            @RequestParam String password) {
-        repoService.deleteRepo(username, repoName, password);
+            @RequestParam String password, BindingResult bindingResult) {
+        gitHubUserAuthenticatedValidator.validateGitHubUserAuthenticated(password, userService.findUserByUsername(username), bindingResult);
+        repoService.deleteRepo(username, repoName);
     }
 
     // Crear un repositorio de un usuario de GitHub (ya existente)
@@ -73,8 +93,9 @@ public class RepoController {
     public Repo addRepo(
             @RequestBody @Valid Repo createRepo,
             @PathVariable String username,
-            @RequestParam String password) {
-        return repoService.saveRepo(username, createRepo, password);
+            @RequestParam String password, BindingResult bindingResult) {
+        gitHubUserAuthenticatedValidator.validateGitHubUserAuthenticated(password, userService.findUserByUsername(username), bindingResult);
+        return repoService.saveRepo(username, createRepo);
     }
 
     // Crear un repositorio de un usuario de GitHub (ya existente)
@@ -87,9 +108,9 @@ public class RepoController {
             @RequestParam(defaultValue = "false") @Pattern(regexp ="^(?)(true|false)$") Boolean isPrivate,
             @RequestParam(required = false) String gitIgnoreTemplate,
             @RequestParam(defaultValue = "false") @Pattern(regexp ="^(?)(true|false)$") Boolean isTemplate,
-            @RequestParam(required = false) String homepage) {
-        return repoService.saveRepo(username, idTask, password, haveAutoInit, isPrivate, gitIgnoreTemplate, isTemplate, homepage);
-        // Boolean haveAutoInit, Boolean isPrivate, String gitIgnoreTemplate, Boolean isTemplate, String homepage
+            @RequestParam(required = false) String homepage, BindingResult bindingResult) {
+        gitHubUserAuthenticatedValidator.validateGitHubUserAuthenticated(password, userService.findUserByUsername(username), bindingResult);
+        return repoService.saveRepo(username, idTask, haveAutoInit, isPrivate, gitIgnoreTemplate, isTemplate, homepage);
     }
 
 
@@ -100,7 +121,9 @@ public class RepoController {
             @RequestBody @Valid Repo updateRepo,
             @PathVariable String username,
             @PathVariable String repoName,
-            @RequestParam String password) {
-        return repoService.updateRepo(username, repoName, updateRepo, password);
+            @RequestParam String password,
+            BindingResult bindingResult) {
+        gitHubUserAuthenticatedValidator.validateGitHubUserAuthenticated(password, userService.findUserByUsername(username), bindingResult);
+        return repoService.updateRepo(username, repoName, updateRepo);
     }
 }

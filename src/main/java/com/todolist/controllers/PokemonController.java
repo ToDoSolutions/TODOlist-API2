@@ -1,6 +1,7 @@
 package com.todolist.controllers;
 
 import com.todolist.dtos.ShowTask;
+import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.NumberFilter;
@@ -15,6 +16,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,15 +24,20 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
-@Validated
 public class PokemonController {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator(); // Arreglar algún día.
-    @Autowired
+
     private TaskService taskService;
 
-    @Autowired
     private PokemonService pokemonService;
+
+
+    @Autowired
+    public PokemonController(TaskService taskService, PokemonService pokemonService) {
+        this.taskService = taskService;
+        this.pokemonService = pokemonService;
+    }
 
     /* POKEMON OPERATIONS */
 
@@ -64,9 +71,9 @@ public class PokemonController {
 
     @GetMapping("/pokemon/{name}") // GetSoloTest
     public Map<String, Object> getPokemon(@PathVariable String name,
-                                          @RequestParam(required = false) String status,
-                                          @RequestParam(required = false) String finishedDate,
-                                          @RequestParam(required = false) String startDate,
+                                          @RequestParam(required = false) Status status,
+                                          @RequestParam(required = false) LocalDate finishedDate,
+                                          @RequestParam(required = false) LocalDate startDate,
                                           @RequestParam(required = false) Long priority,
                                           @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
                                           @RequestParam(required = false) @Min(value = 0, message = "The days must be positive.") Integer days) {
@@ -82,10 +89,10 @@ public class PokemonController {
 
     @PostMapping("/pokemon/{name}") // PostTest
     public Map<String, Object> addPokemon(@PathVariable String name,
-                                          @RequestParam(required = false) /*@Pattern(regexp = "DRAFT|IN_PROGRESS|DONE|IN_REVISION|CANCELLED", message = "The status is invalid.")*/ String status,
-                                          @RequestParam(required = false) /*@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate is invalid.")*/ String finishedDate,
-                                          @RequestParam(required = false) /*@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate is invalid.")*/ String startDate,
-                                          @RequestParam(required = false) /*@Max(value = 5, message = "The priority must be between 0 and 5")*/ Long priority,
+                                          @RequestParam(required = false) Status status,
+                                          @RequestParam(required = false) LocalDate finishedDate,
+                                          @RequestParam(required = false) LocalDate startDate,
+                                          @RequestParam(required = false) Long priority,
                                           @RequestParam(required = false) @Min(value = 0, message = "The days must be positive.") Integer days) {
         Task task = pokemonService.findPokemonByName(name, status, finishedDate, startDate, priority, days);
         Set<ConstraintViolation<Task>> errors = validator.validate(task);

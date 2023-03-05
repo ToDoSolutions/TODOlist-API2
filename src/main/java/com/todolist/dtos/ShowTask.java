@@ -43,15 +43,11 @@ public class ShowTask {
         this.title = task.getTitle();
         this.description = task.getDescription();
         this.annotation = task.getAnnotation();
-        this.status = task.getStatus() != null ? Status.parse(task.getStatus()) : null;
-        this.finishedDate = LocalDate.parse(task.getFinishedDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        this.startDate = task.getStartDate() != null ? LocalDate.parse(task.getStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : LocalDate.now();
+        this.status = task.getStatus();
+        this.finishedDate = task.getFinishedDate();
+        this.startDate = task.getStartDate();
         this.priority = task.getPriority();
-        this.difficulty = task.getDifficulty() != null ? Difficulty.parse(task.getDifficulty()) : null;
-    }
-
-    public long getDuration() {
-        return DAYS.between(startDate, finishedDate);
+        this.difficulty = task.getDifficulty();
     }
 
     public Map<String, Object> getFields(String fields) {

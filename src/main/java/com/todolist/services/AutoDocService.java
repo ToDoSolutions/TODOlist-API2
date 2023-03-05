@@ -21,6 +21,10 @@ import java.util.stream.Stream;
 @Service
 public class AutoDocService {
 
+    public static final Object[] HEADER_PLANNING = {"Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste"};
+    public static final Object[] HEADER_ANALYSIS = {"ID", "Conclusiones", "Decisiones tomadas"};
+    public static final String SEPARATOR_ID = ":";
+    public static final String JUMP_LINE = "\n";
     private final ClockifyService clockifyService;
     private final IssueService issueService;
 
@@ -83,10 +87,10 @@ public class AutoDocService {
         List<Employee> employees = getEmployees(timeTasks);
         Table.Builder taskTable = new Table.Builder()
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                .addRow("Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste");
+                .addRow(HEADER_PLANNING);
         // Obtenemos la tabla con los costes de cada tarea.
         for (TimeTask timeTask : timeTasks) {
-            taskTable.addRow(timeTask.getTitle().trim(), timeTask.getDescription() != null ? timeTask.getDescription().trim().replace("\n",""): null, timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
+            taskTable.addRow(timeTask.getTitle().trim(), timeTask.getDescription() != null ? timeTask.getDescription().trim().replace(JUMP_LINE,""): null, timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
                     , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
                     , timeTask.getDuration().toHours() + " horas y " + timeTask.getDuration().toMinutes() % 60 + " minutos"
                     , Math.round(timeTask.getCost()*100)/100. + "€");
@@ -95,7 +99,7 @@ public class AutoDocService {
         double cost = 0;
         // Obtenemos la tabla para los empleados.
         for (Employee employee : employees) {
-            personalTable.append("\n").append(new Heading(employee.getName(), 3)).append("\n");
+            personalTable.append(JUMP_LINE).append(new Heading(employee.getName(), 3)).append(JUMP_LINE);
             personalTable.append(new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                     .addRow("Rol", "Coste")
                     .addRow("Desarrollador", employee.getSalaryByRole(Role.DEVELOPER) + "€")
@@ -115,18 +119,18 @@ public class AutoDocService {
             timeTasks = autoDoc(repoName, username);
         else
             timeTasks = autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
-        StringBuilder output = new StringBuilder(new Heading("Enunciados", 3).toString()).append("\n");
+        StringBuilder output = new StringBuilder(new Heading("Enunciados", 3).toString()).append(JUMP_LINE);
         Table.Builder table = new Table.Builder()
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                .addRow("ID", "Conclusiones", "Decisiones tomadas");
+                .addRow(HEADER_ANALYSIS);
         for (TimeTask timeTask : timeTasks) {
-            String[] text = timeTask.getTitle().split(":");
+            String[] text = timeTask.getTitle().split(SEPARATOR_ID);
             String id = text[0].trim();
             String body = text[1].trim();
-            output.append("- ").append(new BoldText(id)).append("-").append(body).append("\n");
+            output.append("- ").append(new BoldText(id)).append("-").append(body).append(JUMP_LINE);
             table.addRow(id, timeTask.getConlusion().trim(), timeTask.getDecision().trim());
         }
-        output.append("\n").append(new Heading("Análisis", 3)).append("\n").append(table.build().serialize());
+        output.append(JUMP_LINE).append(new Heading("Análisis", 3)).append(JUMP_LINE).append(table.build().serialize());
         return output.toString();
     }
 }

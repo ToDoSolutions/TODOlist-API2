@@ -1,6 +1,7 @@
 package com.todolist.controllers.github;
 
 import com.todolist.dtos.ShowGroup;
+import com.todolist.entity.autodoc.github.Organization;
 import com.todolist.services.github.OrganizationService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +21,7 @@ public class OrganizationController {
 
     // Get an organization orgs/{org}
     @GetMapping("/orgs/{idGroup}")
-    public ShowGroup getOrganization(@PathVariable Long idGroup) {
-        return organizationService.turnOrganizationIntoShowGroup(organizationService.findById(idGroup));
+    public Organization getOrganization(@PathVariable Long idGroup) {
+        return organizationService.findById(idGroup);
     }
 }

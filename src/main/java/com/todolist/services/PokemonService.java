@@ -1,6 +1,7 @@
 package com.todolist.services;
 
 import com.todolist.dtos.Difficulty;
+import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import com.todolist.entity.pokemon.AllPokemon;
 import com.todolist.entity.pokemon.Pokemon;
@@ -21,14 +22,14 @@ public class PokemonService {
     @Value("${pokemon.api.url}")
     private String startUrl;
 
-    public Task findPokemonByName(String name, String status, String finishedDate, String startDate, Long priority, Integer days) {
+    public Task findPokemonByName(String name, Status status, LocalDate finishedDate, LocalDate startDate, Long priority, Integer days) {
         String url = startUrl + "/pokemon/" + name;
         RestTemplate restTemplate = new RestTemplate();
         Pokemon response = restTemplate.getForObject(url, Pokemon.class);
         return parsePokemon(status, finishedDate, startDate, priority, days, response);
     }
 
-    public Task parsePokemon(String status, String finishedDate, String startDate, Long priority, Integer days, Pokemon pokemon) {
+    public Task parsePokemon(Status status, LocalDate finishedDate, LocalDate startDate, Long priority, Integer days, Pokemon pokemon) {
         StringBuilder types = new StringBuilder();
         if (finishedDate != null && days != null)
             throw new BadRequestException("You can't use both finishedDate and days");
@@ -42,11 +43,11 @@ public class PokemonService {
         return Task.of("Catch: " + pokemon.getName(), "Type pokemon: " + types, getPokemonAnnotation(pokemon), status,
                 finishedDate == null ?
                         startDate == null ?
-                                LocalDate.now().plusDays(days).toString() :
-                                LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE).plusDays(days).toString() :
+                                LocalDate.now().plusDays(days):
+                                startDate.plusDays(days):
                         finishedDate,
-                startDate == null ? LocalDate.now().toString() : startDate, priority,
-                getPokemonDifficulty(pokemon).toString());
+                startDate == null ? LocalDate.now() : startDate, priority,
+                getPokemonDifficulty(pokemon));
     }
 
     private String getPokemonAnnotation(Pokemon pokemon) {

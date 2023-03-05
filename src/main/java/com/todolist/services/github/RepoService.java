@@ -1,18 +1,17 @@
 package com.todolist.services.github;
 
-import com.todolist.dtos.ShowTask;
-import com.todolist.dtos.Status;
+import com.todolist.component.FetchApiData;
+import com.todolist.component.GitHubConverter;
+import com.todolist.dtos.Difficulty;
 import com.todolist.entity.Group;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
-import com.todolist.entity.autodoc.github.Release;
 import com.todolist.entity.autodoc.github.Repo;
 import com.todolist.entity.autodoc.github.TaskGitHub;
-import com.todolist.exceptions.BadRequestException;
-import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -21,192 +20,98 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Objects;
+import java.time.LocalDate;
 
 @Service
 public class RepoService {
 
+    public static final String USERNAME = "{username}";
+    public static final String REPO_NAME = "{repoName}";
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER = "Bearer ";
     @Value("${github.api.url}")
     private String startUrl;
 
+    @Value("${github.api.url.repos.all}")
+    private String allReposUrl;
+
+    @Value("${github.api.url.repos.one}")
+    private String oneRepoUrl;
+
+    @Value("${github.api.url.repos.authenticated}")
+    private String authenticatedRepoUrl;
+
+    @Value("${github.api.url.repos.organization}")
+    private String organizationRepoUrl;
+
+
+    private final GroupService  groupService;
+    private final UserService userService;
+    private final TaskService taskService;
+    private final GitHubConverter gitHubConverter;
     @Autowired
-    private GroupService  groupService;
+    private final FetchApiData fetchApiData;
 
     @Autowired
-    private UserService userService;
+    public RepoService(GroupService groupService, UserService userService, TaskService taskService, GitHubConverter gitHubConverter, FetchApiData fetchApiData) {
+        this.groupService = groupService;
+        this.userService = userService;
+        this.taskService = taskService;
+        this.gitHubConverter = gitHubConverter;
+        this.fetchApiData = fetchApiData;
+    }
 
-    @Autowired
-    private TaskService taskService;
-
-
-    // TODO: revisar si en el caso de que se utilice una autorización cuenta también los privados.
     public TaskGitHub findRepoByName(String username, String repoName) {
         User user = userService.findUserByUsername(username);
-        if (user == null) {
-            user = new User();
-            user.setUsername(username);
-        }
-        String url = startUrl + "/repos/" + user.getUsername() + "/" + repoName;
-        RestTemplate restTemplate = new RestTemplate();
-        if (user.getToken() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + user.getToken());
-            return restTemplate.getForObject(url, TaskGitHub.class, headers);
-        } else {
-            return restTemplate.getForObject(url, TaskGitHub.class);
-        }
+        String url = oneRepoUrl.replace(USERNAME, user.getUsername()).replace(REPO_NAME, repoName);
+        return fetchApiData.getApiDataWithToken(url, TaskGitHub.class, new Pair<>(AUTHORIZATION, BEARER + user.getToken()));
+
     }
 
     public TaskGitHub[] findAllRepos(String username) {
         User user = userService.findUserByUsername(username);
-        if (user == null) {
-            user = new User();
-            user.setUsername(username);
-        }
-        String url = startUrl + "/users/" + user.getUsername() + "/repos";
-        RestTemplate restTemplate = new RestTemplate();
-        if (user.getToken() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + user.getToken());
-            return restTemplate.getForObject(url, TaskGitHub[].class, headers);
-        } else
-            return restTemplate.getForObject(url, TaskGitHub[].class);
+        String url = allReposUrl.replace(USERNAME, user.getUsername());
+        return fetchApiData.getApiDataWithToken(url, TaskGitHub[].class, new Pair<>(AUTHORIZATION, BEARER + user.getToken()));
     }
 
-    public ShowTask saveTask(String username, String repoName, String finishedDate, Long priority, String difficulty) {
+    public Task saveTask(String username, String repoName, LocalDate finishedDate, Long priority, Difficulty difficulty) {
         User user = userService.findUserByUsername(username);
-        if (user == null)
-            throw new NotFoundException("User not found");
-        String url = startUrl + "/repos/" + user.getUsername() + "/" + repoName;
-        RestTemplate restTemplate = new RestTemplate();
-        TaskGitHub repo;
-        if (user.getToken() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + user.getToken());
-            repo  = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null, headers), TaskGitHub.class).getBody();
-        } else
-            repo = restTemplate.getForObject(url, TaskGitHub.class);
-        Task task = turnTaskGitHubIntoTask(repo, finishedDate, priority, difficulty);
-        return new ShowTask(taskService.saveTask(task));
+        String url = oneRepoUrl.replace(USERNAME, user.getUsername()).replace(REPO_NAME, repoName);
+        TaskGitHub repo = fetchApiData.getApiDataWithToken(url, TaskGitHub.class, new Pair<>(AUTHORIZATION, BEARER + user.getToken()));
+        Task task = gitHubConverter.turnTaskGitHubIntoTask(repo, finishedDate, priority, difficulty);
+        return taskService.saveTask(task);
     }
 
-    public Repo saveRepo(String username, Repo repo, String password) {
+    public Repo saveRepo(String username, Repo repo) {
         User user = userService.findUserByUsername(username);
-        if (user == null)
-            throw new NotFoundException("User not found.");
-        if (user.getToken() != null)
-            throw new BadRequestException("User must have a token.");
-        if (Objects.equals(password, user.getPassword()))
-            throw new BadRequestException("Password is incorrect.");
-        String url = startUrl + "/user/repos";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(repo, headers), TaskGitHub.class);
+        fetchApiData.postApiDataWithToken(authenticatedRepoUrl, TaskGitHub.class, new Pair<>(AUTHORIZATION, BEARER + user.getToken()), repo);
         return repo;
     }
 
-    public Repo saveRepo(String username, Long IdTask, String password, Boolean haveAutoInit, Boolean isPrivate, String gitIgnoreTemplate, Boolean isTemplate, String homepage) {
+    public Repo saveRepo(String username, Long IdTask, Boolean haveAutoInit, Boolean isPrivate, String gitIgnoreTemplate, Boolean isTemplate, String homepage) {
         User user = userService.findUserByUsername(username);
         Task task = taskService.findTaskById(IdTask);
-        if (user == null)
-            throw new NotFoundException("User not found.");
-        if (user.getToken() != null)
-            throw new BadRequestException("User must have a token.");
-        if (task == null)
-            throw new NotFoundException("Task not found.");
-        if (Objects.equals(password, user.getPassword()))
-            throw new BadRequestException("Password is incorrect.");
-        String url = startUrl + "/user/repos";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + user.getToken());
-        Repo repo = turnTaskIntoRepo(task, haveAutoInit, isPrivate, gitIgnoreTemplate, isTemplate, homepage);
-        return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(repo, headers), Repo.class).getBody();
-        // Boolean haveAutoInit, Boolean isPrivate, String gitIgnoreTemplate, Boolean isTemplate, String homepage
+        Repo repo = gitHubConverter.turnTaskIntoRepo(task, haveAutoInit, isPrivate, gitIgnoreTemplate, isTemplate, homepage);
+        return fetchApiData.postApiDataWithToken(authenticatedRepoUrl, Repo.class, new Pair<>(AUTHORIZATION, BEARER + user.getToken()), repo);
     }
 
-    public Repo updateRepo(String username, String repoName, Repo repo, String password) {
+    public Repo updateRepo(String username, String repoName, Repo repo) {
         User user = userService.findUserByUsername(username);
-        if (user == null)
-            throw new NotFoundException("User not found.");
-        if (user.getToken() != null)
-            throw new BadRequestException("User must have a token.");
-        if (Objects.equals(password, user.getPassword()))
-            throw new BadRequestException("Password is incorrect.");
-        String url = startUrl + "/repos" + user.getUsername() + "/" + repoName;
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(null, headers), TaskGitHub.class);
+        String url = oneRepoUrl.replace(USERNAME, user.getUsername()).replace(REPO_NAME, repoName);
+        fetchApiData.putApiDataWithToken(url, Repo.class, new Pair<>(AUTHORIZATION, BEARER + user.getToken()), repo);
         return repo;
     }
 
-    public void deleteRepo(String username, String repoName, String password) {
+    public void deleteRepo(String username, String repoName) {
         User user = userService.findUserByUsername(username);
-        if (user == null)
-            throw new NotFoundException("User not found.");
-        if (user.getToken() != null)
-            throw new BadRequestException("User must have a token.");
-        if (Objects.equals(password, user.getPassword()))
-            throw new BadRequestException("Password is incorrect.");
-        String url = startUrl + "/repos" + user.getUsername() + "/" + repoName;
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + user.getToken());
-        restTemplate.exchange(url, HttpMethod.DELETE, new HttpEntity<>(null, headers), TaskGitHub.class);
+        String url = oneRepoUrl.replace(USERNAME, user.getUsername()).replace(REPO_NAME, repoName);
+        fetchApiData.deleteApiDataWithToken(url, TaskGitHub.class, new Pair<>(AUTHORIZATION, BEARER + user.getToken()), null);
     }
 
-    public ShowTask findOrganizationWithRepo(Long idGroup) {
+    public Task findOrganizationWithRepo(Long idGroup) {
         Group group = groupService.findGroupById(idGroup);
-        if (group == null)
-            throw new NotFoundException("Group not found");
-        String url = startUrl + "/orgs/" + group.getName() + "/repos";
-        RestTemplate restTemplate = new RestTemplate();
-        TaskGitHub repo = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null), TaskGitHub.class).getBody();
-        return turnTaskGitHubIntoShowTask(repo, null, null, null);
-    }
-
-    public ShowTask turnTaskGitHubIntoShowTask(TaskGitHub taskGitHub, String finishedDate, Long priority, String difficulty) {
-        return new ShowTask(turnTaskGitHubIntoTask(taskGitHub, finishedDate, priority, difficulty));
-    }
-
-    public Task turnTaskGitHubIntoTask(TaskGitHub taskGitHub, String finishedDate, Long priority, String difficulty) {
-        String status;
-        try {
-            status = getStatus(taskGitHub.getReleasesUrl());
-        } catch (Exception e) {
-            status = Status.UNKNOWN.toString();
-        }
-        return Task.of(
-                taskGitHub.getName(),
-                taskGitHub.getDescription(),
-                taskGitHub.getCloneUrl(),
-                status,
-                finishedDate,
-                taskGitHub.getCreatedAt().split("T")[0], priority, difficulty);
-    }
-
-    private String getStatus(String releaseUrl) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = releaseUrl + "/latest"; // Solo funciona si se pasa el token.
-        Release release = restTemplate.getForObject(url, Release.class);
-        if (release == null) return Status.CANCELLED.toString();
-        else if (Boolean.TRUE.equals(release.getDraft())) return Status.DRAFT.toString();
-        else if (Boolean.TRUE.equals(release.getPrerelease())) return Status.DONE.toString();
-        else return Status.IN_REVISION.toString();
-    }
-
-    private Repo turnTaskIntoRepo(
-            Task task, Boolean haveAutoInit, Boolean isPrivate, String gitIgnoreTemplate, Boolean isTemplate, String homepage) {
-        Repo repo = new Repo();
-        repo.setName(task.getTitle());
-        repo.setDescription(task.getDescription());
-        repo.setAutoInit(haveAutoInit);
-        repo.setPrivate(isPrivate);
-        repo.setGitignoreTemplate(gitIgnoreTemplate); // Poner
-        repo.setTemplate(isTemplate);
-        repo.setHomepage(homepage);
-        return repo;
+        String url = organizationRepoUrl.replace("groupName", group.getName());
+        TaskGitHub repo = fetchApiData.getApiData(url, TaskGitHub.class);
+        return gitHubConverter.turnTaskGitHubIntoTask(repo, null, null, null);
     }
 }

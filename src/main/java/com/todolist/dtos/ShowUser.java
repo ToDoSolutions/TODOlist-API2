@@ -31,9 +31,6 @@ public class ShowUser {
     private String location;
     private List<ShowTask> tasks;
 
-    public ShowUser() {
-    }
-
 
     public ShowUser(User user, List<ShowTask> tasks) {
         this.idUser = user.getIdUser();

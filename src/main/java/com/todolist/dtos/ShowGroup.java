@@ -41,7 +41,7 @@ public class ShowGroup {
         this.idGroup = group.getIdGroup();
         this.name = group.getName();
         this.description = group.getDescription();
-        this.createdDate = group.getCreatedDate() != null ? LocalDate.parse(group.getCreatedDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : LocalDate.now();
+        this.createdDate = group.getCreatedDate();
         this.users = users;
     }
 

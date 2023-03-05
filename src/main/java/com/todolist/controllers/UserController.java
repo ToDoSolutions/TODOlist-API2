@@ -1,6 +1,7 @@
 package com.todolist.controllers;
 
 import com.google.common.collect.Lists;
+import com.todolist.component.DTOManager;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Task;
@@ -10,31 +11,44 @@ import com.todolist.exceptions.NotFoundException;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import lombok.AllArgsConstructor;
+import com.todolist.entity.IterableEntity;
+import com.todolist.validators.FieldValidator;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
 @Validated
-@AllArgsConstructor
 public class UserController {
 
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator(); // Arreglar algún día.
-    private TaskService taskService;
+    private final Validator validator;
+    private final TaskService taskService;
 
-    private UserService userService;
+    private final UserService userService;
+    private final FieldValidator fieldValidator;
+    private final DTOManager dtoManager;
+
+
+    @Autowired
+    public UserController(Validator validator, TaskService taskService, UserService userService, FieldValidator fieldValidator, DTOManager dtoManager) {
+        this.validator = validator;
+        this.taskService = taskService;
+        this.userService = userService;
+        this.fieldValidator = fieldValidator;
+        this.dtoManager = dtoManager;
+    }
 
     /* USER OPERATIONS */
 
@@ -62,31 +76,23 @@ public class UserController {
                                                  @RequestParam(required = false) NumberFilter taskCompleted) {
         String propertyOrder = order.charAt(0) == '+' || order.charAt(0) == '-' ? order.substring(1) : order;
         List<String> listUserFields = List.of(ShowUser.ALL_ATTRIBUTES.toLowerCase().split(","));
-        List<String> listTaskFields = List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
         if (listUserFields.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
             throw new BadRequestException("The order is invalid.");
-        if (!(Arrays.stream(fieldsUser.split(",")).allMatch(field -> listUserFields.contains(field.toLowerCase()))))
-            throw new BadRequestException("The users' fields are invalid.");
-        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> listTaskFields.contains(field.toLowerCase()))))
-            throw new BadRequestException("The tasks' fields are invalid.");
-        List<ShowUser> result = Lists.newArrayList(),
+        List<User> result = Lists.newArrayList(),
                 users = userService.findAllShowUsers(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
-        if (limit == -1) limit = users.size();
-        int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > users.size() || start + limit > users.size() ? users.size() : start + limit; // Donde va a terminar.
-        for (int i = start; i < end; i++) {
-            ShowUser user = users.get(i);
+        IterableEntity<User> iterableEntity = new IterableEntity<>(users, limit, offset);
+        for (User user : iterableEntity) {
             if (user != null &&
                     (name == null || user.getName().equals(name)) &&
                     (surname == null || user.getSurname().equals(surname)) &&
                     (email == null || user.getEmail().equals(email)) &&
                     (location == null || user.getLocation().equals(location)) &&
-                    (taskCompleted == null || taskCompleted.isValid(user.getTaskCompleted())) &&
+                    (taskCompleted == null || taskCompleted.isValid(userService.getTaskCompleted(user))) &&
                     (bio == null || user.getBio().contains(bio)) &&
                     (avatar == null || user.getAvatar().equals(avatar)))
                 result.add(user);
         }
-        return result.stream().map(user -> user.getFields(fieldsUser, fieldsTask)).toList();
+        return result.stream().map(user -> dtoManager.getShowUserAsJson(user, fieldsUser, fieldsTask)).toList();
     }
 
     @GetMapping("/user/{idUser}") // GetSoloTest
@@ -94,39 +100,27 @@ public class UserController {
                                        @RequestParam(defaultValue = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration") String fieldsTask,
                                        @RequestParam(defaultValue = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks") String fieldsUser) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
-        if (!(Arrays.stream(fieldsUser.split(",")).allMatch(field -> ShowUser.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
-            throw new BadRequestException("The users' fields are invalid.");
-        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
-            throw new BadRequestException("The tasks' fields are invalid.");
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(fieldsUser, fieldsTask);
+        fieldValidator.userFieldValidate(fieldsUser);
+        fieldValidator.taskFieldValidate(fieldsTask);
+        return dtoManager.getShowUserAsJson(user, fieldsUser, fieldsTask);
     }
 
     @PostMapping("/user") // PostTest
-    public Map<String, Object> addUser(@RequestBody @Valid User user) {
-        if (user == null)
-            throw new BadRequestException("The user is null.");
-        if (user.getName() == null || user.getName().isEmpty())
-            throw new BadRequestException("The name is required.");
-        if (user.getSurname() == null || user.getSurname().isEmpty())
-            throw new BadRequestException("The surname is required.");
-        if (user.getEmail() == null || user.getEmail().isEmpty())
-            throw new BadRequestException("The email is required.");
-        if (user.getAvatar() == null || user.getAvatar().isEmpty())
-            throw new BadRequestException("The avatar is required.");
-        if (user.getPassword() == null || user.getPassword().isEmpty())
-            throw new BadRequestException("The password is required.");
-        if (user.getToken() != null)
-            throw new BadRequestException("The token is not required.");
+    public Map<String, Object> addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            throw new BadRequestException("The user is invalid.");
         user = userService.saveUser(user);
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowUserAsJson(user);
     }
 
     @PutMapping("/user") // PutTest
-    public Map<String, Object> updateUser(@RequestBody @Valid User user) {
-        User oldUser = userService.updateUser(userService.findUserById(user.getIdUser()), user);
-        return new ShowUser(oldUser, userService.getShowTaskFromUser(oldUser)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+    public Map<String, Object> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            throw new BadRequestException("The user is invalid.");
+        User oldUser = userService.findUserById(user.getIdUser());
+        BeanUtils.copyProperties(user, oldUser, "idUser", "password", "token", "tasks");
+        oldUser = userService.saveUser(oldUser);
+        return dtoManager.getShowUserAsJson(oldUser);
     }
 
     /* TASK OPERATIONS */
@@ -134,63 +128,45 @@ public class UserController {
     @DeleteMapping("/user/{idUser}/tasks") // DeleteTest
     public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Long idUser) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
         userService.removeAllTasksFromUser(user);
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowUserAsJson(user);
     }
 
     @DeleteMapping("/user/{idUser}/task/{idTask}") // DeleteAllTest
     public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
         if (userService.getTasksFromUser(user).contains(task)) userService.removeTaskFromUser(user, task);
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowUserAsJson(user);
     }
 
     @GetMapping("/users/task/{idTask}") // GetAllTest
     public List<Map<String, Object>> getUserWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
         List<User> users = userService.findUsersWithTask(task);
-        if (users == null || users.isEmpty())
-            throw new BadRequestException("The task with idTask " + idTask + " does not belong to any user.");
-        return users.stream().map(user -> new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES)).toList();
+        return users.stream().map(dtoManager::getShowUserAsJson).toList();
     }
 
     @PutMapping("/user/{idUser}/task/{idTask}") // PutTest
     public Map<String, Object> addTaskToUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
         if (!userService.getTasksFromUser(user).contains(task)) userService.addTaskToUser(user, task);
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowUserAsJson(user);
     }
 
     /* TOKEN OPERATION */
 
-    @SuppressWarnings("unchecked")
     @PutMapping("/user/{idUser}/token") // TokenTest
     public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser,
                                            @RequestHeader("Authorization") String token) {
         User user = userService.findUserById(idUser);
-        if (user == null)
-            throw new NotFoundException("The user with idUser " + idUser + " does not exist.");
-        System.out.println("token: " + token);
         if (token == null || token.isEmpty())
             throw new BadRequestException("The token is required.");
         if (token.contains("Bearer")) token = token.replace("Bearer", "").trim();
         validator.validate(user);
         user.setToken(token);
         user = userService.saveUser(user);
-        return new ShowUser(user, userService.getShowTaskFromUser(user)).getFields(ShowUser.ALL_ATTRIBUTES, ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowUserAsJson(user);
     }
 }

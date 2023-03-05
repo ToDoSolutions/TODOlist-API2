@@ -8,14 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Serializable>, PagingAndSortingRepository<Task, Serializable> {
 
     List<Task> findAll();
 
-    Task findByIdTask(Long idTask);
+    Optional<Task> findByIdTask(Long idTask);
 
-    Task findByTitle(String title);
+    Optional<Task> findByTitle(String title);
 
 }

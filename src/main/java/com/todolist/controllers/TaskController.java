@@ -1,48 +1,49 @@
 package com.todolist.controllers;
 
 import com.google.common.collect.Lists;
+import com.todolist.component.DTOManager;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import com.todolist.exceptions.BadRequestException;
-import com.todolist.exceptions.NotFoundException;
 import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
-import lombok.AllArgsConstructor;
+import com.todolist.entity.IterableEntity;
+import com.todolist.validators.task.DateTaskValidator;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.validation.constraints.Min;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1")
-@Validated
-@AllArgsConstructor
 public class TaskController {
 
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator(); // Arreglar algún día.
 
-    private TaskService taskService;
+    private final TaskService taskService;
+    private final DateTaskValidator dateTaskValidator;
+    private final DTOManager dtoManager;
+
+    @Autowired
+    public TaskController(TaskService taskService, DateTaskValidator dateTaskValidator, DTOManager dtoManager) {
+        this.taskService = taskService;
+        this.dateTaskValidator = dateTaskValidator;
+        this.dtoManager = dtoManager;
+    }
 
     @DeleteMapping("/task/{idTask}") // DeleteTest
     public Map<String, Object> deleteTask(@PathVariable("idTask") Long idTask) {
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
         taskService.deleteTask(task);
-        return new ShowTask(task).getFields(ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowTaskAsJson(task);
     }
 
     /* TASKS OPERATIONS */
@@ -65,14 +66,10 @@ public class TaskController {
         List<String> listFields = List.of(ShowTask.ALL_ATTRIBUTES.toLowerCase().split(","));
         if (listFields.stream().noneMatch(prop -> prop.equalsIgnoreCase(propertyOrder)))
             throw new BadRequestException("The order is invalid.");
-        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> listFields.contains(field.toLowerCase()))))
-            throw new BadRequestException("The task' fields are invalid.");
-        List<ShowTask> result = Lists.newArrayList(), tasks = taskService.findAllShowTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
-        if (limit == -1) limit = tasks.size();
-        int start = offset == null || offset < 1 ? 0 : offset - 1; // Donde va a comenzar.
-        int end = limit > tasks.size() || limit + start > tasks.size() ? tasks.size() : start + limit; // Donde va a terminar.
-        for (int i = start; i < end; i++) {
-            ShowTask task = tasks.get(i);
+        List<Task> result = Lists.newArrayList(),
+                tasks = taskService.findAllTasks(Sort.by(order.charAt(0) == '-' ? Sort.Direction.DESC : Sort.Direction.ASC, propertyOrder));
+        IterableEntity<Task> iterator = new IterableEntity<>(tasks, limit, offset);
+        for (Task task : iterator) {
             if (task != null &&
                     (title == null || task.getTitle().contains(title)) &&
                     (status == null || task.getStatus() == status) &&
@@ -85,70 +82,33 @@ public class TaskController {
                     (description == null || task.getDescription().contains(description)))
                 result.add(task);
         }
-        return result.stream().map(task -> task.getFields(fieldsTask)).toList();
+        return result.stream().map(task -> dtoManager.getShowTaskAsJson(task, fieldsTask)).toList();
     }
 
     @GetMapping("/task/{idTask}") // GetSoloTest
     public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
                                        @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES) String fieldsTask) {
         Task task = taskService.findTaskById(idTask);
-        if (task == null)
-            throw new NotFoundException("The task with idTask " + idTask + " does not exist.");
-        if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> ShowTask.ALL_ATTRIBUTES.toLowerCase().contains(field.toLowerCase()))))
-            throw new BadRequestException("The task' fields are invalid.");
-        return new ShowTask(task).getFields(fieldsTask);
+        return dtoManager.getShowTaskAsJson(task, fieldsTask);
     }
 
     @PostMapping("/task") // PostTest
-    public Map<String, Object> addTask(@RequestBody @Valid Task task) {
-        if (task == null)
-            throw new BadRequestException("Task is null.");
-        if (task.getTitle() == null || task.getTitle().isEmpty())
-            throw new BadRequestException("The task with idTask " + task.getIdTask() + " must have title.");
-        if (task.getDescription() == null || task.getDescription().isEmpty())
-            throw new BadRequestException("The task with idTask " + task.getIdTask() + " must have description.");
-        if (task.getFinishedDate() == null || task.getFinishedDate().isEmpty())
-            throw new BadRequestException("The task with idTask " + task.getIdTask() + " must have finishedDate.");
-        if (task.getStartDate() == null) task.setStartDate(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
-        ShowTask showTask = new ShowTask(task);
-        if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
-            throw new BadRequestException("The startDate must be before the finishedDate.");
-        if (showTask.getFinishedDate().isBefore(LocalDate.now()))
-            throw new BadRequestException("The finishedDate must be after the current date.");
+    public Map<String, Object> addTask(@RequestBody @Valid Task task, BindingResult bindingResult) {
+        dateTaskValidator.validate(task, bindingResult);
+        if (bindingResult.hasErrors())
+            throw new BadRequestException("The task is invalid.");
         task = taskService.saveTask(task);
-        showTask = new ShowTask(task);
-        return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
+        return dtoManager.getShowTaskAsJson(task);
     }
 
     @PutMapping("/task") // PutTest
-    public Map<String, Object> updateTask(@RequestBody @Valid Task task) {
+    public Map<String, Object> updateTask(@RequestBody @Valid Task task, BindingResult bindingResult) {
+        dateTaskValidator.validate(task, bindingResult);
+        if (bindingResult.hasErrors())
+            throw new BadRequestException("The task is invalid.");
         Task oldTask = taskService.findTaskById(task.getIdTask());
-        if (oldTask == null)
-            throw new NotFoundException("The task with idTask " + task.getIdTask() + " does not exist.");
-        if (task.getTitle() != null && !Objects.equals(task.getTitle(), ""))
-            oldTask.setTitle(task.getTitle());
-        if (task.getDescription() != null && !Objects.equals(task.getDescription(), ""))
-            oldTask.setDescription(task.getDescription());
-        if (task.getStatus() != null && !Objects.equals(task.getStatus(), ""))
-            oldTask.setStatus(task.getStatus());
-        if (task.getFinishedDate() != null && !Objects.equals(task.getFinishedDate(), ""))
-            oldTask.setFinishedDate(task.getFinishedDate());
-        if (task.getStartDate() != null && !Objects.equals(task.getStartDate(), ""))
-            oldTask.setStartDate(task.getStartDate());
-        if (task.getAnnotation() != null && !Objects.equals(task.getAnnotation(), ""))
-            oldTask.setAnnotation(task.getAnnotation());
-        if (task.getPriority() != null && !Objects.equals(task.getPriority(), ""))
-            oldTask.setPriority(task.getPriority());
-        if (task.getDifficulty() != null && !Objects.equals(task.getDifficulty(), ""))
-            oldTask.setDifficulty(task.getDifficulty());
-        validator.validate(oldTask);
-        ShowTask showTask = new ShowTask(oldTask);
-        if (!showTask.getStartDate().isBefore(showTask.getFinishedDate()))
-            throw new BadRequestException("The startDate is must be before the finishedDate.");
-        if (showTask.getFinishedDate().isBefore(LocalDate.now()))
-            throw new BadRequestException("The finishedDate is must be after the current date.");
-        oldTask = taskService.saveTask(oldTask);
-        showTask = new ShowTask(oldTask);
-        return showTask.getFields(ShowTask.ALL_ATTRIBUTES);
+        BeanUtils.copyProperties(task, oldTask, "idTask");
+        taskService.saveTask(oldTask);
+        return dtoManager.getShowTaskAsJson(task);
     }
 }

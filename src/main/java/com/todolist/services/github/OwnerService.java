@@ -1,84 +1,66 @@
 package com.todolist.services.github;
 
+import com.todolist.component.FetchApiData;
+import com.todolist.component.GitHubConverter;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.User;
 import com.todolist.entity.autodoc.github.Owner;
 import com.todolist.services.UserService;
+import org.javatuples.Pair;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OwnerService {
 
+    public static final String EASY_PASSWORD = "1234";
+    public static final String USERNAME = "{username}";
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER = "Bearer ";
+    public static final String[] IGNORED_PROPERTIES = {"id", "password", "tasks", "token"};
     @Value("${github.api.url}")
     private String startUrl;
 
+    @Value("${github.api.url.user}")
+    private String userUrl;
+
+
+    private final UserService userService;
+    private final FetchApiData fetchApiData;
+    private final GitHubConverter gitHubConverter;
+
+
     @Autowired
-    private UserService userService;
+    public OwnerService(UserService userService, FetchApiData fetchApiData, GitHubConverter gitHubConverter) {
+        this.userService = userService;
+        this.fetchApiData = fetchApiData;
+        this.gitHubConverter = gitHubConverter;
+    }
 
     // findById(String userId)
     public Owner findByUsername(String username) {
         User oldUser = userService.findUserByUsername(username);
-        if (oldUser == null) {
-            oldUser = new User();
-            oldUser.setUsername(username);
-        }
-        String url = startUrl + "/users/" + oldUser.getUsername();
-        RestTemplate restTemplate = new RestTemplate();
-        Owner owner;
-        if (oldUser.getToken() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + oldUser.getToken());
-            owner = restTemplate.getForObject(url, Owner.class, headers);
-        } else owner = restTemplate.getForObject(url, Owner.class);
-        return owner;
+        String url = userUrl.replace(USERNAME, username);
+        return fetchApiData.getApiDataWithToken(url, Owner.class, new Pair<>(AUTHORIZATION, BEARER + oldUser.getToken()));
     }
 
-    public ShowUser turnOwnerIntoShowUser(Owner owner) {
-        User user = turnOwnerIntoUser(owner, "pwd");
-        return new ShowUser(user, userService.getShowTaskFromUser(user));
-    }
-
-    public User turnOwnerIntoUser(Owner owner, String password) {
-        Object auxName = owner.getName();
-        List<String> fullName;
-        String name = null;
-        String surname = null;
-        if (auxName != null) {
-            fullName = Arrays.asList(owner.getName().split(" "));
-            name = fullName.get(0);
-            surname = fullName.size() == 1 ? null : fullName.stream().skip(1).reduce("", (ac, nx) -> ac + " " + nx);
-        }
-        return User.of(name, surname, owner.getLogin(), owner.getEmail(), owner.getAvatarUrl(), owner.getBio(), owner.getLocation(), password);
-    }
-
+    @Transactional
     public User updateUser(User oldUser) {
         Owner owner = findByUsername(oldUser.getUsername());
-        User newUser = turnOwnerIntoUser(owner, oldUser.getPassword());
-        oldUser = userService.updateUser(oldUser, newUser);
+        User newUser = gitHubConverter.turnOwnerIntoUser(owner, oldUser.getPassword());
+        BeanUtils.copyProperties(newUser, oldUser, IGNORED_PROPERTIES);
+        oldUser = userService.saveUser(oldUser);
         return oldUser;
     }
 
     public Owner updateOwner(User oldUser) {
         Owner owner = findByUsername(oldUser.getUsername());
-        if (oldUser.getUsername() != null) owner.setLogin(oldUser.getUsername());
-        if (oldUser.getAvatar() != null) owner.setAvatarUrl(oldUser.getAvatar());
-        if (oldUser.getEmail() != null) owner.setEmail(oldUser.getEmail());
-        if (oldUser.getBio() != null) owner.setBio(oldUser.getBio());
-        if (oldUser.getLocation() != null) owner.setLocation(oldUser.getLocation());
-        String url = startUrl + "/users/" + oldUser.getUsername();
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + oldUser.getToken());
-        owner = restTemplate.postForEntity(url, new HttpEntity<>(owner, headers), Owner.class, headers).getBody();
-        return owner;
+        BeanUtils.copyProperties(oldUser, owner, IGNORED_PROPERTIES);
+        String url = userUrl.replace(USERNAME, oldUser.getUsername());
+        return fetchApiData.postApiDataWithToken(url, Owner.class, new Pair<>(AUTHORIZATION, BEARER + oldUser.getToken()), owner);
     }
 
     // List organizations for user

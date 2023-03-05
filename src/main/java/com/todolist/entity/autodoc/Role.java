@@ -9,7 +9,7 @@ public enum Role {
     MANAGER(40),
     ANALYST(30);
 
-    private int salary;
+    private final int salary;
 
 
     Role(int i) {
