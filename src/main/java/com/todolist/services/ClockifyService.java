@@ -21,7 +21,6 @@ public class ClockifyService {
     public static final String TAG_ID = "{tagId}";
     public static final String X_API_KEY = "X-Api-Key";
     private final FetchApiData fetchApiData;
-    private final TaskService taskService;
     private final UserService userService;
     @Value("${clockify.api.url.entries}")
     private String entriesUrl;
@@ -31,9 +30,8 @@ public class ClockifyService {
     private String token;
 
     @Autowired
-    public ClockifyService(FetchApiData fetchApiData, TaskService taskService, UserService userService) {
+    public ClockifyService(FetchApiData fetchApiData, UserService userService) {
         this.fetchApiData = fetchApiData;
-        this.taskService = taskService;
         this.userService = userService;
     }
 

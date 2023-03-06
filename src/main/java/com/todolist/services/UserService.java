@@ -1,5 +1,8 @@
 package com.todolist.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.todolist.component.DataManager;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
@@ -8,24 +11,47 @@ import com.todolist.entity.UserTask;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.UserRepository;
 import com.todolist.repositories.UserTaskRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
 
-    private TaskService taskService;
+    private final TaskService taskService;
 
 
-    private UserTaskRepository userTaskRepository;
+    private final UserTaskRepository userTaskRepository;
+    private final DataManager dataManager;
+
+    public UserService(UserRepository userRepository, TaskService taskService, UserTaskRepository userTaskRepository, DataManager dataManager) {
+        this.userRepository = userRepository;
+        this.taskService = taskService;
+        this.userTaskRepository = userTaskRepository;
+        this.dataManager = dataManager;
+    }
+
+    @PostConstruct
+    @Transactional
+    public void init() throws IOException {
+        loadData();
+    }
+
+    @Transactional
+    public void loadData() throws IOException {
+        List<User> users = dataManager.loadUser();
+        userRepository.saveAll(users);
+        List<UserTask> userTasks = dataManager.loadUserTask();
+        userTaskRepository.saveAll(userTasks);
+    }
 
     @Transactional(readOnly = true)
     public List<User> findAllUsers(Sort sort) {
@@ -101,4 +127,6 @@ public class UserService {
         List<UserTask> userTask = userTaskRepository.findByIdUser(user.getIdUser());
         userTaskRepository.deleteAll(userTask);
     }
+
+
 }

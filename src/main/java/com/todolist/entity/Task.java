@@ -39,12 +39,9 @@ public class Task implements Serializable {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The finishedDate must be in format yyyy-MM-dd.")
-    @NotBlank(message = "The finishedDate is required.")
     @NotNull(message = "The finishedDate is required.")
     private LocalDate finishedDate;
 
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "The startDate must be in format yyyy-MM-dd.")
     private LocalDate startDate;
 
     @Max(value = 5, message = "The priority must be between 0 and 5.")

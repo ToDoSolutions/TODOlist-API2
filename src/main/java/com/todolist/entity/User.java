@@ -3,6 +3,7 @@ package com.todolist.entity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,12 +17,11 @@ import java.io.Serializable;
 @Getter
 @Setter
 @EqualsAndHashCode(of = {"idUser"})
+@ToString
 public class User implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @NotBlank
-    @NotNull
     private Long idUser;
 
     @Size(max = 50, message = "The name is too long.")
@@ -61,7 +61,6 @@ public class User implements Serializable {
     private String password;
 
     @Size(max = 50, message = "The token is too long.")
-    @Pattern(regexp = "ghp_[a-zA-Z0-9]{36}", message = "The token is invalid.")
     private String token;
 
     private String clockifyId;

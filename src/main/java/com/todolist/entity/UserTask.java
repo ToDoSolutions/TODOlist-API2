@@ -13,11 +13,10 @@ public class UserTask {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id_user_task")
     private Long idUserTask;
-    @Column(name = "id_task")
+
     private Long idTask;
-    @Column(name = "id_user")
+
     private Long idUser;
 
     public UserTask() {

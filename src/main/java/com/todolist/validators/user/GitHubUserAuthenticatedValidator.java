@@ -6,6 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @Component
 public class GitHubUserAuthenticatedValidator implements Validator {
@@ -20,6 +21,8 @@ public class GitHubUserAuthenticatedValidator implements Validator {
         User user = (User) target;
         if (user.getToken() == null)
             errors.rejectValue("token", "Token is required.");
+        if (Pattern.compile("ghp_[a-zA-Z0-9]{36}").matcher(user.getToken()).find())
+            errors.rejectValue("token", "The token is invalid.");
     }
 
     public void validateGitHubUserAuthenticated(String password, Object target, Errors errors) {
