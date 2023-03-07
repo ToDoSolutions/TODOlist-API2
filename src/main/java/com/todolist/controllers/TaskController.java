@@ -4,12 +4,12 @@ import com.todolist.component.DTOManager;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
-import com.todolist.entity.IterableEntity;
 import com.todolist.entity.Task;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
+import com.todolist.utilities.MyIterable;
 import com.todolist.utilities.Order;
 import com.todolist.utilities.Predicator;
 import com.todolist.validators.task.DateTaskValidator;
@@ -65,7 +65,7 @@ public class TaskController {
                                                  @RequestParam(required = false) NumberFilter duration) {
         order.validateOrder(fieldsTask);
         List<Task> tasks = taskService.findAllTasks(order.getSort());
-        List<Task> result = new IterableEntity<>(tasks, limit, offset)
+        List<Task> result = new MyIterable<>(tasks, limit, offset)
                 .stream().filter(task -> Objects.nonNull(task) &&
                         Predicator.isNullOrValid(title, t -> task.getTitle().contains(t)) &&
                         Predicator.isNullOrValid(status, s -> task.getStatus() == s) &&

@@ -5,7 +5,6 @@ import com.todolist.dtos.ShowGroup;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Group;
-import com.todolist.entity.IterableEntity;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
@@ -14,6 +13,7 @@ import com.todolist.filters.NumberFilter;
 import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
+import com.todolist.utilities.MyIterable;
 import com.todolist.utilities.Order;
 import com.todolist.utilities.Predicator;
 import org.springframework.beans.BeanUtils;
@@ -68,7 +68,7 @@ public class GroupController {
                                                   @RequestParam(required = false) DateFilter createdDate) {
         order.validateOrder(fieldsGroup);
         List<Group> groups = groupService.findAllGroups(order.getSort());
-        List<Group> result = new IterableEntity<>(groups, limit, offset)
+        List<Group> result = new MyIterable<>(groups, limit, offset)
                 .stream().filter(group -> Objects.nonNull(group) &&
                         Predicator.isNullOrValid(name, n -> group.getName().equals(n)) &&
                         Predicator.isNullOrValid(description, d -> group.getDescription().equals(d)) &&

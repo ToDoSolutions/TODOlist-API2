@@ -38,7 +38,6 @@ public class DTOManager {
     }
 
     public Map<String, Object> getShowTaskAsJson(Task task) {
-        System.out.println("getShowTaskAsJson");
         return getShowTask(task).toJson();
     }
 

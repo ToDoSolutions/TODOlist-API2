@@ -9,7 +9,6 @@
     "surname": "Santiago Félix",
     "password": "1234",
     "username": "alesanfe",
-    "token": "...",
     "clockifyId": "6346cc6798d3761140bf88d2"
   },
   {
@@ -21,7 +20,6 @@
     "surname": "Vico Martín",
     "password": "1234",
     "username": "marvicmar",
-    "token": "...",
     "clockifyId": "636bf399d1e99e4a3364838e"
   },
   {
@@ -33,7 +31,6 @@
     "surname": "Pérez Vázquez",
     "password": "1234",
     "username": "alepervaz",
-    "token": "...",
     "clockifyId": "63e4e12705420c60297c5e7c"
   },
   {
@@ -45,7 +42,6 @@
     "surname": "Santiago Sánchez",
     "password": "1234",
     "username": "sersansan2",
-    "token": "...",
     "clockifyId": "6335c4fb82274401b556108a"
   },
   {
@@ -57,7 +53,6 @@
     "surname": "Rosso Ramírez",
     "password": "1234",
     "username": "FranciscoRossoR",
-    "token": "...",
     "clockifyId": "6335c4fb82274401b556108a"
   },
   {
@@ -69,7 +64,6 @@
     "surname": "Rosso Ramírez",
     "password": "1234",
     "username": "frarosram",
-    "token": "...",
     "clockifyId": "6335c4fb82274401b556108a"
   }
 ]

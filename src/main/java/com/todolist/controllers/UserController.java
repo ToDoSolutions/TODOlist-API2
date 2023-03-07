@@ -3,13 +3,13 @@ package com.todolist.controllers;
 import com.todolist.component.DTOManager;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
-import com.todolist.entity.IterableEntity;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
+import com.todolist.utilities.MyIterable;
 import com.todolist.utilities.Order;
 import com.todolist.utilities.Predicator;
 import com.todolist.validators.FieldValidator;
@@ -19,13 +19,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,7 +74,7 @@ public class UserController {
                                                  @RequestParam(required = false) NumberFilter taskCompleted) {
         order.validateOrder(fieldsUser);
         List<User> users = userService.findAllUsers(order.getSort());
-        List<User> result = new IterableEntity<>(users, limit, offset)
+        List<User> result = new MyIterable<>(users, limit, offset)
                 .stream().filter(user -> Objects.nonNull(user) &&
                         Predicator.isNullOrValid(name, n -> user.getName().equals(n)) &&
                         Predicator.isNullOrValid(surname, s -> user.getSurname().equals(s)) &&

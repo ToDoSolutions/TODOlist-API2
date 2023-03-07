@@ -36,8 +36,10 @@ public class AutoDocController {
     }
 
     @RequestMapping("/{repoName}/{username}")
-    public List<TimeTask> getAutoDoc(@PathVariable String repoName, @PathVariable String username) {
-        return autoDocService.autoDoc(repoName, username);
+    public ResponseEntity<List<TimeTask>> getAutoDoc(@PathVariable String repoName, @PathVariable String username) {
+        List<TimeTask> timeTasks = autoDocService.autoDoc(repoName, username);
+        System.out.println(timeTasks);
+        return ResponseEntity.ok(timeTasks);
     }
 
     @RequestMapping("/planning/{repoName}/{username}/md")

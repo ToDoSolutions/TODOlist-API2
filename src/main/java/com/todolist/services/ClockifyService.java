@@ -2,7 +2,6 @@ package com.todolist.services;
 
 import com.todolist.component.FetchApiData;
 import com.todolist.entity.Task;
-import com.todolist.entity.User;
 import com.todolist.entity.autodoc.Role;
 import com.todolist.entity.autodoc.clockify.ClockifyTask;
 import com.todolist.entity.autodoc.clockify.Tag;
@@ -49,7 +48,8 @@ public class ClockifyService {
         Task task = userService.findTaskByTitle(username, repoName);
         if (tagId == null)
             return new Tag();
-        return fetchApiData.getApiDataWithToken(tagsUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(TAG_ID, tagId), Tag.class, new Pair<>(X_API_KEY, token));
+        String url = tagsUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(TAG_ID, tagId);
+        return fetchApiData.getApiDataWithToken(url, Tag.class, new Pair<>(X_API_KEY, token));
     }
 
     public Role getRoleFromClockify(String repoName, String username, String roleId) {
