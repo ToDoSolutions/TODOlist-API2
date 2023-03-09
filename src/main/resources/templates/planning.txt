@@ -7,6 +7,12 @@
 5. **Conclusiones**
 6. **Bibliografía**
 
+# Tabla de revisión
+---
+|Nºde revisión|Fecha|Descripción|Sprint|
+|:-|:-|:-|:-|
+|1|{creationDate}|Primera revisión|1|
+
 # Resumen
 ---
 En este documento se va a llevar a cabo un análisis anticipado sobre los costes del proyecto.

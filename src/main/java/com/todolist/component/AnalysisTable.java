@@ -37,7 +37,9 @@ public class AnalysisTable {
         for (TimeTask timeTask : timeTasks) {
             String[] text = timeTask.getTitle().split(SEPARATOR_ID);
             String id = text[0].trim();
-            table.addRow(id, timeTask.getConclusion().trim(), timeTask.getDecision().trim());
+            String conlusion = timeTask.getConclusion() != null ? timeTask.getConclusion().trim() : "";
+            String decision = timeTask.getDecision() != null ? timeTask.getDecision().trim() : "";
+            table.addRow(id, conlusion, decision);
         }
         return output.append(table.build().serialize());
 

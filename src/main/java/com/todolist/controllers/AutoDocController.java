@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -46,6 +47,7 @@ public class AutoDocController {
         String[] output = autoDocService.getPlanning(repoName, username, individual);
         String fileName = individual.equals(ALL) ? PLANNING_GROUP : PLANNING_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE));
         return new WriterManager(TEMPLATES_PLANNING)
+                .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
                 .map(s -> s.replace("{content0}", output[0]))
                 .map(s -> s.replace("{content1}", output[1]))
                 .map(s -> s.replace("{content2}", output[2]))
@@ -57,6 +59,7 @@ public class AutoDocController {
         String output = autoDocService.getAnalysis(repoName, username, individual);
         String fileName = individual.equals(ALL) ? ANALYSIS_GROUP : ANALYSIS_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE));
         return new WriterManager(TEMPLATES_ANALYSIS)
+                .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
                 .map(s -> s.replace("{content}", output))
                 .get(fileName);
     }

@@ -112,8 +112,7 @@ public class AutoDocService {
     }
 
     public String getAnalysis(String repoName, String username, String individual) {
-        List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username);
-        Collections.sort(timeTasks);
+        List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username).stream().sorted().toList();
 
         // Obtenemos los enunciados.
         StringBuilder output = analysisTable.getStatements(timeTasks);
