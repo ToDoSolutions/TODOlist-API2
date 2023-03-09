@@ -43,7 +43,9 @@ public class AutoDocService {
 
     public Map<Issue, ClockifyTask[]> groupIssuesWithHisTime(Issue[] issues, ClockifyTask[] clockifyTasks) {
         return Stream.of(issues).collect(
-                Collectors.toMap(issue -> issue, issue -> Stream.of(clockifyTasks).filter(clockifyTask -> clockifyTask.getDescription().contains(issue.title)).toArray(ClockifyTask[]::new))
+                Collectors.toMap(issue -> issue, issue -> Stream.of(clockifyTasks)
+                        .filter(clockifyTask -> clockifyTask.getDescription().contains(issue.title))
+                        .toArray(ClockifyTask[]::new))
         );
     }
 
@@ -57,7 +59,7 @@ public class AutoDocService {
         for (ClockifyTask task : clockifyTask) {
             Employee employee = findEmployeeClockifyTask(employees, task);
             List<Role> roles = task.getTagIds().stream().map(tagId -> clockifyService.getRoleFromClockify(repoName, username, tagId)).distinct().toList();
-            duration = duration.plus(task.calculateSalary(roles, duration, employee));
+            duration = duration.plus(task.calculateSalary(roles, employee));
             allRoles.addAll(roles);
         }
         return new TimeTask(issue.body, issue.title, duration, allRoles, employees);
@@ -69,20 +71,33 @@ public class AutoDocService {
 
     public List<Employee> getEmployees(List<TimeTask> timeTasks) {
         List<Employee> employeesTime = timeTasks.stream().flatMap(timeTask -> timeTask.getEmployees().stream()).toList();
+        List<String> employeesName = employeesTime.stream().map(Employee::getName).distinct().toList();
         List<Employee> employees = Lists.newArrayList();
-        for (Employee employeeTime : employeesTime) {
-            Employee employee = employees.stream().filter(employee1 -> employee1.getName().equals(employeeTime.getName())).findFirst().orElse(null);
-            if (employee == null)
-                employees.add(employeeTime);
-            else
-                employee.updateSalary(employeeTime);
+
+        for (String name : employeesName) {
+            List<Employee> dataEmployee = employeesTime.stream().filter(employee1 -> employee1.getName().equals(name)).toList();
+            for (Employee data : dataEmployee) {
+                if (employeesName.contains(data.getName())) {
+                    System.out.println("Eliminado: " + data.getName() + " " + data.getSalary());
+                    employeesName = employeesName.stream().filter(s -> !s.equals(data.getName())).toList();
+                    try {
+                        employees.add((Employee) data.clone());
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                    }
+                } else
+                    employees.stream().filter(employee -> employee.getName().equals(data.getName())).forEach(employee -> employee.updateSalary(data));
+            }
         }
+        System.out.println(employees);
         return employees;
     }
 
     public String[] getPlanning(String repoName, String username, String individual) {
-        List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username);
+        List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username).stream().sorted().toList();
         List<Employee> employees = getEmployees(timeTasks);
+        if (!Objects.equals(individual, ALL))
+            employees = employees.stream().filter(employee -> employee.getName().equals(individual)).toList();
 
         // Obtenemos la tabla para las tareas.
         String taskTable = planningTable.getTaskTable(timeTasks).serialize();
@@ -98,6 +113,7 @@ public class AutoDocService {
 
     public String getAnalysis(String repoName, String username, String individual) {
         List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username);
+        Collections.sort(timeTasks);
 
         // Obtenemos los enunciados.
         StringBuilder output = analysisTable.getStatements(timeTasks);

@@ -11,7 +11,7 @@ import java.util.Map;
 @Getter
 @Setter
 @EqualsAndHashCode(of = {"name", "clockifyId"})
-public class Employee {
+public class Employee implements Cloneable{
     private String name;
     private Map<Role, Double> salary;
     private String clockifyId;
@@ -43,6 +43,10 @@ public class Employee {
         if (salary == null || !salary.containsKey(role))
             return 0;
         return Math.round(salary.get(role)*100)/100.;
+    }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

@@ -164,7 +164,7 @@ public class ClockifyTask {
         this.additionalProperties.put(name, value);
     }
 
-    public Duration calculateSalary(List<Role> roles, Duration duration, Employee employee) {
+    public Duration calculateSalary(List<Role> roles, Employee employee) {
         LocalDateTime start = LocalDateTime.parse(getTimeInterval().getStart(), DateTimeFormatter.ISO_DATE_TIME);
         LocalDateTime end = LocalDateTime.parse(getTimeInterval().getEnd(), DateTimeFormatter.ISO_DATE_TIME);
         Duration difference = Duration.between(start, end);
