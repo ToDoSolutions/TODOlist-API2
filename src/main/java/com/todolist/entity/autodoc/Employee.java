@@ -42,7 +42,7 @@ public class Employee {
     public double getSalaryByRole(Role role) {
         if (salary == null || !salary.containsKey(role))
             return 0;
-        return salary.get(role);
+        return Math.round(salary.get(role)*100)/100.;
 
     }
 }

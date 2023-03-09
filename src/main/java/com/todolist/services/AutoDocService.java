@@ -91,7 +91,7 @@ public class AutoDocService {
         String personalTable = planningTable.getAllEmployeeTables(employees);
 
         // Obtenemos el coste total.
-        double cost = employees.stream().mapToDouble(employee -> employee.getSalary().values().stream().mapToDouble(i -> i).sum()).sum();
+        double cost = Math.round(employees.stream().mapToDouble(employee -> employee.getSalary().values().stream().mapToDouble(i -> i).sum()).sum()*100)/100;
 
         return new String[]{taskTable, personalTable, cost + EURO};
     }
