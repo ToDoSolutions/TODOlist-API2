@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Component
@@ -24,10 +25,9 @@ public class DataManager {
                 .registerModule(new Jdk8Module())
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        return mapper.readValue(
-                new File("src/main/resources/db/data/user.json"), new TypeReference<>() {
-                })
-                ;
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("db/data/user.json");
+        return mapper.readValue(inputStream, new TypeReference<>() {});
     }
 
     public List<Task> loadTask() throws IOException {
@@ -36,10 +36,9 @@ public class DataManager {
                 .registerModule(new Jdk8Module())
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        return mapper.readValue(
-                new File("src/main/resources/db/data/task.json"), new TypeReference<>() {
-                })
-                ;
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("db/data/task.json");
+        return mapper.readValue(inputStream, new TypeReference<>() {});
     }
 
     public List<UserTask> loadUserTask() throws IOException {
@@ -48,9 +47,8 @@ public class DataManager {
                 .registerModule(new Jdk8Module())
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        return mapper.readValue(
-                new File("src/main/resources/db/data/user_task.json"), new TypeReference<>() {
-                })
-                ;
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("db/data/user_task.json");
+        return mapper.readValue(inputStream, new TypeReference<>() {});
     }
 }

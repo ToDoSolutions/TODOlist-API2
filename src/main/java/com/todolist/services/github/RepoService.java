@@ -51,8 +51,6 @@ public class RepoService {
     public TaskGitHub findRepoByName(String username, String repoName) {
         User user = userService.findUserByUsername(username);
         String url = oneRepoUrl.replace(USERNAME, user.getUsername()).replace(REPO_NAME, repoName);
-        System.out.println(url);
-        System.out.println(user.getToken());
         if (user.getToken() == null || user.getToken().isEmpty())
             return fetchApiData.getApiData(url, TaskGitHub.class);
         else

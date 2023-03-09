@@ -35,7 +35,7 @@ public class TaskService {
     }
 
     @PostConstruct
-    @Autowired
+    @Transactional
     public void loadData() throws IOException {
         List<Task> tasks = dataManager.loadTask();
         taskRepository.saveAll(tasks);

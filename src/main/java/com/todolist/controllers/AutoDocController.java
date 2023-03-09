@@ -26,8 +26,8 @@ public class AutoDocController {
     public static final String LINE = "_";
     public static final String ANALYSIS_GROUP = "analysis_group.md";
     public static final String ANALYSIS_INDIVIDUAL = "analysis_{username}.md";
-    public static final String TEMPLATES_ANALYSIS = "src/main/resources/templates/analysis.txt";
-    public static final String TEMPLATES_PLANNING = "src/main/resources/templates/planning.txt";
+    public static final String TEMPLATES_ANALYSIS = "templates/analysis.txt";
+    public static final String TEMPLATES_PLANNING = "templates/planning.txt";
     private final AutoDocService autoDocService;
 
     @Autowired
@@ -38,7 +38,6 @@ public class AutoDocController {
     @RequestMapping("/{repoName}/{username}")
     public ResponseEntity<List<TimeTask>> getAutoDoc(@PathVariable String repoName, @PathVariable String username) {
         List<TimeTask> timeTasks = autoDocService.autoDoc(repoName, username);
-        System.out.println(timeTasks);
         return ResponseEntity.ok(timeTasks);
     }
 

@@ -35,7 +35,6 @@ public class CustomErrorHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException exception, ServletWebRequest webRequest) {
         String message = exception.getMessage().indexOf(":") > 0 ? exception.getMessage().split(":")[1] : exception.getMessage();
-        System.out.println(Arrays.stream(exception.getStackTrace()).map(StackTraceElement::toString).reduce("", (a, b) -> a + "" + b));
         ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), message, webRequest.getRequest().getRequestURI(), HttpStatus.NOT_FOUND.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
