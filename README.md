@@ -12,7 +12,7 @@
 * [AutoDoc](#autodoc)
 
 # Introduction
-To check out URIs and request bodies, refer to our [SwaggerHub Page](https://todolist-api2-379012.ew.r.appspot.com/swagger-ui/).
+To check out URIs and request bodies, refer to our [SwaggerHub Page](https://localhost:8080/swagger-ui/).
 Using the interactive documentation you will be able to check out URIs, response and request bodies...etc.
 
 # Resources
