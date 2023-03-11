@@ -30,6 +30,7 @@ Una vez identificados todos los requisitos, se proporcionarán recomendaciones c
 En resumen, el objetivo de este informe es ofrecer un análisis exhaustivo de los requisitos y brindar recomendaciones claras sobre cómo cumplir con cada uno de ellos. Este análisis se realizará con una atención cuidadosa a los detalles y se abordarán cualquier inconsistencia o duda para garantizar que los requisitos se cumplan adecuadamente.
 
 # Análisis de requisitos
+---
 {content}
 
 # Conclusiones

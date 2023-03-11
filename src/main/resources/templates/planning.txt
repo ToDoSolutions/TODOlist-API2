@@ -33,6 +33,7 @@ A cada uno de los integrantes del grupo se les ha asignado un número de estudia
 3. Alejandro Pérez Vázquez
 4. Alejandro Santiago Félix
 5. Sergio Santiago Sanchez
+
 Por ejemplo (Task 2(I1))dictamina que Maria Vico Martín es la encargada de la Task 2.
 
 ## Costes fijos
@@ -76,6 +77,8 @@ Amortización lineal = $\frac{Valor\ inicial}{Vida\ útil\ estimada}$
 ---
 {content1}
 
+## Coste total
+---
 |Tipo de coste|Coste total|
 |:-|:-|
 |Coste fijo|5415€|
