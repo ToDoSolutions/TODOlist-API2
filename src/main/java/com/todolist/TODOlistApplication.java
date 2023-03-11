@@ -28,7 +28,8 @@ public class TODOlistApplication {
     public static final String DATASOURCE_USERNAME = "spring.datasource.username";
 
     public static void main(String[] args) throws IOException {
-        prepareEnvironment(args);
+        if (args.length > 0)
+            prepareEnvironment(args);
         SpringApplication.run(TODOlistApplication.class, args);
     }
 
@@ -44,6 +45,9 @@ public class TODOlistApplication {
                 properties.setProperty(PROFILES, CLOUD);
             }
         }
+        // Se debe de modificar el mismo archivo properties
+
+
         try (OutputStream output = new FileOutputStream(APPLICATION_PROPERTIES)) {
             properties.store(output, null);
         }
