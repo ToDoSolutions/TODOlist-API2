@@ -55,17 +55,16 @@ public class AutoDocService {
         Duration duration = Duration.ZERO;
         Set<Role> allRoles = new HashSet<>();
         List<User> users = issue.assignees.stream().map(issueService::getUserAssignedToIssue).toList();
-        List<Employee> employees = users.stream().map(user -> new Employee(user.getFullName(), user.getClockifyId())).toList();
+        List<Employee> employees = users.stream()
+                .map(user -> new Employee(user.getFullName(), user.getClockifyId())).toList();
         for (ClockifyTask task : clockifyTask) {
             Employee employee = findEmployeeClockifyTask(employees, task);
-            if (employee == null)
-                continue;
-
             List<Role> roles = task.getTagIds().stream()
                     .map(tagId -> clockifyService.getRoleFromClockify(repoName, username, tagId)).distinct().toList();
             duration = duration.plus(task.calculateSalary(roles, employee));
             allRoles.addAll(roles);
         }
+
         return new TimeTask(issue.body, issue.title, duration, allRoles, employees);
     }
 
@@ -92,7 +91,6 @@ public class AutoDocService {
                     employees.stream().filter(employee -> employee.getName().equals(data.getName())).forEach(employee -> employee.updateSalary(data));
             }
         }
-        System.out.println(employees);
         return employees;
     }
 

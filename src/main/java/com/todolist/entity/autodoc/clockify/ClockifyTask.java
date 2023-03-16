@@ -3,6 +3,7 @@ package com.todolist.entity.autodoc.clockify;
 import com.fasterxml.jackson.annotation.*;
 import com.todolist.entity.autodoc.Employee;
 import com.todolist.entity.autodoc.Role;
+import lombok.ToString;
 
 import javax.annotation.Generated;
 import javax.validation.Valid;
