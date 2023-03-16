@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Service
@@ -19,6 +21,7 @@ public class ClockifyService {
     public static final String CLOCKIFY_ID = "{clockifyId}";
     public static final String TAG_ID = "{tagId}";
     public static final String X_API_KEY = "X-Api-Key";
+    private final Map<String, Tag> tagAlreadyFind;
     private final FetchApiData fetchApiData;
     private final UserService userService;
     @Value("${clockify.api.url.entries}")
@@ -30,6 +33,7 @@ public class ClockifyService {
 
     @Autowired
     public ClockifyService(FetchApiData fetchApiData, UserService userService) {
+        this.tagAlreadyFind = new HashMap<>();
         this.fetchApiData = fetchApiData;
         this.userService = userService;
     }
@@ -48,8 +52,12 @@ public class ClockifyService {
         Task task = userService.findTaskByTitle(username, repoName);
         if (tagId == null)
             return new Tag();
+        if (tagAlreadyFind.containsKey(tagId))
+            return tagAlreadyFind.get(tagId);
         String url = tagsUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(TAG_ID, tagId);
-        return fetchApiData.getApiDataWithToken(url, Tag.class, new Pair<>(X_API_KEY, token));
+        Tag tag = fetchApiData.getApiDataWithToken(url, Tag.class, new Pair<>(X_API_KEY, token));
+        tagAlreadyFind.put(tagId, tag);
+        return tag;
     }
 
     public Role getRoleFromClockify(String repoName, String username, String roleId) {
