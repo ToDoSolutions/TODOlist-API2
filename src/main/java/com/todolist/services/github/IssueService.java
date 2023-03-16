@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 @Service
 public class IssueService {
 
@@ -32,7 +34,18 @@ public class IssueService {
     public Issue[] findByUsernameAndRepo(String username, String repoName) {
         User user = userService.findUserByUsername(username);
         TaskGitHub task = repoService.findRepoByName(user.getUsername(), repoName);
-        return fetchApiData.getApiData(startUrl + "/repos/" + user.getUsername() + "/" + task.getName() + "/issues?state=all&per_page=999", Issue[].class);
+        Arrays.stream(fetchApiData.getApiData(startUrl + "/repos/" + user.getUsername() + "/" + task.getName() + "/issues?state=all&per_page=999", Issue[].class))
+                .filter(issue -> !(issue.title.contains("ADD") || issue.title.contains("FIX"))).forEach(issue -> {
+            System.out.println(issue.title);
+
+                });
+        System.out.println("test");
+        return Arrays.stream(fetchApiData.getApiData(startUrl + "/repos/" + user.getUsername() + "/" + task.getName() + "/issues?state=all&per_page=999", Issue[].class))
+                .filter(issue -> {
+                    System.out.println(issue.title);
+                    System.out.println(issue.title.contains("ADD") || issue.title.contains("FIX"));
+                    return !(issue.title.contains("ADD") || issue.title.contains("FIX"));
+                }).toArray(Issue[]::new);
     }
 
     public User getUserAssignedToIssue(Owner owner) {

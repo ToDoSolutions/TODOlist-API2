@@ -7,7 +7,8 @@ public enum Role {
     TESTER(20),
     DEVELOPER(20),
     MANAGER(40),
-    ANALYST(30);
+    ANALYST(30),
+    UNDEFINED(0);
 
     private final int salary;
 
@@ -24,7 +25,7 @@ public enum Role {
             case "DEVELOPER" -> DEVELOPER;
             case "MANAGER" -> MANAGER;
             case "ANALYST" -> ANALYST;
-            default -> throw new IllegalStateException("Unexpected value: " + name);
+            default -> UNDEFINED;
         };
     }
 

@@ -58,7 +58,11 @@ public class AutoDocService {
         List<Employee> employees = users.stream().map(user -> new Employee(user.getFullName(), user.getClockifyId())).toList();
         for (ClockifyTask task : clockifyTask) {
             Employee employee = findEmployeeClockifyTask(employees, task);
-            List<Role> roles = task.getTagIds().stream().map(tagId -> clockifyService.getRoleFromClockify(repoName, username, tagId)).distinct().toList();
+            if (employee == null)
+                continue;
+
+            List<Role> roles = task.getTagIds().stream()
+                    .map(tagId -> clockifyService.getRoleFromClockify(repoName, username, tagId)).distinct().toList();
             duration = duration.plus(task.calculateSalary(roles, employee));
             allRoles.addAll(roles);
         }
@@ -78,7 +82,6 @@ public class AutoDocService {
             List<Employee> dataEmployee = employeesTime.stream().filter(employee1 -> employee1.getName().equals(name)).toList();
             for (Employee data : dataEmployee) {
                 if (employeesName.contains(data.getName())) {
-                    System.out.println("Eliminado: " + data.getName() + " " + data.getSalary());
                     employeesName = employeesName.stream().filter(s -> !s.equals(data.getName())).toList();
                     try {
                         employees.add((Employee) data.clone());

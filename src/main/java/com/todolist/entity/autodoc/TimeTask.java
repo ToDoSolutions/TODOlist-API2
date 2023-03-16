@@ -27,6 +27,8 @@ public class TimeTask implements Comparable<TimeTask> {
     private List<Employee> employees;
 
     public TimeTask(String body, String title, Duration duration, Set<Role> allRoles, List<Employee> employees) {
+        // System.out.println(body);
+        System.out.println(title);
         if (body != null && body.contains("\r\n\r\n") && body.split("\r\n\r\n").length == 3) {
             String[] text = body.split("\r\n\r\n");
             this.description = text[0];
