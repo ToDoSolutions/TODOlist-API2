@@ -3,6 +3,7 @@ package com.todolist.entity.autodoc;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -11,7 +12,8 @@ import java.util.Map;
 @Getter
 @Setter
 @EqualsAndHashCode(of = {"name", "clockifyId"})
-public class Employee implements Cloneable{
+@ToString
+public class Employee {
     private String name;
     private Map<Role, Double> salary;
     private String clockifyId;
@@ -45,8 +47,9 @@ public class Employee implements Cloneable{
         return Math.round(salary.get(role)*100)/100.;
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Employee getClone() {
+        Employee employee = new Employee(name, clockifyId);
+        employee.setSalary(new HashMap<>(salary));
+        return employee;
     }
 }

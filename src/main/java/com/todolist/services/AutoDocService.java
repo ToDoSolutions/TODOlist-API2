@@ -59,6 +59,8 @@ public class AutoDocService {
                 .map(user -> new Employee(user.getFullName(), user.getClockifyId())).toList();
         for (ClockifyTask task : clockifyTask) {
             Employee employee = findEmployeeClockifyTask(employees, task);
+            if (employee == null || task.getTimeInterval().getEnd() == null) // Por si alguien tiene el Clockify arrancado.
+                continue;
             List<Role> roles = task.getTagIds().stream()
                     .map(tagId -> clockifyService.getRoleFromClockify(repoName, username, tagId)).distinct().toList();
             duration = duration.plus(task.calculateSalary(roles, employee));
@@ -76,17 +78,12 @@ public class AutoDocService {
         List<Employee> employeesTime = timeTasks.stream().flatMap(timeTask -> timeTask.getEmployees().stream()).toList();
         List<String> employeesName = employeesTime.stream().map(Employee::getName).distinct().toList();
         List<Employee> employees = Lists.newArrayList();
-
         for (String name : employeesName) {
             List<Employee> dataEmployee = employeesTime.stream().filter(employee1 -> employee1.getName().equals(name)).toList();
             for (Employee data : dataEmployee) {
                 if (employeesName.contains(data.getName())) {
                     employeesName = employeesName.stream().filter(s -> !s.equals(data.getName())).toList();
-                    try {
-                        employees.add((Employee) data.clone());
-                    } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
-                    }
+                    employees.add(data.getClone());
                 } else
                     employees.stream().filter(employee -> employee.getName().equals(data.getName())).forEach(employee -> employee.updateSalary(data));
             }

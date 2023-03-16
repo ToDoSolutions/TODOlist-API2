@@ -21,16 +21,6 @@ public class PlanningTable {
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                 .addRow(HEADER_PLANNING);
         for (TimeTask timeTask : timeTasks) {
-            if (timeTask.getTitle() != null && timeTask.getTitle().contains("9(G)")) {
-                System.out.println(timeTask.getTitle());
-                System.out.println(timeTask.getDuration().toMinutes());
-                timeTask.getEmployees().forEach(employee -> {
-                            System.out.println(employee.getName());
-                            System.out.println(employee.getSalary());
-                        }
-                );
-                System.out.println(timeTask.getCost());
-            }
             taskTable.addRow(timeTask.getTitle().trim(), timeTask.getDescription() != null ? timeTask.getDescription().trim().replace(JUMP_LINE, "") : null, timeTask.getEmployees().stream().map(Employee::getName).reduce((s, s2) -> s + ", " + s2).orElse("")
                     , timeTask.getRoles().stream().map(Role::toString).reduce((s, s2) -> s + ", " + s2).orElse(""), "x"
                     , timeTask.getDuration().toHours() + " horas y " + timeTask.getDuration().toMinutes() % 60 + " minutos"

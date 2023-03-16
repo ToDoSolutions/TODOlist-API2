@@ -167,6 +167,7 @@ public class ClockifyTask {
 
     public Duration calculateSalary(List<Role> roles, Employee employee) {
         LocalDateTime start = LocalDateTime.parse(getTimeInterval().getStart(), DateTimeFormatter.ISO_DATE_TIME);
+        System.out.println(getTimeInterval().getEnd());
         LocalDateTime end = LocalDateTime.parse(getTimeInterval().getEnd(), DateTimeFormatter.ISO_DATE_TIME);
         Duration difference = Duration.between(start, end);
         roles.forEach(role -> employee.keepSalary(role, difference));
