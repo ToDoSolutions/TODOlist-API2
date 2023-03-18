@@ -3,6 +3,7 @@ package com.todolist.component;
 import com.todolist.entity.autodoc.Employee;
 import com.todolist.entity.autodoc.Role;
 import com.todolist.entity.autodoc.TimeTask;
+import net.steppschuh.markdowngenerator.list.ListBuilder;
 import net.steppschuh.markdowngenerator.table.Table;
 import net.steppschuh.markdowngenerator.text.heading.Heading;
 import org.springframework.stereotype.Component;
@@ -49,4 +50,11 @@ public class PlanningTable {
         return personalTable.toString();
     }
 
+    public String getNames(List<Employee> employees) {
+        ListBuilder listBuilder = new ListBuilder();
+        for (Employee employee : employees) {
+            listBuilder.append(employee.getName());
+        }
+        return listBuilder.toString();
+    }
 }

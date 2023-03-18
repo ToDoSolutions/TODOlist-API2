@@ -13,7 +13,10 @@ import com.todolist.services.github.IssueService;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,7 +24,6 @@ import java.util.stream.Stream;
 public class AutoDocService {
 
 
-    public static final String ALL = "all";
     public static final String EURO = "€";
     private final ClockifyService clockifyService;
     private final IssueService issueService;
@@ -91,11 +93,40 @@ public class AutoDocService {
         return employees;
     }
 
-    public String[] getPlanning(String repoName, String username, String individual) {
-        List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username).stream().sorted().toList();
+    public String[] getPlanning(String repoName, String username, String individual, String title) {
+        List<TimeTask> timeTasks = autoDoc(repoName, username).stream().filter(task -> task.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual) && task.getTitle().contains(title))).sorted().toList();
         List<Employee> employees = getEmployees(timeTasks);
-        if (!Objects.equals(individual, ALL))
-            employees = employees.stream().filter(employee -> employee.getName().equals(individual)).toList();
+        List<Employee> individualEmployee = employees.stream().filter(employee -> employee.getName().equals(individual)).toList();
+
+        // Obtenemos la tabla para las tareas.
+        String taskTable = planningTable.getTaskTable(timeTasks).serialize();
+
+        // Obtenemos la tabla para los empleados.
+        String personalTable = planningTable.getAllEmployeeTables(individualEmployee);
+
+        // Obtenemos el coste total.
+        double cost = Math.round(individualEmployee.stream().mapToDouble(employee -> employee.getSalary().values().stream().mapToDouble(i -> i).sum()).sum() * 100) / 100;
+
+        // Nombres de los empleados.
+        String names = planningTable.getNames(employees);
+
+        // Roles del empleado.
+        List<Role> roles = employees.stream().flatMap(employee -> employee.getSalary().keySet().stream()).distinct().toList();
+        StringBuilder rolesString = new StringBuilder();
+        for (var i = 0; i < roles.size(); i++) {
+            rolesString.append(roles.get(i).toString().toLowerCase());
+            if (i < roles.size() - 2)
+                rolesString.append(", ");
+            else if (i == roles.size() - 2)
+                rolesString.append(" y ");
+        }
+
+        return new String[]{taskTable, personalTable, cost + EURO, names, rolesString.toString()};
+    }
+
+    public String[] getPlanning(String repoName, String username, String title) {
+        List<TimeTask> timeTasks = autoDoc(repoName, username).stream().filter(task -> task.getTitle().contains(title)).sorted().toList();
+        List<Employee> employees = getEmployees(timeTasks);
 
         // Obtenemos la tabla para las tareas.
         String taskTable = planningTable.getTaskTable(timeTasks).serialize();
@@ -104,13 +135,17 @@ public class AutoDocService {
         String personalTable = planningTable.getAllEmployeeTables(employees);
 
         // Obtenemos el coste total.
-        double cost = Math.round(employees.stream().mapToDouble(employee -> employee.getSalary().values().stream().mapToDouble(i -> i).sum()).sum()*100)/100;
+        double cost = Math.round(employees.stream().mapToDouble(employee -> employee.getSalary().values().stream().mapToDouble(i -> i).sum()).sum() * 100) / 100;
 
-        return new String[]{taskTable, personalTable, cost + EURO};
+        // Nombres de los empleados.
+        String names = planningTable.getNames(employees);
+
+        return new String[]{taskTable, personalTable, cost + EURO, names};
     }
 
-    public String getAnalysis(String repoName, String username, String individual) {
-        List<TimeTask> timeTasks = getTimeTasks(individual, repoName, username).stream().sorted().toList();
+    public String getAnalysis(String repoName, String username, String individual, String title) {
+        List<TimeTask> timeTasks = autoDoc(repoName, username).stream().filter(task -> task.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))
+        && task.getTitle().contains(title)).sorted().toList();
 
         // Obtenemos los enunciados.
         StringBuilder output = analysisTable.getStatements(timeTasks);
@@ -121,10 +156,15 @@ public class AutoDocService {
         return output.toString();
     }
 
-    private List<TimeTask> getTimeTasks(String individual, String repoName, String username) {
-        if (Objects.equals(individual, ALL))
-            return autoDoc(repoName, username);
-        else
-            return autoDoc(repoName, username).stream().filter(timeTask -> timeTask.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))).toList();
+    public String getAnalysis(String repoName, String username, String title) {
+        List<TimeTask> timeTasks = autoDoc(repoName, username).stream().filter(task -> task.getTitle().contains(title)).sorted().toList();
+
+        // Obtenemos los enunciados.
+        StringBuilder output = analysisTable.getStatements(timeTasks);
+
+        // Obtenemos la tabla con los análisis.
+        output.append(analysisTable.getAnalysis(timeTasks));
+
+        return output.toString();
     }
 }
