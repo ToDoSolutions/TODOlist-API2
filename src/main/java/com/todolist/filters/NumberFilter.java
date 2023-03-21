@@ -11,11 +11,14 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class NumberFilter {
 
+    // Attributes -------------------------------------------------------------
+
     private Boolean isGreater;
     private Boolean isLess;
     private Boolean isEqual;
     private Long number;
 
+    // Factory methods --------------------------------------------------------
     public static NumberFilter parse(String filterWithNumber) {
         // [<>=]{2}\d+|[<>=]\d+
         if (Pattern.compile("[<>=]\\d+").matcher(filterWithNumber).matches()) {
@@ -44,6 +47,7 @@ public class NumberFilter {
         }
     }
 
+    // Validations ------------------------------------------------------------
     public boolean isValid(Long number) {
         if (Objects.isNull(number))
             return false;

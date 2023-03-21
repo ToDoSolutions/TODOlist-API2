@@ -10,6 +10,8 @@ import java.util.List;
 
 @Component
 public class AnalysisTable {
+
+    // Constants --------------------------------------------------------------
     public static final String JUMP_LINE = "\n";
     public static final String SEPARATOR_ID = ": ";
     public static final String LIST_ELEMENTS = "- ";
@@ -17,6 +19,7 @@ public class AnalysisTable {
     public static final String ANALYSIS = "Análisis";
     public static final String STATEMENTS = "Enunciados";
 
+    // Methods ----------------------------------------------------------------
     public StringBuilder getStatements(List<TimeTask> timeTasks) {
         StringBuilder output = new StringBuilder(new Heading(STATEMENTS, 3).toString()).append(JUMP_LINE);
         for (TimeTask timeTask : timeTasks) {

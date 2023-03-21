@@ -13,13 +13,16 @@ import java.time.LocalDate;
 @EnableScheduling
 public class TaskEvents {
 
+    // Services ---------------------------------------------------------------
     private final TaskService taskService;
 
+    // Constructors -----------------------------------------------------------
     @Autowired
     public TaskEvents(TaskService taskService) {
         this.taskService = taskService;
     }
 
+    // Scheduled --------------------------------------------------------------
     @Scheduled(cron = "0 0 12 * * *", zone = "Europe/Madrid")
     private void delateOutDatedTask() {
         taskService.findAllTasks().stream()

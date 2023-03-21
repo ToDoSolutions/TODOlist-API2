@@ -13,13 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/v1/clockify")
 public class ClockifyController {
 
+    // Services ---------------------------------------------------------------
     private final ClockifyService clockifyService;
 
+    // Constructors -----------------------------------------------------------
     @Autowired
     public ClockifyController(ClockifyService clockifyService) {
         this.clockifyService = clockifyService;
     }
 
+    // Methods ----------------------------------------------------------------
     // Get all task from a workspace
     @GetMapping("/{repoName}/{username}/time-entries")
     public ResponseEntity<ClockifyTask[]> getTaskFromWorkspace(@PathVariable String repoName, @PathVariable String username) {

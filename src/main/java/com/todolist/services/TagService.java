@@ -8,6 +8,7 @@ import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TagService {
@@ -33,11 +34,13 @@ public class TagService {
     }
 
     // Finders ----------------------------------------------------------------
-    Tag getTagById(Group group, String idTag) {
+    @Transactional
+    public Tag getTagById(Group group, String idTag) {
         return tagRepository.findByClockifyId(idTag).orElse(getTagFromClockify(group, idTag));
     }
 
-    private Tag getTagFromClockify(Group group, String idTag) {
+    @Transactional
+    public Tag getTagFromClockify(Group group, String idTag) {
         String url = tagsUrl.replace(WORKSPACE_ID, group.getWorkSpaceId()).replace(TAG_ID, idTag);
         Tag tag = fetchApiData.getApiDataWithToken(url, Tag.class, new Pair<>(X_API_KEY, token));
         tagRepository.save(tag);

@@ -34,6 +34,7 @@ public class AutoDocService {
     private final PlanningTable planningTable;
     private final AnalysisTable analysisTable;
 
+    // Constructors -----------------------------------------------------------
     @Autowired
     public AutoDocService(ClockifyService clockifyService, IssueService issueService, PlanningTable planningTable, AnalysisTable analysisTable) {
         this.clockifyService = clockifyService;

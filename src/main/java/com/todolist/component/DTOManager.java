@@ -17,10 +17,14 @@ import java.util.Map;
 @Component
 public class DTOManager {
 
+    // Services ---------------------------------------------------------------
     private final UserService userService;
     private final GroupService groupService;
+
+    // Components -------------------------------------------------------------
     private final FieldValidator fieldValidator;
 
+    // Constructors -----------------------------------------------------------
     @Autowired
     public DTOManager(UserService userService, GroupService groupService, FieldValidator fieldValidator) {
         this.userService = userService;
@@ -28,6 +32,7 @@ public class DTOManager {
         this.fieldValidator = fieldValidator;
     }
 
+    // Methods ----------------------------------------------------------------
     public ShowTask getShowTask(Task task) {
         return new ShowTask(task);
     }

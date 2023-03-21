@@ -9,14 +9,17 @@ import java.util.stream.Stream;
 @Getter
 public class Order {
 
+    // Attributes -------------------------------------------------------------
     private final Sort.Direction direction;
     private final String field;
 
+    // Constructors -----------------------------------------------------------
     public Order(Character direction, String field) {
         this.direction = direction.equals('-') ? Sort.Direction.DESC : Sort.Direction.ASC;
         this.field = field.trim();
     }
 
+    // Methods ----------------------------------------------------------------
     @Override
     public String toString() {
         return direction.equals(Sort.Direction.ASC) ? "+" + field : "-" + field;

@@ -13,10 +13,12 @@ import java.util.List;
 @Component
 public class PlanningTable {
 
+    // Constants --------------------------------------------------------------
     protected static final Object[] HEADER_PLANNING = {"Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste"};
     public static final String JUMP_LINE = "\n";
     public static final String EURO = "€";
 
+    // Methods ----------------------------------------------------------------
     public Table getTaskTable(List<TimeTask> timeTasks) {
         Table.Builder taskTable = new Table.Builder()
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)

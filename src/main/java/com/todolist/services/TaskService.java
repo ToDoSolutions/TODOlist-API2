@@ -24,7 +24,6 @@ public class TaskService {
     }
 
     // Finders ----------------------------------------------------------------
-
     @Transactional(readOnly = true)
     public List<Task> findAllTasks(Sort sort) {
         return taskRepository.findAll(sort);
@@ -35,7 +34,7 @@ public class TaskService {
         return taskRepository.findAll().stream().toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Task findTaskById(Integer idTask) {
         return taskRepository.findById(idTask).orElseThrow(() -> new NotFoundException("The task with idTask " + idTask + " does not exist."));
     }

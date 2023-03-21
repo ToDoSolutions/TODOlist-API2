@@ -22,6 +22,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 
 /**
  * Simple JavaBean domain object with an id property. Used as a base class for objects
@@ -33,7 +34,7 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 @Getter
 @Setter
-public class BaseEntity {
+public class BaseEntity implements Serializable {
 
 	// Attributes -------------------------------------------------------------
 	@Id

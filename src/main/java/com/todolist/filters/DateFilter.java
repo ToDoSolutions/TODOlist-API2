@@ -13,11 +13,14 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 @Getter
 public class DateFilter {
+
+    // Attributes -------------------------------------------------------------
     private Boolean isGreater;
     private Boolean isLess;
     private Boolean isEqual;
     private LocalDate date;
 
+    // Factory methods --------------------------------------------------------
     public static DateFilter parse(String filterWithDate) {
         if (Pattern.compile("[<>=]\\d{4}-\\d{2}-\\d{2}").matcher(filterWithDate).matches()) {
             String filter = filterWithDate.charAt(0) + "";
@@ -45,6 +48,7 @@ public class DateFilter {
         }
     }
 
+    // Validations ------------------------------------------------------------
     public boolean isValid(LocalDate date) {
         if (Objects.isNull(date))
             return false;

@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/v1/autodoc")
 public class AutoDocController {
 
+    // Constants --------------------------------------------------------------
     public static final String PLANNING_GROUP = "Informe de planificación - Grupal.md";
     public static final String PLANNING_INDIVIDUAL = "Informe de planificación - {username}.md";
     public static final String USERNAME = "{username}";
@@ -32,13 +33,17 @@ public class AutoDocController {
     public static final String TEMPLATES_PLANNING_INDIVIDUAL = "templates/planning_individual.txt";
     public static final String GROUP = "G";
     public static final String INDIVIDUAL = "I";
+
+    // Services ---------------------------------------------------------------
     private final AutoDocService autoDocService;
 
+    // Constructors -----------------------------------------------------------
     @Autowired
     public AutoDocController(AutoDocService autoDocService) {
         this.autoDocService = autoDocService;
     }
 
+    // Methods ----------------------------------------------------------------
     @RequestMapping("/{repoName}/{username}")
     public ResponseEntity<List<TimeTask>> getAutoDoc(@PathVariable String repoName, @PathVariable String username) {
         List<TimeTask> timeTasks = autoDocService.autoDoc(repoName, username);

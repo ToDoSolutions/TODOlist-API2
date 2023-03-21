@@ -93,12 +93,6 @@ public class UserService {
         return users;
     }
 
-    @Transactional
-    public Task findTaskByTitle(String username, String title) {
-        User user = findUserByUsername(username);
-        return user.getTasks().stream().filter(task -> task.getTitle().equals(title)).findFirst().orElseThrow(() -> new NotFoundException("The task with title " + title + " does not exist."));
-    }
-
     @Transactional(readOnly = true)
     public List<ShowTask> getShowTaskFromUser(User user) {
         return user.getTasks().stream().map(ShowTask::new).toList();
@@ -126,6 +120,4 @@ public class UserService {
         user.setTasks(null);
         saveUser(user);
     }
-
-
 }

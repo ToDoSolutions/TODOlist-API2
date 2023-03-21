@@ -15,14 +15,17 @@ import java.util.function.Function;
 
 public class WriterManager {
 
+    // Attributes -------------------------------------------------------------
     private String input;
 
+    // Constructors -----------------------------------------------------------
     public WriterManager(String template) throws IOException {
         String location = getResource(template).orElseThrow(() -> new FileNotFoundException(template)).getFile();
         File file = new File(location);
         input = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
     }
 
+    // Methods ----------------------------------------------------------------
     private Optional<URL> getResource(String template) {
         return Optional.ofNullable(getClass().getClassLoader().getResource(template));
     }

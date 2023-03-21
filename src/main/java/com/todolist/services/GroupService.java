@@ -112,7 +112,7 @@ public class GroupService {
      * USERS
      */
     // Finders ----------------------------------------------------------------
-    @Transactional
+    @Transactional(readOnly = true)
     public List<User> getUsersFromGroup(Group group) {
         return groupUserRepository.findById(group.getId()).stream()
                 .map(groupUser -> userService.findUserById(groupUser.getIdUser()))

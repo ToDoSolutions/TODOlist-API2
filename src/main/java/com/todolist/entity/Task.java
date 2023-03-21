@@ -10,7 +10,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -21,7 +20,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Task extends BaseEntity implements Serializable {
+public class Task extends BaseEntity {
 
     // Attributes -------------------------------------------------------------
     @Size(max = 50, message = "The title is too long.")
