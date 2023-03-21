@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 @Getter
 public class DateFilter {
-
     private Boolean isGreater;
     private Boolean isLess;
     private Boolean isEqual;

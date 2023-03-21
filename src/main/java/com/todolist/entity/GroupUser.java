@@ -1,30 +1,22 @@
 package com.todolist.entity;
 
+import com.todolist.model.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
-public class GroupUser {
+public class GroupUser extends BaseEntity {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private Long idGroupUser;
+    // Attributes -------------------------------------------------------------
+    private Integer idGroup;
 
-    private Long idGroup;
-
-    private Long idUser;
-
-    public GroupUser(Long idGroup, Long idUser) {
-        this.idGroup = idGroup;
-        this.idUser = idUser;
-    }
+    private Integer idUser;
 }

@@ -33,7 +33,7 @@ The Task resource is used to create, retrieve, update, and delete tasks. If we'r
   "difficulty": "It could be SLEEP, EASY, MEDIUM, HARD, HARDCORE and I_WANT_TO_DIE.",
   "duration": "Calculated using the start date and the end date.",
   "finishedDate": "The date that the task must be finished.",
-  "idTask": "The id of the task.",
+  "idGroup": "The id of the task.",
   "priority": "It must be a number between 0 and 5 (0 not important, 5 very important).",
   "startDate": "The date that the task was started.",
   "status": "It could be DRAFT, IN_PROGRESS, IN_REVISION, DONE and CANCELLED.",
@@ -122,7 +122,7 @@ To access the automatic document generation service for the Design and Testing s
 [
   {
     "idUser": "The user's id.",
-    "idTask": "The task's id."
+    "idGroup": "The task's id."
   }
 ]
 ```

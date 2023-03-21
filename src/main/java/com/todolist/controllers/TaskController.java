@@ -41,7 +41,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/task/{idTask}") // DeleteTest
-    public Map<String, Object> deleteTask(@PathVariable("idTask") Long idTask) {
+    public Map<String, Object> deleteTask(@PathVariable("idTask") Integer idTask) {
         Task task = taskService.findTaskById(idTask);
         taskService.deleteTask(task);
         return dtoManager.getShowTaskAsJson(task);
@@ -80,7 +80,7 @@ public class TaskController {
     }
 
     @GetMapping("/task/{idTask}") // GetSoloTest
-    public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask,
+    public Map<String, Object> getTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask,
                                        @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask) {
         Task task = taskService.findTaskById(idTask);
         return dtoManager.getShowTaskAsJson(task, fieldsTask);
@@ -100,7 +100,7 @@ public class TaskController {
         dateTaskValidator.validate(task, bindingResult);
         if (bindingResult.hasErrors())
             throw new BadRequestException("The task is invalid.");
-        Task oldTask = taskService.findTaskById(task.getIdTask());
+        Task oldTask = taskService.findTaskById(task.getId());
         BeanUtils.copyProperties(task, oldTask, "idTask");
         taskService.saveTask(oldTask);
         return dtoManager.getShowTaskAsJson(task);

@@ -1,7 +1,7 @@
 package com.todolist.controllers;
 
 
-import com.todolist.entity.autodoc.TimeTask;
+import com.todolist.dtos.autodoc.TimeTask;
 import com.todolist.services.AutoDocService;
 import com.todolist.utilities.WriterManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +76,6 @@ public class AutoDocController {
                 .map(s -> s.replace("{content3}", output[3]))
                 .map(s -> s.replace("{roles}", output[4]))
                 .map(s -> s.replace("{individual}", individual))
-
                 .get(PLANNING_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE)));
     }
 

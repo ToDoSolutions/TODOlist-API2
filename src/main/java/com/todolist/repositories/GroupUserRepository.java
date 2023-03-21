@@ -13,11 +13,9 @@ public interface GroupUserRepository extends JpaRepository<GroupUser, Serializab
 
     List<GroupUser> findAll();
 
-    List<GroupUser> findByIdGroup(Long idGroup);
+    List<GroupUser> findById(Integer idGroup);
 
-    List<GroupUser> findByIdUser(Long idUser);
-
-    List<GroupUser> findByIdGroupAndIdUser(Long idGroup, Long idUser);
+    List<GroupUser> findByIdAndIdUser(Integer idGroup, Integer idUser);
 
 
 }

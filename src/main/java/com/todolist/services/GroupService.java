@@ -1,5 +1,6 @@
 package com.todolist.services;
 
+import com.todolist.component.DataManager;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.*;
 import com.todolist.exceptions.BadRequestException;
@@ -7,39 +8,88 @@ import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.GroupRepository;
 import com.todolist.repositories.GroupUserRepository;
 import com.todolist.repositories.UserTaskRepository;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class GroupService {
 
+    // Services ---------------------------------------------------------------
+    private final GroupRepository groupRepository;
+    private final UserTaskRepository userTaskRepository;
 
-    private GroupRepository groupRepository;
+    private final GroupUserRepository groupUserRepository;
+
+    private final UserService userService;
+
+    // Components -------------------------------------------------------------
+    private final DataManager dataManager;
 
 
-    private UserTaskRepository userTaskRepository;
+    // Constructors -----------------------------------------------------------
+    @Autowired
+    public GroupService(GroupRepository groupRepository, UserTaskRepository userTaskRepository, GroupUserRepository groupUserRepository, UserService userService, DataManager dataManager) {
+        this.groupRepository = groupRepository;
+        this.userTaskRepository = userTaskRepository;
+        this.groupUserRepository = groupUserRepository;
+        this.userService = userService;
+        this.dataManager = dataManager;
+    }
 
+    // Populate database ------------------------------------------------------
+    @PostConstruct
+    @Transactional
+    public void init() throws IOException {
+        List<Group> groups = dataManager.loadGroup();
+        groupRepository.saveAll(groups);
+        List<GroupUser> groupUsers = dataManager.loadGroupUser();
+        groupUserRepository.saveAll(groupUsers);
+    }
 
-    private GroupUserRepository groupUserRepository;
-
-
-    private UserService userService;
-
+    /**
+     * GROUPS
+     */
+    // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<Group> findAllGroups(Sort sort) {
         return groupRepository.findAll(sort);
     }
 
     @Transactional(readOnly = true)
-    public Group findGroupById(Long idGroup) {
+    public Group findGroupById(Integer idGroup) {
         return groupRepository.findById(idGroup).orElseThrow(() -> new NotFoundException("The group with idGroup " + idGroup + " does not exist."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Group> findGroupsWithUser(User user) {
+        List<Group> groups = groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).contains(user)).toList();
+        if (groups.isEmpty())
+            throw new BadRequestException("The user with idUser " + user.getId() + " does not belong to any group.");
+        return groups;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Group> findGroupsWithTask(Task task) {
+        List<Group> groups = groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).stream().anyMatch(user -> userService.getTasksFromUser(user).contains(task))).toList();
+        if (groups.isEmpty())
+            throw new BadRequestException("The task with idTask " + task.getId() + " does not belong to any group.");
+        return groups;
+    }
+
+    @Transactional(readOnly = true)
+    public Group findTaskByTitle(String username, String repoName) {
+        return findGroupsWithUser(userService.findUserByUsername(username)).stream()
+                .filter(group -> group.getName().equals(repoName))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("The group with name " + repoName + " does not exist."));
     }
 
     @Transactional(readOnly = true)
@@ -49,6 +99,7 @@ public class GroupService {
                 .collect(Collectors.toSet()).size();
     }
 
+    // Save and delete --------------------------------------------------------
     @Transactional
     public Group saveGroup(Group group) {
         if (group.getCreatedDate() == null) group.setCreatedDate(LocalDate.now());
@@ -60,9 +111,13 @@ public class GroupService {
         groupRepository.delete(group);
     }
 
+    /**
+     * USERS
+     */
+    // Finders ----------------------------------------------------------------
     @Transactional
     public List<User> getUsersFromGroup(Group group) {
-        return groupUserRepository.findByIdGroup(group.getIdGroup()).stream()
+        return groupUserRepository.findById(group.getId()).stream()
                 .map(groupUser -> userService.findUserById(groupUser.getIdUser()))
                 .toList();
     }
@@ -72,29 +127,34 @@ public class GroupService {
         return getUsersFromGroup(group).stream().map(user -> new ShowUser(user, userService.getShowTaskFromUser(user))).toList();
     }
 
+    // Save and delete --------------------------------------------------------
     @Transactional
     public void addUserToGroup(Group group, User user) {
-        groupUserRepository.save(new GroupUser(group.getIdGroup(), user.getIdUser()));
+        groupUserRepository.save(new GroupUser(group.getId(), user.getId()));
     }
 
     @Transactional
     public void removeUserFromGroup(Group group, User user) {
-        List<GroupUser> groupUser = groupUserRepository.findByIdGroupAndIdUser(group.getIdGroup(), user.getIdUser());
+        List<GroupUser> groupUser = groupUserRepository.findByIdAndIdUser(group.getId(), user.getId());
         groupUserRepository.deleteAll(groupUser);
     }
 
     @Transactional
     public void removeAllUsersFromGroup(Group group) {
-        List<GroupUser> groupUser = groupUserRepository.findByIdGroup(group.getIdGroup());
+        List<GroupUser> groupUser = groupUserRepository.findById(group.getId());
         if (groupUser == null)
-            throw new NotFoundException("The group with idGroup " + group.getIdGroup() + " does not exist.");
+            throw new NotFoundException("The group with idGroup " + group.getId() + " does not exist.");
         groupUserRepository.deleteAll(groupUser);
     }
 
+    /**
+     * TASKS
+     */
+    // Save and delete --------------------------------------------------------
     @Transactional
     public void addTaskToGroup(Group group, Task task) {
         for (User user : getUsersFromGroup(group)) {
-            List<UserTask> userTask = userTaskRepository.findByIdTaskAndIdUser(task.getIdTask(), user.getIdUser());
+            List<UserTask> userTask = userTaskRepository.findByIdAndIdUser(task.getId(), user.getId());
             if (userTask.isEmpty())
                 userService.addTaskToUser(user, task);
         }
@@ -103,26 +163,10 @@ public class GroupService {
     @Transactional
     public void removeTaskFromGroup(Group group, Task task) {
         for (User user : getUsersFromGroup(group)) {
-            List<UserTask> userTask = userTaskRepository.findByIdTaskAndIdUser(task.getIdTask(), user.getIdUser());
+            List<UserTask> userTask = userTaskRepository.findByIdAndIdUser(task.getId(), user.getId());
             if (!userTask.isEmpty())
                 userService.removeTaskFromUser(user, task);
         }
-    }
-
-    @Transactional(readOnly = true)
-    public List<Group> findGroupsWithUser(User user) {
-        List<Group> groups = groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).contains(user)).toList();
-        if (groups.isEmpty())
-            throw new BadRequestException("The user with idUser " + user.getIdUser() + " does not belong to any group.");
-        return groups;
-    }
-
-    @Transactional(readOnly = true)
-    public List<Group> findGroupsWithTask(Task task) {
-        List<Group> groups = groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).stream().anyMatch(user -> userService.getTasksFromUser(user).contains(task))).toList();
-        if (groups.isEmpty())
-            throw new BadRequestException("The task with idTask " + task.getIdTask() + " does not belong to any group.");
-        return groups;
     }
 
     @Transactional

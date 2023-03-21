@@ -1,52 +1,30 @@
 package com.todolist.entity;
 
 
-import lombok.EqualsAndHashCode;
+import com.todolist.model.NamedEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(of = {"idGroup"})
-public class Group {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Group extends NamedEntity {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private Long idGroup;
-
-    @Size(max = 50, message = "The name is too long.")
-    @NotNull(message = "The name is required.")
-    @NotBlank(message = "The name is required.")
-    private String name;
-
+    // Attributes -------------------------------------------------------------
     @Size(max = 500, message = "The description is too long.")
-    @NotNull(message = "The description is required.")
     @NotBlank(message = "The description is required.")
     private String description;
 
     private LocalDate createdDate;
 
-    public Group() {
-        this.idGroup = 0L;
-    }
-
-    public static Group of(String name, String description, LocalDate createdDate) {
-        Group group = new Group();
-        group.setName(name);
-        group.setDescription(description);
-        group.setCreatedDate(createdDate);
-        return group;
-    }
-
-
+    private String workSpaceId;
 }

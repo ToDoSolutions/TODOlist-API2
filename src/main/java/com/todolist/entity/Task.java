@@ -2,11 +2,15 @@ package com.todolist.entity;
 
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.Status;
-import lombok.EqualsAndHashCode;
+import com.todolist.model.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -16,21 +20,17 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(of = {"idTask"})
-public class Task implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Task extends BaseEntity implements Serializable {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private Long idTask;
-
+    // Attributes -------------------------------------------------------------
     @Size(max = 50, message = "The title is too long.")
     @NotBlank(message = "The title is required.")
-    @NotNull(message = "The title is required.")
     private String title;
 
     @Size(max = 200, message = "The description is too long.")
     @NotBlank(message = "The description is required.")
-    @NotNull(message = "The description is required.")
     private String description;
 
     @Size(max = 50, message = "The annotation is too long.")
@@ -51,24 +51,6 @@ public class Task implements Serializable {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
-    private String workSpaceId;
-
-    public Task() {
-        this.idTask = 0L;
-    }
-
-    public static Task of(String title, String description, String annotation, Status status, LocalDate finishedDate, LocalDate startDate, Long priority, Difficulty difficulty) {
-        Task task = new Task();
-        task.setTitle(title);
-        task.setDescription(description);
-        task.setAnnotation(annotation);
-        task.setStatus(status);
-        task.setFinishedDate(finishedDate);
-        task.setStartDate(startDate);
-        task.setPriority(priority);
-        task.setDifficulty(difficulty);
-        return task;
-    }
 
     public long getDuration() {
         return DAYS.between(startDate, finishedDate);

@@ -11,7 +11,6 @@ import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 // TODO: Revisar todas estas excepciones.

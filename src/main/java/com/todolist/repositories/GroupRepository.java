@@ -7,11 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Serializable>, PagingAndSortingRepository<Group, Serializable> {
     List<Group> findAll();
 
-    Optional<Group> findByIdGroup(Long idGroup);
 }

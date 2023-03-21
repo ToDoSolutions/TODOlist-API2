@@ -20,7 +20,7 @@ public class ShowTask extends ShowEntity{
     public static final List<String> ALL_ATTRIBUTES = List.of("idTask", "title", "description", "status", "finishedDate", "startDate", "annotation", "priority", "difficulty", "duration");
     public static final String ALL_ATTRIBUTES_STRING = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration";
 
-    private Long idTask;
+    private Integer idTask;
     private String title, description, annotation;
     private Status status;
     private LocalDate finishedDate, startDate;
@@ -31,7 +31,7 @@ public class ShowTask extends ShowEntity{
     }
 
     public ShowTask(Task task) {
-        this.idTask = task.getIdTask();
+        this.idTask = task.getId();
         this.title = task.getTitle();
         this.description = task.getDescription();
         this.annotation = task.getAnnotation();

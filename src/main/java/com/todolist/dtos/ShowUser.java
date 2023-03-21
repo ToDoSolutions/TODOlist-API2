@@ -19,7 +19,7 @@ public class ShowUser extends ShowEntity {
     public static final String ALL_ATTRIBUTES_STRING = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks";
     public static final String TASKS = "tasks";
     public static final String COMMA = ",";
-    private Long idUser;
+    private Integer idUser;
     private String name;
     private String surname;
     private String username;
@@ -31,7 +31,7 @@ public class ShowUser extends ShowEntity {
 
 
     public ShowUser(User user, List<ShowTask> tasks) {
-        this.idUser = user.getIdUser();
+        this.idUser = user.getId();
         this.name = user.getName();
         this.surname = user.getSurname();
         this.email = user.getEmail();

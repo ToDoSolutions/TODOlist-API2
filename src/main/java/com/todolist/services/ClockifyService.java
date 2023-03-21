@@ -1,66 +1,61 @@
 package com.todolist.services;
 
 import com.todolist.component.FetchApiData;
-import com.todolist.entity.Task;
-import com.todolist.entity.autodoc.Role;
-import com.todolist.entity.autodoc.clockify.ClockifyTask;
-import com.todolist.entity.autodoc.clockify.Tag;
+import com.todolist.dtos.autodoc.RoleStatus;
+import com.todolist.dtos.autodoc.clockify.ClockifyTask;
+import com.todolist.entity.Group;
+import com.todolist.entity.Tag;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
 @Service
 public class ClockifyService {
 
+    // Constants ---------------------------------------------------------------
     public static final String WORKSPACE_ID = "{workspaceId}";
     public static final String CLOCKIFY_ID = "{clockifyId}";
-    public static final String TAG_ID = "{tagId}";
     public static final String X_API_KEY = "X-Api-Key";
-    private final Map<String, Tag> tagAlreadyFind;
+    // Services ---------------------------------------------------------------
+    private final GroupService groupService;
+    private final TagService tagService;
+    // Components -------------------------------------------------------------
     private final FetchApiData fetchApiData;
-    private final UserService userService;
-    @Value("${clockify.api.url.entries}")
-    private String entriesUrl;
-    @Value("${clockify.api.url.tags}")
-    private String tagsUrl;
     @Value("${clockify.api.token}")
     private String token;
+    // Urls ------------------------------------------------------------------
+    @Value("${clockify.api.url.entries}")
+    private String entriesUrl;
 
+
+    // Constructors -----------------------------------------------------------
     @Autowired
-    public ClockifyService(FetchApiData fetchApiData, UserService userService) {
-        this.tagAlreadyFind = new HashMap<>();
+    public ClockifyService(FetchApiData fetchApiData, GroupService groupService, TagService tagService) {
+        this.groupService = groupService;
+        this.tagService = tagService;
         this.fetchApiData = fetchApiData;
-        this.userService = userService;
     }
 
-    // Get all task from a workspace
-    public ClockifyTask[] getTaskFromWorkspace(String repoName, String username) {
-
-        Task task = userService.findTaskByTitle(username, repoName);
-        return userService.findUsersWithTask(task)
+    // Methods ----------------------------------------------------------------
+    public ClockifyTask[] getTaskFromWorkspace(String repoName, String username) { // Get all task from a workspace
+        Group task = groupService.findTaskByTitle(username, repoName);
+        return groupService.getUsersFromGroup(task)
                 .stream()
                 .map(user -> fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair<>(X_API_KEY, token)))
                 .flatMap(Stream::of).toArray(ClockifyTask[]::new);
     }
 
     public Tag getTagFromClockify(String repoName, String username, String tagId) {
-        Task task = userService.findTaskByTitle(username, repoName);
+        Group task = groupService.findTaskByTitle(username, repoName);
         if (tagId == null)
             return new Tag();
-        if (tagAlreadyFind.containsKey(tagId))
-            return tagAlreadyFind.get(tagId);
-        String url = tagsUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(TAG_ID, tagId);
-        Tag tag = fetchApiData.getApiDataWithToken(url, Tag.class, new Pair<>(X_API_KEY, token));
-        tagAlreadyFind.put(tagId, tag);
-        return tag;
+        return tagService.getTagById(task, tagId);
     }
 
-    public Role getRoleFromClockify(String repoName, String username, String roleId) {
-        return Role.parseTag(getTagFromClockify(repoName, username, roleId));
+    public RoleStatus getRoleFromClockify(String repoName, String username, String roleId) {
+        return RoleStatus.parseTag(getTagFromClockify(repoName, username, roleId));
     }
 }

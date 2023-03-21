@@ -1,10 +1,7 @@
 package com.todolist.dtos;
 
 import com.todolist.entity.Group;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,13 +13,14 @@ import java.util.stream.Stream;
 @Setter
 @ToString
 @EqualsAndHashCode(of = {"idGroup"}, callSuper = false)
+@NoArgsConstructor
 public class ShowGroup extends ShowEntity{
 
     public static final List<String> ALL_ATTRIBUTES = List.of("idGroup", "name", "description", "createdDate", "users", "numTasks");
     public static final String ALL_ATTRIBUTES_STRING = "idGroup,name,description,createdDate,users,numTasks";
     public static final String COMMA = ",";
     public static final String USERS = "users";
-    private Long idGroup;
+    private Integer idGroup;
     private String name;
     private String description;
     private LocalDate createdDate;
@@ -31,11 +29,8 @@ public class ShowGroup extends ShowEntity{
 
     private List<ShowUser> users;
 
-    public ShowGroup() {
-    }
-
     public ShowGroup(Group group, List<ShowUser> users) {
-        this.idGroup = group.getIdGroup();
+        this.idGroup = group.getId();
         this.name = group.getName();
         this.description = group.getDescription();
         this.createdDate = group.getCreatedDate();

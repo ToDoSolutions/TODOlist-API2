@@ -1,51 +1,41 @@
 package com.todolist.entity;
 
-import lombok.EqualsAndHashCode;
+import com.todolist.model.NamedEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.*;
+import javax.persistence.Transient;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(of = {"idUser"})
-@ToString
-public class User implements Serializable {
+@AllArgsConstructor
+@NoArgsConstructor
+public class User extends NamedEntity implements Serializable {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private Long idUser;
-
-    @Size(max = 50, message = "The name is too long.")
-    @NotBlank(message = "The name is required.")
-    @NotNull(message = "The name is required.")
-    private String name;
-
+    // Attributes -------------------------------------------------------------
     @Size(max = 50, message = "The surname is too long.")
-    @NotNull(message = "The surname is required.")
     @NotBlank(message = "The surname is required.")
     private String surname;
 
     @Size(max = 50, message = "The username is too long.")
-    @NotNull(message = "The username is required.")
     @NotBlank(message = "The username is required.")
     private String username;
 
     @Email(message = "The email is invalid.")
-    @NotNull(message = "The email is required.")
     @NotBlank(message = "The email is required.")
     private String email;
 
     @Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z\\d+&@#/%?=~_|!:,.;]*[-a-zA-Z\\d+&@#/%=~_|]", message = "The avatar is invalid.")
-    @NotNull(message = "The avatar is required.")
     @NotBlank(message = "The avatar is required.")
     private String avatar;
 
@@ -57,7 +47,6 @@ public class User implements Serializable {
 
     @Size(max = 50, message = "The password is too long.")
     @NotBlank(message = "The password is required.")
-    @NotNull(message = "The password is required.")
     private String password;
 
     @Size(max = 50, message = "The token is too long.")
@@ -65,25 +54,10 @@ public class User implements Serializable {
 
     private String clockifyId;
 
-    public User() {
-        this.idUser = 0L;
-    }
-
-    public static User of(String name, String surname, String username, String email, String avatar, String bio, String location, String password) {
-        User user = new User();
-        user.setName(name);
-        user.setSurname(surname);
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setAvatar(avatar);
-        user.setBio(bio);
-        user.setLocation(location);
-        user.setPassword(password);
-        return user;
-    }
-
+    // Derived attributes -----------------------------------------------------
+    @Transient
     public String getFullName() {
-        return name + " " + surname;
+        return getName() + " " + surname;
     }
 
 

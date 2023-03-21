@@ -49,7 +49,7 @@ public class GroupController {
     /* GROUP OPERATIONS */
 
     @DeleteMapping("/group/{idGroup}") // DeleteTest
-    public Map<String, Object> deleteGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
+    public Map<String, Object> deleteGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup) {
         Group group = groupService.findGroupById(idGroup);
         groupService.deleteGroup(group);
         return dtoManager.getShowGroupAsJson(group);
@@ -78,7 +78,7 @@ public class GroupController {
     }
 
     @GetMapping("/group/{idGroup}") // GetSoloTest
-    public Map<String, Object> getGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
+    public Map<String, Object> getGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
                                         @RequestParam(defaultValue = ShowGroup.ALL_ATTRIBUTES_STRING) String fieldsGroup,
                                         @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES_STRING) String fieldsUser,
                                         @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask) {
@@ -95,8 +95,8 @@ public class GroupController {
     @PutMapping("/group") // PutTest
     public Map<String, Object> updateGroup(@RequestBody @Valid Group group, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
-            throw new BadRequestException("The group with idGroup " + group.getIdGroup() + " is invalid.");
-        Group oldGroup = groupService.findGroupById(group.getIdGroup());
+            throw new BadRequestException("The group with idGroup " + group.getId() + " is invalid.");
+        Group oldGroup = groupService.findGroupById(group.getId());
         BeanUtils.copyProperties(group, oldGroup, "idGroup", "createdDate");
         oldGroup = groupService.saveGroup(oldGroup);
         return dtoManager.getShowGroupAsJson(oldGroup);
@@ -105,7 +105,7 @@ public class GroupController {
     /* USER OPERATIONS */
 
     @DeleteMapping("/group/{idGroup}/users") // DeleteAllTest
-    public Map<String, Object> deleteAllUsersFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
+    public Map<String, Object> deleteAllUsersFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup) {
         Group group = groupService.findGroupById(idGroup);
         groupService.removeAllUsersFromGroup(group);
         return dtoManager.getShowGroupAsJson(group);
@@ -113,8 +113,8 @@ public class GroupController {
 
 
     @DeleteMapping("/group/{idGroup}/user/{idUser}") // DeleteTest
-    public Map<String, Object> deleteUserFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
-                                                   @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
+    public Map<String, Object> deleteUserFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
+                                                   @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser) {
         Group group = groupService.findGroupById(idGroup);
         User user = userService.findUserById(idUser);
         groupService.removeUserFromGroup(group, user);
@@ -123,7 +123,7 @@ public class GroupController {
 
 
     @GetMapping("/groups/user/{idUser}") // GetAllTest
-    public List<Map<String, Object>> getGroupsWithUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
+    public List<Map<String, Object>> getGroupsWithUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser) {
         User user = userService.findUserById(idUser);
         List<Group> groups = groupService.findGroupsWithUser(user);
         return groups.stream().map(dtoManager::getShowGroupAsJson).toList();
@@ -131,8 +131,8 @@ public class GroupController {
 
 
     @PutMapping("/group/{idGroup}/user/{idUser}") // PutTest
-    public Map<String, Object> addUserToGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
-                                              @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser) {
+    public Map<String, Object> addUserToGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
+                                              @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser) {
         Group group = groupService.findGroupById(idGroup);
         User user = userService.findUserById(idUser);
         if (!groupService.getShowUserFromGroup(group).contains(new ShowUser(user, userService.getShowTaskFromUser(user))))
@@ -143,7 +143,7 @@ public class GroupController {
     /* TASK OPERATIONS */
 
     @DeleteMapping("/group/{idGroup}/tasks") // DeleteAllTest
-    public Map<String, Object> deleteAllTasksFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup) {
+    public Map<String, Object> deleteAllTasksFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup) {
         Group group = groupService.findGroupById(idGroup);
         groupService.removeAllTasksFromGroup(group);
         return dtoManager.getShowGroupAsJson(group);
@@ -151,8 +151,8 @@ public class GroupController {
 
 
     @DeleteMapping("group/{idGroup}/task/{idTask}") // DeleteTest
-    public Map<String, Object> deleteTaskFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
-                                                   @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
+    public Map<String, Object> deleteTaskFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
+                                                   @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
         Group group = groupService.findGroupById(idGroup);
         Task task = taskService.findTaskById(idTask);
         if (groupService.getShowUserFromGroup(group).stream().anyMatch(user -> user.getTasks().contains(new ShowTask(task))))
@@ -161,15 +161,15 @@ public class GroupController {
     }
 
     @GetMapping("/groups/task/{idTask}") // GetAllTest
-    public List<Map<String, Object>> getGroupsWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
+    public List<Map<String, Object>> getGroupsWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
         Task task = taskService.findTaskById(idTask);
         List<Group> groups = groupService.findGroupsWithTask(task);
         return groups.stream().map(dtoManager::getShowGroupAsJson).toList();
     }
 
     @PutMapping("/group/{idGroup}/task/{idTask}") // PutTest
-    public Map<String, Object> addTaskToGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Long idGroup,
-                                              @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
+    public Map<String, Object> addTaskToGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
+                                              @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
         Group group = groupService.findGroupById(idGroup);
         Task task = taskService.findTaskById(idTask);
         if (groupService.getShowUserFromGroup(group).stream().noneMatch(user -> user.getTasks().contains(new ShowTask(task))))

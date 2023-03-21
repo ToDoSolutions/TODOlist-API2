@@ -1,6 +1,5 @@
 [
   {
-    "idUser": 0,
     "avatar": "https://lh3.googleuserconte.png",
     "bio": "...",
     "email": "example@example.com",
@@ -42,7 +41,7 @@
     "surname": "Santiago Sánchez",
     "password": "1234",
     "username": "sersansan2",
-    "clockifyId": "6335c4fb82274401b556108a"
+    "clockifyId": "63554fb06377717db5f59884"
   },
   {
     "avatar": "https://lh3.googleuserconte.png",

@@ -13,10 +13,8 @@ public interface UserTaskRepository extends JpaRepository<UserTask, Serializable
 
     List<UserTask> findAll();
 
-    List<UserTask> findByIdTask(Long idTask);
+    List<UserTask> findByIdUser(Integer idUser);
 
-    List<UserTask> findByIdUser(Long idUser);
-
-    List<UserTask> findByIdTaskAndIdUser(Long idTask, Long idUser);
+    List<UserTask> findByIdAndIdUser(Integer idTask, Integer idUser);
 
 }

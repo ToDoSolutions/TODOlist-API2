@@ -1,12 +1,5 @@
 package com.todolist.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import com.todolist.component.DataManager;
 import com.todolist.entity.Task;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.TaskRepository;
@@ -15,32 +8,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class TaskService {
 
-
+    // Repositories -----------------------------------------------------------
     private final TaskRepository taskRepository;
-    private final DataManager dataManager;
 
+    // Constructors -----------------------------------------------------------
     @Autowired
-    public TaskService(TaskRepository taskRepository, DataManager dataManager) {
+    public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-        this.dataManager = dataManager;
     }
 
-    @PostConstruct
-    @Transactional
-    public void loadData() throws IOException {
-        List<Task> tasks = dataManager.loadTask();
-        taskRepository.saveAll(tasks);
-    }
-
+    // Finders ----------------------------------------------------------------
 
     @Transactional(readOnly = true)
     public List<Task> findAllTasks(Sort sort) {
@@ -53,10 +36,11 @@ public class TaskService {
     }
 
     @Transactional
-    public Task findTaskById(Long idTask) {
+    public Task findTaskById(Integer idTask) {
         return taskRepository.findById(idTask).orElseThrow(() -> new NotFoundException("The task with idTask " + idTask + " does not exist."));
     }
 
+    // Save and delete --------------------------------------------------------
     @Transactional
     public Task saveTask(Task task) {
         if (task.getStartDate() == null)

@@ -53,7 +53,7 @@ public class UserController {
     /* USER OPERATIONS */
 
     @DeleteMapping("/user/{idUser}") // DeleteTest
-    public Map<String, Object> deleteUser(@PathVariable("idUser") @Min(value = 0, message = "The idGroup must be positive.") Long idUser) {
+    public Map<String, Object> deleteUser(@PathVariable("idUser") Integer idUser) {
         User user = userService.findUserById(idUser);
         userService.deleteUser(user);
         return dtoManager.getShowUserAsJson(user);
@@ -87,7 +87,7 @@ public class UserController {
     }
 
     @GetMapping("/user/{idUser}") // GetSoloTest
-    public Map<String, Object> getUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser,
+    public Map<String, Object> getUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser,
                                        @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
                                        @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES_STRING) String fieldsUser) {
         User user = userService.findUserById(idUser);
@@ -108,7 +108,7 @@ public class UserController {
     public Map<String, Object> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BadRequestException("The user is invalid.");
-        User oldUser = userService.findUserById(user.getIdUser());
+        User oldUser = userService.findUserById(user.getId());
         BeanUtils.copyProperties(user, oldUser, "idUser", "password", "token", "tasks");
         oldUser = userService.saveUser(oldUser);
         return dtoManager.getShowUserAsJson(oldUser);
@@ -117,14 +117,14 @@ public class UserController {
     /* TASK OPERATIONS */
 
     @DeleteMapping("/user/{idUser}/tasks") // DeleteTest
-    public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Long idUser) {
+    public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Integer idUser) {
         User user = userService.findUserById(idUser);
         userService.removeAllTasksFromUser(user);
         return dtoManager.getShowUserAsJson(user);
     }
 
     @DeleteMapping("/user/{idUser}/task/{idTask}") // DeleteAllTest
-    public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
+    public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
         User user = userService.findUserById(idUser);
         Task task = taskService.findTaskById(idTask);
         if (userService.getTasksFromUser(user).contains(task)) userService.removeTaskFromUser(user, task);
@@ -132,14 +132,14 @@ public class UserController {
     }
 
     @GetMapping("/users/task/{idTask}") // GetAllTest
-    public List<Map<String, Object>> getUserWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Long idTask) {
+    public List<Map<String, Object>> getUserWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
         Task task = taskService.findTaskById(idTask);
         List<User> users = userService.findUsersWithTask(task);
         return users.stream().map(dtoManager::getShowUserAsJson).toList();
     }
 
     @PutMapping("/user/{idUser}/task/{idTask}") // PutTest
-    public Map<String, Object> addTaskToUser(@PathVariable("idUser") Long idUser, @PathVariable("idTask") Long idTask) {
+    public Map<String, Object> addTaskToUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
         User user = userService.findUserById(idUser);
         Task task = taskService.findTaskById(idTask);
         if (!userService.getTasksFromUser(user).contains(task)) userService.addTaskToUser(user, task);
@@ -149,7 +149,7 @@ public class UserController {
     /* TOKEN OPERATION */
 
     @PutMapping("/user/{idUser}/token") // TokenTest
-    public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Long idUser,
+    public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser,
                                            @RequestHeader("Authorization") String token) {
         User user = userService.findUserById(idUser);
         if (token == null || token.isEmpty())
