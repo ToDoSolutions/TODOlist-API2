@@ -127,7 +127,7 @@ public class UserController {
     public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
         User user = userService.findUserById(idUser);
         Task task = taskService.findTaskById(idTask);
-        if (userService.getTasksFromUser(user).contains(task)) userService.removeTaskFromUser(user, task);
+        if (user.getTasks().contains(task)) userService.removeTaskFromUser(user, task);
         return dtoManager.getShowUserAsJson(user);
     }
 
@@ -142,7 +142,7 @@ public class UserController {
     public Map<String, Object> addTaskToUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
         User user = userService.findUserById(idUser);
         Task task = taskService.findTaskById(idTask);
-        if (!userService.getTasksFromUser(user).contains(task)) userService.addTaskToUser(user, task);
+        if (!user.getTasks().contains(task)) userService.addTaskToUser(user, task);
         return dtoManager.getShowUserAsJson(user);
     }
 

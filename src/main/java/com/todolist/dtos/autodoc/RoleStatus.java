@@ -1,10 +1,7 @@
 package com.todolist.dtos.autodoc;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.todolist.converters.RoleStatusDeserializer;
 import com.todolist.entity.Tag;
 
-@JsonDeserialize(using = RoleStatusDeserializer.class)
 public enum RoleStatus {
     OPERATOR(20),
     TESTER(20),

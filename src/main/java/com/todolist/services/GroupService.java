@@ -7,7 +7,6 @@ import com.todolist.exceptions.BadRequestException;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.GroupRepository;
 import com.todolist.repositories.GroupUserRepository;
-import com.todolist.repositories.UserTaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ public class GroupService {
 
     // Services ---------------------------------------------------------------
     private final GroupRepository groupRepository;
-    private final UserTaskRepository userTaskRepository;
 
     private final GroupUserRepository groupUserRepository;
 
@@ -36,9 +34,8 @@ public class GroupService {
 
     // Constructors -----------------------------------------------------------
     @Autowired
-    public GroupService(GroupRepository groupRepository, UserTaskRepository userTaskRepository, GroupUserRepository groupUserRepository, UserService userService, DataManager dataManager) {
+    public GroupService(GroupRepository groupRepository, GroupUserRepository groupUserRepository, UserService userService, DataManager dataManager) {
         this.groupRepository = groupRepository;
-        this.userTaskRepository = userTaskRepository;
         this.groupUserRepository = groupUserRepository;
         this.userService = userService;
         this.dataManager = dataManager;
@@ -78,7 +75,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public List<Group> findGroupsWithTask(Task task) {
-        List<Group> groups = groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).stream().anyMatch(user -> userService.getTasksFromUser(user).contains(task))).toList();
+        List<Group> groups = groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).stream().anyMatch(user -> user.getTasks().contains(task))).toList();
         if (groups.isEmpty())
             throw new BadRequestException("The task with idTask " + task.getId() + " does not belong to any group.");
         return groups;
@@ -95,7 +92,7 @@ public class GroupService {
     @Transactional(readOnly = true)
     public Long getNumTasks(Group group) {
         return (long) getUsersFromGroup(group).stream()
-                .flatMap(user -> userService.getTasksFromUser(user).stream())
+                .flatMap(user -> user.getTasks().stream())
                 .collect(Collectors.toSet()).size();
     }
 
@@ -154,18 +151,14 @@ public class GroupService {
     @Transactional
     public void addTaskToGroup(Group group, Task task) {
         for (User user : getUsersFromGroup(group)) {
-            List<UserTask> userTask = userTaskRepository.findByIdAndIdUser(task.getId(), user.getId());
-            if (userTask.isEmpty())
-                userService.addTaskToUser(user, task);
+            userService.addTaskToUser(user, task);
         }
     }
 
     @Transactional
     public void removeTaskFromGroup(Group group, Task task) {
         for (User user : getUsersFromGroup(group)) {
-            List<UserTask> userTask = userTaskRepository.findByIdAndIdUser(task.getId(), user.getId());
-            if (!userTask.isEmpty())
-                userService.removeTaskFromUser(user, task);
+            userService.removeTaskFromUser(user, task);
         }
     }
 

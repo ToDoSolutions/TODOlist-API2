@@ -3,7 +3,7 @@ package com.todolist.services;
 import com.todolist.component.FetchApiData;
 import com.todolist.entity.Group;
 import com.todolist.entity.Tag;
-import com.todolist.repositories.TagRepositoty;
+import com.todolist.repositories.TagRepository;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ public class TagService {
     public static final String TAG_ID = "{tagId}";
     public static final String X_API_KEY = "X-Api-Key";
     // Repositories -----------------------------------------------------------
-    private final TagRepositoty tagRepositoty;
+    private final TagRepository tagRepository;
     // Components -------------------------------------------------------------
     private final FetchApiData fetchApiData;
     @Value("${clockify.api.token}")
@@ -27,20 +27,20 @@ public class TagService {
     private String tagsUrl;
 
     @Autowired
-    public TagService(TagRepositoty tagRepositoty, FetchApiData fetchApiData) {
-        this.tagRepositoty = tagRepositoty;
+    public TagService(TagRepository tagRepository, FetchApiData fetchApiData) {
+        this.tagRepository = tagRepository;
         this.fetchApiData = fetchApiData;
     }
 
     // Finders ----------------------------------------------------------------
     Tag getTagById(Group group, String idTag) {
-        return tagRepositoty.findByClockifyId(idTag).orElse(getTagFromClockify(group, idTag));
+        return tagRepository.findByClockifyId(idTag).orElse(getTagFromClockify(group, idTag));
     }
 
     private Tag getTagFromClockify(Group group, String idTag) {
         String url = tagsUrl.replace(WORKSPACE_ID, group.getWorkSpaceId()).replace(TAG_ID, idTag);
         Tag tag = fetchApiData.getApiDataWithToken(url, Tag.class, new Pair<>(X_API_KEY, token));
-        tagRepositoty.save(tag);
+        tagRepository.save(tag);
         return tag;
     }
 }

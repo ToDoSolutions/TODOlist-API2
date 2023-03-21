@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.List;
 
 
 @Entity
@@ -60,5 +62,8 @@ public class User extends NamedEntity implements Serializable {
         return getName() + " " + surname;
     }
 
+    // Relationships ----------------------------------------------------------
+    @OneToMany(mappedBy = "user")
+    private List<Task> tasks;
 
 }

@@ -8,12 +8,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -51,8 +50,17 @@ public class Task extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
+    // Derived attributes -----------------------------------------------------
 
+    @Transient
     public long getDuration() {
         return DAYS.between(startDate, finishedDate);
     }
+
+    // Relationships ----------------------------------------------------------
+    @OneToMany(mappedBy = "task")
+    private List<Role> roles;
+
+    @ManyToOne
+    private User user;
 }

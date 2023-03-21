@@ -5,10 +5,9 @@ import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
-import com.todolist.entity.UserTask;
 import com.todolist.exceptions.NotFoundException;
+import com.todolist.repositories.TaskRepository;
 import com.todolist.repositories.UserRepository;
-import com.todolist.repositories.UserTaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -23,23 +22,19 @@ public class UserService {
 
     // Repositories -----------------------------------------------------------
     private final UserRepository userRepository;
-    private final UserTaskRepository userTaskRepository;
-
-    // Services ---------------------------------------------------------------
-
-    private final TaskService taskService;
 
 
     // Components -------------------------------------------------------------
     private final DataManager dataManager;
+    private final TaskService taskService;
 
     // Constructors -----------------------------------------------------------
     @Autowired
-    public UserService(UserRepository userRepository, TaskService taskService, UserTaskRepository userTaskRepository, DataManager dataManager) {
+    public UserService(UserRepository userRepository, DataManager dataManager,
+                       TaskService taskService) {
         this.userRepository = userRepository;
-        this.taskService = taskService;
-        this.userTaskRepository = userTaskRepository;
         this.dataManager = dataManager;
+        this.taskService = taskService;
     }
 
     // Populate database ------------------------------------------------------
@@ -72,7 +67,7 @@ public class UserService {
 
     @Transactional
     public Long getTaskCompleted(User user) {
-        return getTasksFromUser(user).stream().filter(task -> task.getStatus().equals(Status.DONE)).count();
+        return user.getTasks().stream().filter(task -> task.getStatus().equals(Status.DONE)).count();
     }
 
     // Save and delete --------------------------------------------------------
@@ -92,7 +87,7 @@ public class UserService {
     // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<User> findUsersWithTask(Task task) {
-        List<User> users = userRepository.findAll().stream().filter(user -> getTasksFromUser(user).contains(task)).toList();
+        List<User> users = userRepository.findAll().stream().filter(user -> user.getTasks().contains(task)).toList();
         if (users.isEmpty())
             throw new NotFoundException("No users have the task with idTask " + task.getId() + ".");
         return users;
@@ -101,38 +96,35 @@ public class UserService {
     @Transactional
     public Task findTaskByTitle(String username, String title) {
         User user = findUserByUsername(username);
-        return getTasksFromUser(user).stream().filter(task -> task.getTitle().equals(title)).findFirst().orElseThrow(() -> new NotFoundException("The task with title " + title + " does not exist."));
-    }
-
-    @Transactional(readOnly = true)
-    public List<Task> getTasksFromUser(User user) {
-        return userTaskRepository.findByIdUser(user.getId()).stream()
-                .map(userTask -> taskService.findTaskById(userTask.getIdTask()))
-                .toList();
+        return user.getTasks().stream().filter(task -> task.getTitle().equals(title)).findFirst().orElseThrow(() -> new NotFoundException("The task with title " + title + " does not exist."));
     }
 
     @Transactional(readOnly = true)
     public List<ShowTask> getShowTaskFromUser(User user) {
-        return getTasksFromUser(user).stream().map(ShowTask::new).toList();
+        return user.getTasks().stream().map(ShowTask::new).toList();
     }
 
     // Save and delete --------------------------------------------------------
     @Transactional
     public void addTaskToUser(User user, Task task) {
-        userTaskRepository.save(new UserTask(user.getId(), task.getId()));
+        if (!user.getTasks().contains(task)) {
+            task.setUser(user);
+            taskService.saveTask(task);
+            user.getTasks().add(task);
+            saveUser(user);
+        }
     }
     @Transactional
     public void removeTaskFromUser(User user, Task task) {
-        List<UserTask> userTask = userTaskRepository.findByIdAndIdUser(task.getId(), user.getId());
-        if (userTask.isEmpty())
-            throw new NullPointerException("The user with idUser " + user.getId() + " does not have the task with idTask " + task.getId() + ".|method: removeTaskFromUser");
-        userTaskRepository.deleteAll(userTask);
+        List<Task> tasks = user.getTasks().stream().filter(task1 -> task1.getId().equals(task.getId())).toList();
+        user.setTasks(tasks);
+        saveUser(user);
     }
 
     @Transactional
     public void removeAllTasksFromUser(User user) {
-        List<UserTask> userTask = userTaskRepository.findByIdUser(user.getId());
-        userTaskRepository.deleteAll(userTask);
+        user.setTasks(null);
+        saveUser(user);
     }
 
 

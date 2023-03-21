@@ -16,11 +16,11 @@ import java.util.List;
 @Component
 public class DataManager {
 
+    // Data files -------------------------------------------------------------
     public static final String DATA_GROUP = "db/data/group.json";
     public static final String DATA_GROUP_USER = "db/data/group_user.json";
-    public static final String DATA_USER_TASK = "db/data/user_task.json";
-    public static final String DATA_TASK = "db/data/task.json";
 
+    // Loaders ----------------------------------------------------------------
     public List<User> loadUser() throws IOException {
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new ParameterNamesModule())
@@ -29,30 +29,6 @@ public class DataManager {
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream("db/data/user.json");
-        return mapper.readValue(inputStream, new TypeReference<>() {
-        });
-    }
-
-    public List<Task> loadTask() throws IOException {
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(DATA_TASK);
-        return mapper.readValue(inputStream, new TypeReference<>() {
-        });
-    }
-
-    public List<UserTask> loadUserTask() throws IOException {
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(DATA_USER_TASK);
         return mapper.readValue(inputStream, new TypeReference<>() {
         });
     }

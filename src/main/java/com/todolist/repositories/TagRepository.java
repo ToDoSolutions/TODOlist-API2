@@ -9,6 +9,6 @@ import java.io.Serializable;
 import java.util.Optional;
 
 @Repository
-public interface TagRepositoty extends JpaRepository<Tag, Serializable>, PagingAndSortingRepository<Tag, Serializable> {
+public interface TagRepository extends JpaRepository<Tag, Serializable>, PagingAndSortingRepository<Tag, Serializable> {
     Optional<Tag> findByClockifyId(String clockifyId);
 }
