@@ -1,6 +1,6 @@
 package com.todolist.converters;
 
-import com.todolist.utilities.Order;
+import com.todolist.dtos.Order;
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Component;
 

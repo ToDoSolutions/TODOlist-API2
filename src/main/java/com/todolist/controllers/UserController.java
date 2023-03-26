@@ -1,5 +1,7 @@
 package com.todolist.controllers;
 
+import com.fadda.common.Preconditions;
+import com.fadda.iterables.iterator.IterableRangeObject;
 import com.todolist.component.DTOManager;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
@@ -9,9 +11,7 @@ import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import com.todolist.utilities.MyIterable;
-import com.todolist.utilities.Order;
-import com.todolist.utilities.Predicator;
+import com.todolist.dtos.Order;
 import com.todolist.validators.FieldValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,15 +74,15 @@ public class UserController {
                                                  @RequestParam(required = false) NumberFilter taskCompleted) {
         order.validateOrder(fieldsUser);
         List<User> users = userService.findAllUsers(order.getSort());
-        List<User> result = new MyIterable<>(users, limit, offset)
+        List<User> result = new IterableRangeObject<>(users, limit, offset)
                 .stream().filter(user -> Objects.nonNull(user) &&
-                        Predicator.isNullOrValid(name, n -> user.getName().equals(n)) &&
-                        Predicator.isNullOrValid(surname, s -> user.getSurname().equals(s)) &&
-                        Predicator.isNullOrValid(email, e -> user.getEmail().equals(e)) &&
-                        Predicator.isNullOrValid(location, l -> user.getLocation().equals(l)) &&
-                        Predicator.isNullOrValid(taskCompleted, t -> t.isValid(userService.getTaskCompleted(user))) &&
-                        Predicator.isNullOrValid(bio, b -> user.getBio().contains(b)) &&
-                        Predicator.isNullOrValid(avatar, a -> user.getAvatar().equals(a))).toList();
+                        Preconditions.isNullOrValid(name, n -> user.getName().equals(n)) &&
+                        Preconditions.isNullOrValid(surname, s -> user.getSurname().equals(s)) &&
+                        Preconditions.isNullOrValid(email, e -> user.getEmail().equals(e)) &&
+                        Preconditions.isNullOrValid(location, l -> user.getLocation().equals(l)) &&
+                        Preconditions.isNullOrValid(taskCompleted, t -> t.isValid(userService.getTaskCompleted(user))) &&
+                        Preconditions.isNullOrValid(bio, b -> user.getBio().contains(b)) &&
+                        Preconditions.isNullOrValid(avatar, a -> user.getAvatar().equals(a))).toList();
         return result.stream().map(user -> dtoManager.getShowUserAsJson(user, fieldsUser, fieldsTask)).toList();
     }
 

@@ -1,4 +1,4 @@
-package com.todolist.utilities;
+package com.todolist.dtos;
 
 import com.todolist.exceptions.BadRequestException;
 import lombok.Getter;

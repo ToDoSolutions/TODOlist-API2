@@ -1,5 +1,7 @@
 package com.todolist.controllers;
 
+import com.fadda.common.Preconditions;
+import com.fadda.iterables.iterator.IterableRangeObject;
 import com.todolist.component.DTOManager;
 import com.todolist.dtos.ShowGroup;
 import com.todolist.dtos.ShowTask;
@@ -13,13 +15,12 @@ import com.todolist.filters.NumberFilter;
 import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import com.todolist.utilities.MyIterable;
-import com.todolist.utilities.Order;
-import com.todolist.utilities.Predicator;
+import com.todolist.dtos.Order;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -68,12 +69,13 @@ public class GroupController {
                                                   @RequestParam(required = false) DateFilter createdDate) {
         order.validateOrder(fieldsGroup);
         List<Group> groups = groupService.findAllGroups(order.getSort());
-        List<Group> result = new MyIterable<>(groups, limit, offset)
+
+        List<Group> result = new IterableRangeObject<>(groups, limit, offset)
                 .stream().filter(group -> Objects.nonNull(group) &&
-                        Predicator.isNullOrValid(name, n -> group.getName().equals(n)) &&
-                        Predicator.isNullOrValid(description, d -> group.getDescription().equals(d)) &&
-                        Predicator.isNullOrValid(numTasks, n -> n.isValid(groupService.getNumTasks(group))) &&
-                        Predicator.isNullOrValid(createdDate, c -> c.isValid(group.getCreatedDate()))).toList();
+                        Preconditions.isNullOrValid(name, n -> group.getName().equals(n)) &&
+                        Preconditions.isNullOrValid(description, d -> group.getDescription().equals(d)) &&
+                        Preconditions.isNullOrValid(numTasks, n -> n.isValid(groupService.getNumTasks(group))) &&
+                        Preconditions.isNullOrValid(createdDate, c -> c.isValid(group.getCreatedDate()))).toList();
         return result.stream().map(group -> dtoManager.getShowGroupAsJson(group, fieldsGroup, fieldsUser, fieldsTask)).toList();
     }
 

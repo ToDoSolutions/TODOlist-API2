@@ -1,5 +1,7 @@
 package com.todolist.controllers;
 
+import com.fadda.common.Preconditions;
+import com.fadda.iterables.iterator.IterableRangeObject;
 import com.todolist.component.DTOManager;
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.ShowTask;
@@ -9,9 +11,7 @@ import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
-import com.todolist.utilities.MyIterable;
-import com.todolist.utilities.Order;
-import com.todolist.utilities.Predicator;
+import com.todolist.dtos.Order;
 import com.todolist.validators.task.DateTaskValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,6 @@ public class TaskController {
     }
 
     /* TASKS OPERATIONS */
-
     @GetMapping("/tasks") // GetAllTest
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
@@ -65,17 +64,17 @@ public class TaskController {
                                                  @RequestParam(required = false) NumberFilter duration) {
         order.validateOrder(fieldsTask);
         List<Task> tasks = taskService.findAllTasks(order.getSort());
-        List<Task> result = new MyIterable<>(tasks, limit, offset)
+        List<Task> result = new IterableRangeObject<>(tasks, limit, offset)
                 .stream().filter(task -> Objects.nonNull(task) &&
-                        Predicator.isNullOrValid(title, t -> task.getTitle().contains(t)) &&
-                        Predicator.isNullOrValid(status, s -> task.getStatus() == s) &&
-                        Predicator.isNullOrValid(startDate, s -> s.isValid(task.getStartDate())) &&
-                        Predicator.isNullOrValid(finishedDate, f -> f.isValid(task.getFinishedDate())) &&
-                        Predicator.isNullOrValid(priority, p -> p.isValid(task.getPriority())) &&
-                        Predicator.isNullOrValid(difficulty, d -> task.getDifficulty() == d) &&
-                        Predicator.isNullOrValid(duration, d -> d.isValid(task.getDuration())) &&
-                        Predicator.isNullOrValid(annotation, a -> task.getAnnotation().contains(a)) &&
-                        Predicator.isNullOrValid(description, d -> task.getDescription().contains(d))).toList();
+                        Preconditions.isNullOrValid(title, t -> task.getTitle().contains(t)) &&
+                        Preconditions.isNullOrValid(status, s -> task.getStatus() == s) &&
+                        Preconditions.isNullOrValid(startDate, s -> s.isValid(task.getStartDate())) &&
+                        Preconditions.isNullOrValid(finishedDate, f -> f.isValid(task.getFinishedDate())) &&
+                        Preconditions.isNullOrValid(priority, p -> p.isValid(task.getPriority())) &&
+                        Preconditions.isNullOrValid(difficulty, d -> task.getDifficulty() == d) &&
+                        Preconditions.isNullOrValid(duration, d -> d.isValid(task.getDuration())) &&
+                        Preconditions.isNullOrValid(annotation, a -> task.getAnnotation().contains(a)) &&
+                        Preconditions.isNullOrValid(description, d -> task.getDescription().contains(d))).toList();
         return result.stream().map(task -> dtoManager.getShowTaskAsJson(task, fieldsTask)).toList();
     }
 

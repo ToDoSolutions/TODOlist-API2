@@ -1,10 +1,12 @@
 package com.todolist.controllers;
 
 
+import com.fadda.common.io.WriterManager;
+import com.todolist.component.TemplateManager;
 import com.todolist.dtos.autodoc.TimeTask;
 import com.todolist.services.AutoDocService;
-import com.todolist.utilities.WriterManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,10 +39,14 @@ public class AutoDocController {
     // Services ---------------------------------------------------------------
     private final AutoDocService autoDocService;
 
+    // Components -------------------------------------------------------------
+    private final TemplateManager templateManager;
+
     // Constructors -----------------------------------------------------------
     @Autowired
-    public AutoDocController(AutoDocService autoDocService) {
+    public AutoDocController(AutoDocService autoDocService, TemplateManager templateManager) {
         this.autoDocService = autoDocService;
+        this.templateManager = templateManager;
     }
 
     // Methods ----------------------------------------------------------------
@@ -53,45 +59,45 @@ public class AutoDocController {
     @RequestMapping("/planning/{repoName}/{username}/md")
     public ResponseEntity<String> getPlanningGroup(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = GROUP) String title) throws IOException {
         String[] output = autoDocService.getPlanning(repoName, username, title);
-        return new WriterManager(TEMPLATES_PLANNING_GROUP)
+        WriterManager writerManager = templateManager.getGroupPlanningTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
                 .map(s -> s.replace("{content0}", output[0]))
                 .map(s -> s.replace("{content1}", output[1]))
-                .map(s -> s.replace("{content2}", output[2]))
-                .get(PLANNING_GROUP);
+                .map(s -> s.replace("{content2}", output[2]));
+        return templateManager.getResponseEntity(writerManager, PLANNING_GROUP);
     }
 
     @RequestMapping("/analysis/{repoName}/{username}/md")
     public ResponseEntity<String> getAnalysisGroup(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = GROUP) String title) throws IOException {
         String output = autoDocService.getAnalysis(repoName, username, title);
-        return new WriterManager(TEMPLATES_ANALYSIS_GROUP)
+        WriterManager writerManager = templateManager.getGroupAnalysisTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
-                .map(s -> s.replace("{content}", output))
-                .get(ANALYSIS_GROUP);
+                .map(s -> s.replace("{content}", output));
+        return templateManager.getResponseEntity(writerManager, ANALYSIS_GROUP);
     }
 
     @RequestMapping("/planning/{repoName}/{username}/individual/{individual}/md")
     public ResponseEntity<String> getPlanningIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException {
         String[] output = autoDocService.getPlanning(repoName, username, individual, title);
-        return new WriterManager(TEMPLATES_PLANNING_INDIVIDUAL)
+        WriterManager writerManager = templateManager.getIndividualPlanningTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
                 .map(s -> s.replace("{content0}", output[0]))
                 .map(s -> s.replace("{content1}", output[1]))
                 .map(s -> s.replace("{content2}", output[2]))
                 .map(s -> s.replace("{content3}", output[3]))
                 .map(s -> s.replace("{roles}", output[4]))
-                .map(s -> s.replace("{individual}", individual))
-                .get(PLANNING_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE)));
+                .map(s -> s.replace("{individual}", individual));
+        return templateManager.getResponseEntity(writerManager, PLANNING_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE)));
     }
 
     @RequestMapping("/analysis/{repoName}/{username}/individual/{individual}/md")
     public ResponseEntity<String> getAnalysisIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException {
         String output = autoDocService.getAnalysis(repoName, username, individual, title);
-        return new WriterManager(TEMPLATES_ANALYSIS_INDIVIDUAL)
+        WriterManager writerManager = templateManager.getIndividualAnalysisTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
                 .map(s -> s.replace("{content}", output))
-                .map(s -> s.replace("{individual}", individual))
-                .get(ANALYSIS_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE)));
+                .map(s -> s.replace("{individual}", individual));
+        return templateManager.getResponseEntity(writerManager, ANALYSIS_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE)));
     }
 
 }
