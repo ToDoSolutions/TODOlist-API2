@@ -3,10 +3,9 @@ package com.todolist.controllers;
 
 import com.fadda.common.io.WriterManager;
 import com.todolist.component.TemplateManager;
-import com.todolist.dtos.autodoc.TimeTask;
 import com.todolist.services.AutoDocService;
+import com.todolist.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 
 @Controller
 @RequestMapping("/api/v1/autodoc")
@@ -38,24 +36,20 @@ public class AutoDocController {
 
     // Services ---------------------------------------------------------------
     private final AutoDocService autoDocService;
+    private final TaskService taskService;
 
     // Components -------------------------------------------------------------
     private final TemplateManager templateManager;
 
     // Constructors -----------------------------------------------------------
     @Autowired
-    public AutoDocController(AutoDocService autoDocService, TemplateManager templateManager) {
+    public AutoDocController(AutoDocService autoDocService, TaskService taskService, TemplateManager templateManager) {
         this.autoDocService = autoDocService;
+        this.taskService = taskService;
         this.templateManager = templateManager;
     }
 
     // Methods ----------------------------------------------------------------
-    @RequestMapping("/{repoName}/{username}")
-    public ResponseEntity<List<TimeTask>> getAutoDoc(@PathVariable String repoName, @PathVariable String username) {
-        List<TimeTask> timeTasks = autoDocService.autoDoc(repoName, username);
-        return ResponseEntity.ok(timeTasks);
-    }
-
     @RequestMapping("/planning/{repoName}/{username}/md")
     public ResponseEntity<String> getPlanningGroup(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = GROUP) String title) throws IOException {
         String[] output = autoDocService.getPlanning(repoName, username, title);
@@ -92,6 +86,7 @@ public class AutoDocController {
 
     @RequestMapping("/analysis/{repoName}/{username}/individual/{individual}/md")
     public ResponseEntity<String> getAnalysisIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException {
+        taskService.deleteAll();
         String output = autoDocService.getAnalysis(repoName, username, individual, title);
         WriterManager writerManager = templateManager.getIndividualAnalysisTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))

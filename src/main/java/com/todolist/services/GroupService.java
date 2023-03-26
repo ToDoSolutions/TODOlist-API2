@@ -2,7 +2,11 @@ package com.todolist.services;
 
 import com.todolist.component.DataManager;
 import com.todolist.dtos.ShowUser;
-import com.todolist.entity.*;
+import com.todolist.dtos.autodoc.RoleStatus;
+import com.todolist.entity.Group;
+import com.todolist.entity.GroupUser;
+import com.todolist.entity.Task;
+import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.GroupRepository;
@@ -12,11 +16,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,8 +72,18 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
+    public Group findGroupByName(String name) {
+        return groupRepository.findByName(name).orElseThrow(() -> new NotFoundException("The group with name " + name + " does not exist."));
+    }
+
+    @Transactional(readOnly = true)
     public List<Group> findGroupsWithUser(User user) {
-        List<Group> groups = groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).contains(user)).toList();
+        System.out.println("user: " + user.getFullName());
+        System.out.println("user id: " + user.getId());
+        List<Group> groups = groupRepository.findAll().stream().filter(group -> {
+            System.out.println("group: " + getUsersFromGroup(group).stream().map(User::getFullName).toList());
+            return getUsersFromGroup(group).stream().map(User::getId).toList().contains(user.getId());
+        }).toList();
         if (groups.isEmpty())
             throw new BadRequestException("The user with idUser " + user.getId() + " does not belong to any group.");
         return groups;
@@ -115,7 +130,7 @@ public class GroupService {
     // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<User> getUsersFromGroup(Group group) {
-        return groupUserRepository.findById(group.getId()).stream()
+        return groupUserRepository.findByIdGroup(group.getId()).stream()
                 .map(groupUser -> userService.findUserById(groupUser.getIdUser()))
                 .toList();
     }
@@ -123,6 +138,34 @@ public class GroupService {
     @Transactional(readOnly = true)
     public List<ShowUser> getShowUserFromGroup(Group group) {
         return getUsersFromGroup(group).stream().map(user -> new ShowUser(user, userService.getShowTaskFromUser(user))).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getCost(Group group, String title) {
+        Map<RoleStatus, Double> cost = new HashMap<>();
+        for (User user : getUsersFromGroup(group)) {
+            for (RoleStatus role : RoleStatus.values()) {
+                    cost.put(role, userService.getCost(user, title).get(role));
+            }
+        }
+        return cost;
+    }
+
+
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getTotalCost(Group group) {
+        return getCost(group, "");
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getIndividualCost(Group group) {
+        return getCost(group, "I");
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getGroupCost(Group group) {
+        return getCost(group, "G");
     }
 
     // Save and delete --------------------------------------------------------
@@ -139,7 +182,7 @@ public class GroupService {
 
     @Transactional
     public void removeAllUsersFromGroup(Group group) {
-        List<GroupUser> groupUser = groupUserRepository.findById(group.getId());
+        List<GroupUser> groupUser = groupUserRepository.findByIdGroup(group.getId());
         if (groupUser == null)
             throw new NotFoundException("The group with idGroup " + group.getId() + " does not exist.");
         groupUserRepository.deleteAll(groupUser);

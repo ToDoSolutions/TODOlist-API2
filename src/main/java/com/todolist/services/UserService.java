@@ -3,10 +3,11 @@ package com.todolist.services;
 import com.todolist.component.DataManager;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
+import com.todolist.dtos.autodoc.RoleStatus;
+import com.todolist.entity.Role;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.NotFoundException;
-import com.todolist.repositories.TaskRepository;
 import com.todolist.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -15,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -98,6 +101,17 @@ public class UserService {
         return user.getTasks().stream().map(ShowTask::new).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<Task> getIndividualTask(User user) {
+        return user.getTasks().stream().filter(task -> !task.getPosition().equals(0)).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Task> getGroupTask(User user) {
+        List<String> userTask = user.getTasks().stream().filter(task -> task.getPosition().equals(0)).map(Task::getTitle).toList();
+        return taskService.findAllTasks().stream().filter(task -> task.getPosition().equals(0) && userTask.contains(task.getTitle())).toList();
+    }
+
     // Save and delete --------------------------------------------------------
     @Transactional
     public void addTaskToUser(User user, Task task) {
@@ -108,6 +122,7 @@ public class UserService {
             saveUser(user);
         }
     }
+
     @Transactional
     public void removeTaskFromUser(User user, Task task) {
         List<Task> tasks = user.getTasks().stream().filter(task1 -> task1.getId().equals(task.getId())).toList();
@@ -119,5 +134,48 @@ public class UserService {
     public void removeAllTasksFromUser(User user) {
         user.setTasks(null);
         saveUser(user);
+    }
+
+    /**
+     * ROLES
+     */
+    // Finders ----------------------------------------------------------------
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getCost(User user, String title) {
+        Map<RoleStatus, Double> cost = new HashMap<>();
+        for (Task task : user.getTasks())
+            if (task.getTitle().contains(title)) {
+                for (Role role : task.getRoles()) {
+                    if (cost.containsKey(role.getStatus()))
+                        cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
+                    else
+                        cost.put(role.getStatus(), role.getSalary());
+                }
+            }
+        return cost;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getTotalCost(User user) {
+        return getCost(user, "");
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getIndividualCost(User user) {
+        return getCost(user, "I");
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getGroupCost(User user) {
+        Map<RoleStatus, Double> cost = new HashMap<>();
+        List<Task> tasks = getGroupTask(user);
+        for (Task task : tasks)
+            for (Role role : task.getRoles()) {
+                if (cost.containsKey(role.getStatus()))
+                    cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
+                else
+                    cost.put(role.getStatus(), role.getSalary());
+            }
+        return cost;
     }
 }

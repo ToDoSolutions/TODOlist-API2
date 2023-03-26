@@ -1,17 +1,16 @@
 package com.todolist.repositories;
 
-import com.todolist.entity.Group;
+import com.todolist.dtos.autodoc.RoleStatus;
+import com.todolist.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface GroupRepository extends JpaRepository<Group, Serializable>, PagingAndSortingRepository<Group, Serializable> {
-    List<Group> findAll();
+public interface RoleRepository extends JpaRepository<Role, Serializable>, PagingAndSortingRepository<Role, Serializable> {
 
-    Optional<Group> findByName(String name);
+    List<Role> findAllByStatus(RoleStatus name);
 }
