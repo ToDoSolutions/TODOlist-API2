@@ -1,3 +1,11 @@
+[![GitHub release](https://img.shields.io/github/release/alesanfe/TODOlist-API2)](https://github.com/alesanfe/TODOlist-API2/releases)
+[![Java support](https://img.shields.io/badge/Java-17+-green?logo=java&logoColor=white)](https://openjdk.java.net/)
+[![License](https://img.shields.io/github/license/alesanfe/TODOlist-API2?color=4D7A97&logo=apache)](https://www.apache.org/licenses/LICENSE-2.0.html)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-green?label=gitpod&logo=gitpod&logoColor=white)](https://gitpod.io/#https://github.com/alesanfe/TODOlist-API2)
+[![GitHub Stars](https://img.shields.io/github/stars/alesanfe/TODOlist-API2)](https://github.com/alesanfe/TODOlist-API2/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/alesanfe/TODOlist-API2)](https://github.com/alesanfe/TODOlist-API2/fork)
+[![user repos](https://badgen.net/github/dependents-repo/alesanfe/TODOlist-API2?label=user%20repos)](https://github.com/alesanfe/TODOlist-API2/network/dependents)
+[![GitHub Contributors](https://img.shields.io/github/contributors/alesanfe/TODOlist-API2)](https://github.com/alesanfe/TODOlist-API2/graphs/contributors)
 <div align="center">
 <h1><a href="https://todolist-api2-379012.ew.r.appspot.com/">TODOlist-API2<a></h1>
 </div>
