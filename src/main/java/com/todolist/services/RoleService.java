@@ -41,6 +41,33 @@ public class RoleService {
         return roleRepository.findAllByStatus(name);
     }
 
+    @Transactional(readOnly = true)
+    public List<Role>findRoleByTaskId(Integer taskId) {
+        return roleRepository.findAllByTaskId(taskId);
+    }
+
+    @Transactional(readOnly = true)
+    public Duration getDuration(Task task) {
+        return findRoleByTaskId(task.getId()).stream().map(Role::getDuration).reduce(Duration.ZERO, Duration::plus);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Role> getRole(Task task, RoleStatus status) {
+        return findRoleByTaskId(task.getId()).stream().filter(role -> role.getStatus().equals(status)).findFirst();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoleStatus> getStatus(Task task) {
+        return findRoleByTaskId(task.getId()).stream().map(Role::getStatus).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Double getCost(Task task) {
+        return findRoleByTaskId(task.getId()).stream().mapToDouble(Role::getSalary).sum();
+    }
+
+
+
     // Save and delete --------------------------------------------------------
     @Transactional
     public Role saveRole(Role role) {
@@ -53,7 +80,7 @@ public class RoleService {
     }
 
     public Role saveRole(RoleStatus roleStatus, LocalDateTime start, LocalDateTime end, Task task) {
-        Optional<Role> optionalRole = task.getRole(roleStatus);
+        Optional<Role> optionalRole = getRole(task, roleStatus);
         Role role;
         if (optionalRole.isPresent()) {
             role = optionalRole.get();

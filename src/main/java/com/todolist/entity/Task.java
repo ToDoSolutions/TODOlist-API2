@@ -31,8 +31,13 @@ public class Task extends BaseEntity implements Comparable<Task> {
     private Integer student;
     private Integer position;
 
+    @Size(max = 2000, message = "The description is too long.")
     private String description;
+
+    @Size(max = 2000, message = "The conclusion is too long.")
     private String conclusion;
+
+    @Size(max = 2000, message = "The decision is too long.")
     private String decision;
 
     @Size(max = 50, message = "The annotation is too long.")
@@ -50,12 +55,6 @@ public class Task extends BaseEntity implements Comparable<Task> {
     private Difficulty difficulty;
 
     // Derived attributes -----------------------------------------------------
-
-    @Transient
-    public Double getCost() {
-        return roles.stream().mapToDouble(Role::getSalary).sum();
-    }
-
     @Transient
     public String getIdIssue() {
         return title.split(":")[0].trim();
@@ -66,27 +65,7 @@ public class Task extends BaseEntity implements Comparable<Task> {
         return title.split(":")[1].trim();
     }
 
-    @Transient
-    public List<RoleStatus> getStatus() {
-        return roles.stream().map(Role::getStatus).toList();
-    }
-
-    @Transient
-    public Optional<Role> getRole(RoleStatus status) {
-        if (roles == null)
-            return Optional.empty();
-        return roles.stream().filter(role -> role.getStatus().equals(status)).findFirst();
-    }
-
-    @Transient
-    public Duration getDuration() {
-        return roles.stream().map(Role::getDuration).reduce(Duration.ZERO, Duration::plus);
-    }
-
     // Relationships ----------------------------------------------------------
-    @OneToMany(mappedBy = "task")
-    private List<Role> roles;
-
     @ManyToOne
     private User user;
 

@@ -33,10 +33,11 @@ public class AutoDocService {
     private final UserService userService;
     private final TaskService taskService;
     private final GroupService groupService;
+    private final RoleService roleService;
 
     // Constructors -----------------------------------------------------------
     @Autowired
-    public AutoDocService(ClockifyService clockifyService, IssueService issueService, PlanningTable planningTable, AnalysisTable analysisTable, UserService userService, TaskService taskService, GroupService groupService) {
+    public AutoDocService(ClockifyService clockifyService, IssueService issueService, PlanningTable planningTable, AnalysisTable analysisTable, UserService userService, TaskService taskService, GroupService groupService, RoleService roleService) {
         this.clockifyService = clockifyService;
         this.issueService = issueService;
         this.planningTable = planningTable;
@@ -44,22 +45,24 @@ public class AutoDocService {
         this.userService = userService;
         this.taskService = taskService;
         this.groupService = groupService;
+        this.roleService = roleService;
     }
 
     // Methods ----------------------------------------------------------------
     @Transactional
     public void autoDoc(String repoName, String username) {
         taskService.deleteAll();
-        groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName, username), username, repoName);
+        groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName, username), repoName);
     }
 
     @Transactional
-    public void groupIssuesWithHisTime(List<Issue> issues, ClockifyTask[] clockifyTasks, String username, String repoName) {
-        User user = userService.findUserByUsername(username);
+    public void groupIssuesWithHisTime(List<Issue> issues, ClockifyTask[] clockifyTasks, String repoName) {
         Group group = groupService.findGroupByName(repoName);
         for (Issue issue : issues) {
             for (ClockifyTask clockifyTask : clockifyTasks) {
                 if (clockifyTask.getDescription().contains(issue.getTitle())) {
+                    User user = userService.findUserByIdClockify(clockifyTask.getUserId());
+                    System.out.println("user: " + user.getFullName());
                     taskService.saveTask(issue, clockifyTask, group, user);
                 }
             }
@@ -104,7 +107,7 @@ public class AutoDocService {
         String names = planningTable.getNames(employees);
 
         // Roles del empleado.
-        List<RoleStatus> roles = timeTasks.values().stream().flatMap(tasks -> tasks.stream().flatMap(task -> task.getRoles().stream())).map(Role::getStatus).distinct().toList();
+        List<RoleStatus> roles = timeTasks.values().stream().flatMap(tasks -> tasks.stream().flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream())).map(Role::getStatus).distinct().toList();
         StringBuilder rolesString = new StringBuilder();
         for (var i = 0; i < roles.size(); i++) {
             rolesString.append(roles.get(i).toString().toLowerCase());
@@ -123,6 +126,7 @@ public class AutoDocService {
         Map<String, List<Task>> timeTasks = issueService.getTaskPerIssue(repoName, username).entrySet().stream()
                 .filter(entry -> entry.getValue().stream().anyMatch(task -> task.getTitle().contains(title)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        System.out.println("---");
         List<User> employees = getEmployees(timeTasks);
         Group group = groupService.findGroupByName(repoName);
 
@@ -137,7 +141,7 @@ public class AutoDocService {
         if (Objects.equals(title, "I"))
             cost = groupService.getIndividualCost(group).values().stream().mapToDouble(v -> v).sum();
         else if (Objects.equals(title, "G"))
-            cost = groupService.getGroupCost(group).values().stream().mapToDouble(v -> v).sum();
+            cost = groupService.getGroupCost(group).values().stream().filter(Objects::nonNull).mapToDouble(v -> v).sum();
         else
             cost =  groupService.getTotalCost(group).values().stream().mapToDouble(v -> v).sum();
 

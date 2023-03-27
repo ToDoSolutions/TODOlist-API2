@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,8 +54,12 @@ public class IssueService {
 
     public Map<String, List<Task>> getTaskPerIssue(String repoName, String username) {
         List<Issue> issues = findByUsernameAndRepo(username, repoName);
-        return issues.stream().collect(Collectors.groupingBy(Issue::getTitle, Collectors.mapping(issue -> taskService.findAllTasks()
-                .stream().filter(task -> task.getTitle().contains(issue.getTitle())).findFirst().orElse(null), Collectors.toList())))
-                .entrySet().stream().filter(entry -> entry.getValue().get(0) != null).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        List<Task> tasks = taskService.findAllTasks();
+        Map<String, List<Task>> result = new HashMap<>();
+        for (Issue issue: issues) {
+            List<Task> tasksIssue = tasks.stream().filter(task -> task.getTitle().contains(issue.getTitle())).toList();
+            result.put(issue.getTitle(), tasksIssue);
+        }
+        return result;
     }
 }

@@ -13,4 +13,5 @@ import java.util.List;
 public interface RoleRepository extends JpaRepository<Role, Serializable>, PagingAndSortingRepository<Role, Serializable> {
 
     List<Role> findAllByStatus(RoleStatus name);
+    List<Role> findAllByTaskId(Integer taskId);
 }

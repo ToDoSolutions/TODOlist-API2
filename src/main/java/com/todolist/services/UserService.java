@@ -30,14 +30,16 @@ public class UserService {
     // Components -------------------------------------------------------------
     private final DataManager dataManager;
     private final TaskService taskService;
+    private final RoleService roleService;
 
     // Constructors -----------------------------------------------------------
     @Autowired
     public UserService(UserRepository userRepository, DataManager dataManager,
-                       TaskService taskService) {
+                       TaskService taskService, RoleService roleService) {
         this.userRepository = userRepository;
         this.dataManager = dataManager;
         this.taskService = taskService;
+        this.roleService = roleService;
     }
 
     // Populate database ------------------------------------------------------
@@ -61,6 +63,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findUserById(Integer idUser) {
         return userRepository.findById(idUser).orElseThrow(() -> new NotFoundException("The user with idUser " + idUser + " does not exist."));
+    }
+
+    @Transactional(readOnly = true)
+    public User findUserByIdClockify(String idClockify) {
+        return userRepository.findByClockifyId(idClockify).stream().findFirst().orElseThrow(() -> new NotFoundException("The user with idUser " + idClockify + " does not exist."));
     }
 
     @Transactional(readOnly = true)
@@ -145,7 +152,7 @@ public class UserService {
         Map<RoleStatus, Double> cost = new HashMap<>();
         for (Task task : user.getTasks())
             if (task.getTitle().contains(title)) {
-                for (Role role : task.getRoles()) {
+                for (Role role : roleService.findRoleByTaskId(task.getId())) {
                     if (cost.containsKey(role.getStatus()))
                         cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
                     else
@@ -170,7 +177,7 @@ public class UserService {
         Map<RoleStatus, Double> cost = new HashMap<>();
         List<Task> tasks = getGroupTask(user);
         for (Task task : tasks)
-            for (Role role : task.getRoles()) {
+            for (Role role : roleService.findRoleByTaskId(task.getId())) {
                 if (cost.containsKey(role.getStatus()))
                     cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
                 else

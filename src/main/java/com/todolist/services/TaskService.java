@@ -45,7 +45,7 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public List<Task> findAllTasks() {
-        return taskRepository.findAll().stream().toList();
+        return taskRepository.findAll();
     }
 
     @Transactional(readOnly = true)
