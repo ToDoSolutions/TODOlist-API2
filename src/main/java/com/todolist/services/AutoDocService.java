@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class AutoDocService {
@@ -62,7 +61,6 @@ public class AutoDocService {
             for (ClockifyTask clockifyTask : clockifyTasks) {
                 if (clockifyTask.getDescription().contains(issue.getTitle())) {
                     User user = userService.findUserByIdClockify(clockifyTask.getUserId());
-                    System.out.println("user: " + user.getFullName());
                     taskService.saveTask(issue, clockifyTask, group, user);
                 }
             }
@@ -82,32 +80,27 @@ public class AutoDocService {
     @Transactional
     public String[] getPlanning(String repoName, String username, String individual, String title) {
         autoDoc(repoName, username);
-        Map<String, List<Task>> timeTasks = issueService.getTaskPerIssue(repoName, username).entrySet().stream()
-                .filter(entry -> entry.getValue().stream().anyMatch(task -> task.getUser().getUsername().equals(individual) && task.getTitle().contains(title)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        List<User> employees = getEmployees(timeTasks);
+        Map<String, List<Task>> taskPerIssue = issueService.getTaskPerIssueFilter(repoName, username, title, individual);
+        List<User> users = getEmployees(taskPerIssue);
         User individualEmployee = userService.findUserByUsername(individual);
 
         // Obtenemos la tabla para las tareas.
-        String taskTable = planningTable.getTaskTable(timeTasks).serialize();
+        String taskTable = planningTable.getTaskTable(taskPerIssue).serialize();
 
         // Obtenemos la tabla para los empleados.
-        String personalTable = planningTable.getAllEmployeeTables(employees, title);
+        String personalTable = planningTable.getAllEmployeeTables(users, title);
 
         // Obtenemos el coste total.
-        double cost;
-        if (Objects.equals(title, "I"))
-            cost = userService.getIndividualCost(individualEmployee).values().stream().mapToDouble(v -> v).sum();
-        else if (Objects.equals(title, "G"))
-            cost = userService.getGroupCost(individualEmployee).values().stream().mapToDouble(v -> v).sum();
-        else
-            cost =  userService.getTotalCost(individualEmployee).values().stream().mapToDouble(v -> v).sum();
+        double cost = Math.round(userService.getCostByTitle(individualEmployee, title).values().stream()
+                .map(v -> v == null ? 0: v) // TODO: Buscar una solución para no tener esta chapuza.
+                .mapToDouble(v -> v).sum()*100)/100.;
+
 
         // Nombres de los empleados.
-        String names = planningTable.getNames(employees);
+        String names = planningTable.getNames(users);
 
         // Roles del empleado.
-        List<RoleStatus> roles = timeTasks.values().stream().flatMap(tasks -> tasks.stream().flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream())).map(Role::getStatus).distinct().toList();
+        List<RoleStatus> roles = taskPerIssue.values().stream().flatMap(tasks -> tasks.stream().flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream())).map(Role::getStatus).distinct().toList();
         StringBuilder rolesString = new StringBuilder();
         for (var i = 0; i < roles.size(); i++) {
             rolesString.append(roles.get(i).toString().toLowerCase());
@@ -123,30 +116,24 @@ public class AutoDocService {
     @Transactional
     public String[] getPlanning(String repoName, String username, String title) {
         autoDoc(repoName, username);
-        Map<String, List<Task>> timeTasks = issueService.getTaskPerIssue(repoName, username).entrySet().stream()
-                .filter(entry -> entry.getValue().stream().anyMatch(task -> task.getTitle().contains(title)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        System.out.println("---");
-        List<User> employees = getEmployees(timeTasks);
+        Map<String, List<Task>> taskPerIssue = issueService.getTaskPerIssueFilter(repoName, username, title);
+        List<User> users = getEmployees(taskPerIssue);
         Group group = groupService.findGroupByName(repoName);
 
         // Obtenemos la tabla para las tareas.
-        String taskTable = planningTable.getTaskTable(timeTasks).serialize();
+        String taskTable = planningTable.getTaskTable(taskPerIssue).serialize();
 
         // Obtenemos la tabla para los empleados.
-        String personalTable = planningTable.getAllEmployeeTables(employees, title);
+        String personalTable = planningTable.getAllEmployeeTables(users, title);
 
         // Obtenemos el coste total.
-        double cost;
-        if (Objects.equals(title, "I"))
-            cost = groupService.getIndividualCost(group).values().stream().mapToDouble(v -> v).sum();
-        else if (Objects.equals(title, "G"))
-            cost = groupService.getGroupCost(group).values().stream().filter(Objects::nonNull).mapToDouble(v -> v).sum();
-        else
-            cost =  groupService.getTotalCost(group).values().stream().mapToDouble(v -> v).sum();
+        double cost = Math.round(groupService.getCostByTitle(group, title).values()
+                .stream()
+                .map(v -> v == null ? 0: v) // TODO: Buscar una solución para no tener esta chapuza.
+                .mapToDouble(v -> v).sum()+100)/100.;
 
         // Nombres de los empleados.
-        String names = planningTable.getNames(employees);
+        String names = planningTable.getNames(users);
 
         return new String[]{taskTable, personalTable, cost + EURO, names};
     }
@@ -154,9 +141,7 @@ public class AutoDocService {
     @Transactional
     public String getAnalysis(String repoName, String username, String individual, String title) {
         autoDoc(repoName, username);
-        Map<String, List<Task>> timeTasks = issueService.getTaskPerIssue(repoName, username).entrySet().stream()
-                .filter(entry -> entry.getValue().stream().anyMatch(task -> task.getUser().getUsername().equals(individual) && task.getTitle().contains(title)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, List<Task>> timeTasks = issueService.getTaskPerIssueFilter(repoName, username, title, individual);
 
         // Obtenemos los enunciados.
         StringBuilder output = analysisTable.getStatements(timeTasks);
@@ -170,9 +155,7 @@ public class AutoDocService {
     @Transactional
     public String getAnalysis(String repoName, String username, String title) {
         autoDoc(repoName, username);
-        Map<String, List<Task>> timeTasks = issueService.getTaskPerIssue(repoName, username).entrySet().stream()
-                .filter(entry -> entry.getValue().stream().anyMatch(task -> task.getTitle().contains(title)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, List<Task>> timeTasks = issueService.getTaskPerIssueFilter(repoName, username, title);
 
         // Obtenemos los enunciados.
         StringBuilder output = analysisTable.getStatements(timeTasks);

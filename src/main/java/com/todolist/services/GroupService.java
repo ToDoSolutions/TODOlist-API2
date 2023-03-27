@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -144,8 +145,13 @@ public class GroupService {
     public Map<RoleStatus, Double> getCost(Group group, String title) {
         Map<RoleStatus, Double> cost = new HashMap<>();
         for (User user : getUsersFromGroup(group)) {
+            Map<RoleStatus, Double> costUser = userService.getCost(user, title);
             for (RoleStatus role : RoleStatus.values()) {
-                    cost.put(role, userService.getCost(user, title).get(role));
+                Double add = costUser.containsKey(role) ? costUser.get(role): 0;
+                if (cost.containsKey(role))
+                    cost.put(role, cost.get(role) + add);
+                else
+                    cost.put(role, add);
             }
         }
         return cost;
@@ -154,7 +160,7 @@ public class GroupService {
 
 
     @Transactional(readOnly = true)
-    public Map<RoleStatus, Double> getTotalCost(Group group) {
+    public Map<RoleStatus, Double> getTotalCostByRole(Group group) {
         return getCost(group, "");
     }
 
@@ -166,6 +172,16 @@ public class GroupService {
     @Transactional(readOnly = true)
     public Map<RoleStatus, Double> getGroupCost(Group group) {
         return getCost(group, "G");
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getCostByTitle(Group group, String title) {
+        if (Objects.equals(title, "I"))
+            return getIndividualCost(group);
+        else if (Objects.equals(title, "G"))
+            return getGroupCost(group);
+        else
+            return getTotalCostByRole(group);
     }
 
     // Save and delete --------------------------------------------------------

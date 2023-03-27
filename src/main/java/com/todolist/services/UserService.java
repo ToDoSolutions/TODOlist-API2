@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -108,9 +109,11 @@ public class UserService {
         return user.getTasks().stream().map(ShowTask::new).toList();
     }
 
+
+
     @Transactional(readOnly = true)
-    public List<Task> getIndividualTask(User user) {
-        return user.getTasks().stream().filter(task -> !task.getPosition().equals(0)).toList();
+    public List<Task> getTask(User user) {
+        return taskService.findAllTasks().stream().filter(task -> task.getUser().getId().equals(user.getId())).toList();
     }
 
     @Transactional(readOnly = true)
@@ -150,20 +153,25 @@ public class UserService {
     @Transactional(readOnly = true)
     public Map<RoleStatus, Double> getCost(User user, String title) {
         Map<RoleStatus, Double> cost = new HashMap<>();
-        for (Task task : user.getTasks())
+        for (Task task : getTask(user)) {
+            System.out.println(title);
+            System.out.println(task.getTitle());
             if (task.getTitle().contains(title)) {
                 for (Role role : roleService.findRoleByTaskId(task.getId())) {
+                    System.out.println(role.getStatus());
+                    System.out.println(cost);
                     if (cost.containsKey(role.getStatus()))
                         cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
                     else
                         cost.put(role.getStatus(), role.getSalary());
                 }
             }
+        }
         return cost;
     }
 
     @Transactional(readOnly = true)
-    public Map<RoleStatus, Double> getTotalCost(User user) {
+    public Map<RoleStatus, Double> getTotalCostByRole(User user) {
         return getCost(user, "");
     }
 
@@ -184,5 +192,15 @@ public class UserService {
                     cost.put(role.getStatus(), role.getSalary());
             }
         return cost;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getCostByTitle(User user, String title) {
+        if (Objects.equals(title, "I"))
+            return getIndividualCost(user);
+        else if (Objects.equals(title, "G"))
+            return getGroupCost(user);
+        else
+            return getTotalCostByRole(user);
     }
 }

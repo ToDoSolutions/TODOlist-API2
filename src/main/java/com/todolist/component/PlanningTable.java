@@ -15,7 +15,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 public class PlanningTable {
@@ -44,25 +43,21 @@ public class PlanningTable {
             String id = entry.getValue().get(0).getIdIssue();
             String title = entry.getValue().get(0).getTitleIssue();
             String names = entry.getValue().stream().map(task -> task.getUser().getFullName()).reduce((s, s2) -> s + ", " + s2).orElse("");
-            String roles = entry.getValue().stream().map(task -> roleService.getStatus(task).toString()).reduce((s, s2) -> s + ", " + s2).orElse("");
+            String roles = entry.getValue().stream().flatMap(task -> roleService.getStatus(task).stream())
+                    .map(RoleStatus::getInSpanish)
+                    .reduce((s, s2) -> s + ", " + s2).orElse("");
             Duration duration = entry.getValue().stream().map(roleService::getDuration).reduce(Duration.ZERO, Duration::plus);
-            Double cost = entry.getValue().stream().mapToDouble(roleService::getCost).sum();
+            Double cost = Math.round(entry.getValue().stream().mapToDouble(roleService::getCost).sum()*100)/100.;
             taskTable.addRow(id, title, names, roles, "x", duration.toHours() + " horas y " + duration.toMinutes() % 60 + " minutos", cost + EURO);
         }
         return taskTable.build();
     }
 
-    public Table getEmployeeTable(User employee, String title) {
-        Map<RoleStatus, Double> salary;
-        if (Objects.equals(title, "I"))
-            salary = userService.getIndividualCost(employee);
-        else if (Objects.equals(title, "G"))
-            salary = userService.getGroupCost(employee);
-        else
-            salary =  userService.getTotalCost(employee);
+    public Table getEmployeeTable(User user, String title) {
+        Map<RoleStatus, Double> salary = userService.getCostByTitle(user, title);
         Table.Builder table = new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT);
         for (Map.Entry<RoleStatus, Double> entry: salary.entrySet()) {
-            table.addRow(entry.getKey().getInSpanish(), entry.getValue() + EURO);
+            table.addRow(entry.getKey().getInSpanish(), Math.round(entry.getValue()*100)/100. + EURO);
         }
         return table.build();
     }

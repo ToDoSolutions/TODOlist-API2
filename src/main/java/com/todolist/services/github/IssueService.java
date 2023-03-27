@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,5 +58,23 @@ public class IssueService {
             result.put(issue.getTitle(), tasksIssue);
         }
         return result;
+    }
+
+    public Map<String, List<Task>> getTaskPerIssueFilter(String repoName, String username, String title, String individual) {
+        return getTaskPerIssue(repoName, username).entrySet().stream()
+                .filter(entry -> entry.getValue().stream().anyMatch(task -> task.getUser().getUsername().equals(individual) && task.getTitle().contains(title)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().get(0)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+    }
+
+    public Map<String, List<Task>> getTaskPerIssueFilter(String repoName, String username, String title) {
+        return getTaskPerIssue(repoName, username).entrySet().stream()
+                .filter(entry -> entry.getValue().stream().anyMatch(task -> task.getTitle().contains(title)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().get(0)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
     }
 }
