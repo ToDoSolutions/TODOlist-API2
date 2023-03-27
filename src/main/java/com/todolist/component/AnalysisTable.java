@@ -1,12 +1,13 @@
 package com.todolist.component;
 
-import com.todolist.dtos.autodoc.TimeTask;
+import com.todolist.entity.Task;
 import net.steppschuh.markdowngenerator.table.Table;
 import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
 import net.steppschuh.markdowngenerator.text.heading.Heading;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AnalysisTable {
@@ -19,26 +20,29 @@ public class AnalysisTable {
     public static final String ANALYSIS = "Análisis";
     public static final String STATEMENTS = "Enunciados";
 
+
     // Methods ----------------------------------------------------------------
-    public StringBuilder getStatements(List<TimeTask> timeTasks) {
+    public StringBuilder getStatements(Map<String, List<Task>> timeTasks) {
         StringBuilder output = new StringBuilder(new Heading(STATEMENTS, 3).toString()).append(JUMP_LINE);
-        for (TimeTask timeTask : timeTasks) {
-            output.append(LIST_ELEMENTS).append(new BoldText(timeTask.getID()))
+        for (Map.Entry<String, List<Task>> entry : timeTasks.entrySet()) {
+            Task task = entry.getValue().get(0);
+            output.append(LIST_ELEMENTS).append(new BoldText(task.getIdIssue()))
                     .append(SEPARATOR_ID)
-                    .append(timeTask.getTask()).append(JUMP_LINE);
+                    .append(task.getTitleIssue()).append(JUMP_LINE);
         }
         return output;
     }
 
-    public StringBuilder getAnalysis(List<TimeTask> timeTasks) {
+    public StringBuilder getAnalysis(Map<String, List<Task>> timeTasks) {
         StringBuilder output = new StringBuilder(new Heading(ANALYSIS, 3).toString()).append(JUMP_LINE);
         Table.Builder table = new Table.Builder()
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                 .addRow(HEADER_ANALYSIS);
-        for (TimeTask timeTask : timeTasks) {
+        for (Map.Entry<String, List<Task>> entry : timeTasks.entrySet()) {
+            Task timeTask = entry.getValue().get(0);
             String conclusion = timeTask.getConclusion() != null ? timeTask.getConclusion().trim() : "";
             String decision = timeTask.getDecision() != null ? timeTask.getDecision().trim() : "";
-            table.addRow(timeTask.getID(), conclusion, decision);
+            table.addRow(timeTask.getIdIssue(), conclusion, decision);
         }
         return output.append(table.build().serialize());
 

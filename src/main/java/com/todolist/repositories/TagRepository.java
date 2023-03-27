@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Serializable>, PagingAndSortingRepository<Tag, Serializable> {
-    Optional<Tag> findByClockifyId(String clockifyId);
+    Optional<Tag> findById(String clockifyId);
 }

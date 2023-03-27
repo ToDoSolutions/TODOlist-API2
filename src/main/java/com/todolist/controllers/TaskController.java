@@ -4,15 +4,12 @@ import com.fadda.common.Preconditions;
 import com.fadda.iterables.iterator.IterableRangeObject;
 import com.todolist.component.DTOManager;
 import com.todolist.dtos.Difficulty;
+import com.todolist.dtos.Order;
 import com.todolist.dtos.ShowTask;
-import com.todolist.dtos.Status;
 import com.todolist.entity.Task;
 import com.todolist.exceptions.BadRequestException;
-import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
-import com.todolist.dtos.Order;
-import com.todolist.validators.task.DateTaskValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -30,13 +27,11 @@ public class TaskController {
 
 
     private final TaskService taskService;
-    private final DateTaskValidator dateTaskValidator;
     private final DTOManager dtoManager;
 
     @Autowired
-    public TaskController(TaskService taskService, DateTaskValidator dateTaskValidator, DTOManager dtoManager) {
+    public TaskController(TaskService taskService, DTOManager dtoManager) {
         this.taskService = taskService;
-        this.dateTaskValidator = dateTaskValidator;
         this.dtoManager = dtoManager;
     }
 
@@ -55,24 +50,16 @@ public class TaskController {
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
                                                  @RequestParam(required = false) String title,
                                                  @RequestParam(required = false) String description,
-                                                 @RequestParam(required = false) Status status,
-                                                 @RequestParam(required = false) DateFilter finishedDate,
-                                                 @RequestParam(required = false) DateFilter startDate,
                                                  @RequestParam(required = false) String annotation,
                                                  @RequestParam(required = false) NumberFilter priority,
-                                                 @RequestParam(required = false) Difficulty difficulty,
-                                                 @RequestParam(required = false) NumberFilter duration) {
+                                                 @RequestParam(required = false) Difficulty difficulty) {
         order.validateOrder(fieldsTask);
         List<Task> tasks = taskService.findAllTasks(order.getSort());
         List<Task> result = new IterableRangeObject<>(tasks, limit, offset)
                 .stream().filter(task -> Objects.nonNull(task) &&
                         Preconditions.isNullOrValid(title, t -> task.getTitle().contains(t)) &&
-                        Preconditions.isNullOrValid(status, s -> task.getStatus() == s) &&
-                        Preconditions.isNullOrValid(startDate, s -> s.isValid(task.getStartDate())) &&
-                        Preconditions.isNullOrValid(finishedDate, f -> f.isValid(task.getFinishedDate())) &&
                         Preconditions.isNullOrValid(priority, p -> p.isValid(task.getPriority())) &&
                         Preconditions.isNullOrValid(difficulty, d -> task.getDifficulty() == d) &&
-                        Preconditions.isNullOrValid(duration, d -> d.isValid(task.getDuration())) &&
                         Preconditions.isNullOrValid(annotation, a -> task.getAnnotation().contains(a)) &&
                         Preconditions.isNullOrValid(description, d -> task.getDescription().contains(d))).toList();
         return result.stream().map(task -> dtoManager.getShowTaskAsJson(task, fieldsTask)).toList();
@@ -87,7 +74,6 @@ public class TaskController {
 
     @PostMapping("/task") // PostTest
     public Map<String, Object> addTask(@RequestBody @Valid Task task, BindingResult bindingResult) {
-        dateTaskValidator.validate(task, bindingResult);
         if (bindingResult.hasErrors())
             throw new BadRequestException("The task is invalid.");
         task = taskService.saveTask(task);
@@ -96,7 +82,6 @@ public class TaskController {
 
     @PutMapping("/task") // PutTest
     public Map<String, Object> updateTask(@RequestBody @Valid Task task, BindingResult bindingResult) {
-        dateTaskValidator.validate(task, bindingResult);
         if (bindingResult.hasErrors())
             throw new BadRequestException("The task is invalid.");
         Task oldTask = taskService.findTaskById(task.getId());

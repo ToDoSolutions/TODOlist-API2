@@ -16,5 +16,6 @@ public interface UserRepository extends JpaRepository<User, Serializable>, Pagin
     List<User> findAll();
 
     Optional<User> findByUsername(String username);
+    List<User> findByClockifyId(String clockifyId);
 
 }

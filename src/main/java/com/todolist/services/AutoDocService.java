@@ -3,23 +3,19 @@ package com.todolist.services;
 import com.google.common.collect.Lists;
 import com.todolist.component.AnalysisTable;
 import com.todolist.component.PlanningTable;
-import com.todolist.dtos.autodoc.Employee;
 import com.todolist.dtos.autodoc.RoleStatus;
-import com.todolist.dtos.autodoc.TimeTask;
 import com.todolist.dtos.autodoc.clockify.ClockifyTask;
 import com.todolist.dtos.autodoc.github.Issue;
+import com.todolist.entity.Group;
+import com.todolist.entity.Role;
+import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.services.github.IssueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
 @Service
 public class AutoDocService {
@@ -33,100 +29,78 @@ public class AutoDocService {
     private final IssueService issueService;
     private final PlanningTable planningTable;
     private final AnalysisTable analysisTable;
+    private final UserService userService;
+    private final TaskService taskService;
+    private final GroupService groupService;
+    private final RoleService roleService;
 
     // Constructors -----------------------------------------------------------
     @Autowired
-    public AutoDocService(ClockifyService clockifyService, IssueService issueService, PlanningTable planningTable, AnalysisTable analysisTable) {
+    public AutoDocService(ClockifyService clockifyService, IssueService issueService, PlanningTable planningTable, AnalysisTable analysisTable, UserService userService, TaskService taskService, GroupService groupService, RoleService roleService) {
         this.clockifyService = clockifyService;
         this.issueService = issueService;
         this.planningTable = planningTable;
         this.analysisTable = analysisTable;
+        this.userService = userService;
+        this.taskService = taskService;
+        this.groupService = groupService;
+        this.roleService = roleService;
     }
 
     // Methods ----------------------------------------------------------------
-    public List<TimeTask> autoDoc(String repoName, String username) {
-        Map<Issue, ClockifyTask[]> map = groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName, username));
-        return map.entrySet().stream().map(entry -> createTimeTask(entry, repoName, username)).toList();
+    @Transactional
+    public void autoDoc(String repoName, String username) {
+        taskService.deleteAll();
+        groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName, username), repoName);
     }
 
-    public Map<Issue, ClockifyTask[]> groupIssuesWithHisTime(Issue[] issues, ClockifyTask[] clockifyTasks) {
-        // Hacer que guarde en la base de datos las task.
-        return Stream.of(issues).collect(
-                Collectors.toMap(issue -> issue, issue -> Stream.of(clockifyTasks)
-                        .filter(clockifyTask -> clockifyTask.getDescription().contains(issue.getTitle()))
-                        .toArray(ClockifyTask[]::new))
-        );
-    }
-
-    public TimeTask createTimeTask(Map.Entry<Issue, ClockifyTask[]> entry, String repoName, String username) {
-        Issue issue = entry.getKey();
-        // Obtener de la base de datos las task por el nombre de la ISSUE.
-        ClockifyTask[] clockifyTask = entry.getValue();
-        Duration duration = Duration.ZERO;
-        Set<RoleStatus> allRoles = new HashSet<>();
-        List<User> users = issue.getAssignees().stream().map(issueService::getUserAssignedToIssue).toList();
-        // Actualizar el propio usuario.
-        List<Employee> employees = users.stream()
-                .map(user -> new Employee(user.getFullName(), user.getClockifyId())).toList();
-        for (ClockifyTask task : clockifyTask) {
-            // La task debe estar relacionado con un usuario.
-            Employee employee = findEmployeeClockifyTask(employees, task);
-            if (employee == null || task.getTimeInterval().getEnd() == null) // Por si alguien tiene el Clockify arrancado.
-                continue;
-            if (task.getTagIds() != null) {
-                List<RoleStatus> roles = task.getTagIds().stream()
-                        .map(tagId -> clockifyService.getRoleFromClockify(repoName, username, tagId)).distinct().toList();
-                duration = duration.plus(task.calculateSalary(roles, employee));
-                // El usuario debe estar relacionado con todos los posibles roles.
-                allRoles.addAll(roles);
-            }
-
-        }
-        employees.forEach(employee -> System.out.println(employee.getName()));
-        return new TimeTask(issue.getBody(), issue.getTitle(), duration, allRoles, employees);
-    }
-
-    public Employee findEmployeeClockifyTask(List<Employee> employees, ClockifyTask clockifyTask) {
-        return employees.stream().filter(employee -> employee.getClockifyId().equals(clockifyTask.getUserId())).findFirst().orElse(null);
-    }
-
-    public List<Employee> getEmployees(List<TimeTask> timeTasks) {
-        // Obtenemos todos los usuario de la base de datos.
-        List<Employee> employeesTime = timeTasks.stream().flatMap(timeTask -> timeTask.getEmployees().stream()).toList();
-        List<String> employeesName = employeesTime.stream().map(Employee::getName).distinct().toList();
-        List<Employee> employees = Lists.newArrayList();
-        for (String name : employeesName) {
-            List<Employee> dataEmployee = employeesTime.stream().filter(employee1 -> employee1.getName().equals(name)).toList();
-            for (Employee data : dataEmployee) {
-                if (employeesName.contains(data.getName())) {
-                    employeesName = employeesName.stream().filter(s -> !s.equals(data.getName())).toList();
-                    employees.add(data.getClone());
-                } else
-                    employees.stream().filter(employee -> employee.getName().equals(data.getName())).forEach(employee -> employee.updateSalary(data));
+    @Transactional
+    public void groupIssuesWithHisTime(List<Issue> issues, ClockifyTask[] clockifyTasks, String repoName) {
+        Group group = groupService.findGroupByName(repoName);
+        for (Issue issue : issues) {
+            for (ClockifyTask clockifyTask : clockifyTasks) {
+                if (clockifyTask.getDescription().contains(issue.getTitle())) {
+                    User user = userService.findUserByIdClockify(clockifyTask.getUserId());
+                    taskService.saveTask(issue, clockifyTask, group, user);
+                }
             }
         }
-        return employees;
     }
 
+    private List<User> getEmployees(Map<String, List<Task>> timeTasks) {
+        Set<User> employees = new HashSet<>();
+        for (List<Task> tasks : timeTasks.values()) {
+            for (Task task : tasks) {
+                employees.add(task.getUser());
+            }
+        }
+        return Lists.newArrayList(employees);
+    }
+
+    @Transactional
     public String[] getPlanning(String repoName, String username, String individual, String title) {
-        List<TimeTask> timeTasks = autoDoc(repoName, username).stream().filter(task -> task.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual) && task.getTitle().contains(title))).sorted().toList();
-        List<Employee> employees = getEmployees(timeTasks);
-        List<Employee> individualEmployee = employees.stream().filter(employee -> employee.getName().equals(individual)).toList();
+        autoDoc(repoName, username);
+        Map<String, List<Task>> taskPerIssue = issueService.getTaskPerIssueFilter(repoName, username, title, individual);
+        List<User> users = getEmployees(taskPerIssue);
+        User individualEmployee = userService.findUserByUsername(individual);
 
         // Obtenemos la tabla para las tareas.
-        String taskTable = planningTable.getTaskTable(timeTasks).serialize();
+        String taskTable = planningTable.getTaskTable(taskPerIssue).serialize();
 
         // Obtenemos la tabla para los empleados.
-        String personalTable = planningTable.getAllEmployeeTables(individualEmployee);
+        String personalTable = planningTable.getAllEmployeeTables(users, title);
 
         // Obtenemos el coste total.
-        double cost = Math.round(individualEmployee.stream().mapToDouble(employee -> employee.getSalary().values().stream().mapToDouble(i -> i).sum()).sum() * 100) / (double) 100;
+        double cost = Math.round(userService.getCostByTitle(individualEmployee, title).values().stream()
+                .map(v -> v == null ? 0: v) // TODO: Buscar una solución para no tener esta chapuza.
+                .mapToDouble(v -> v).sum()*100)/100.;
+
 
         // Nombres de los empleados.
-        String names = planningTable.getNames(employees);
+        String names = planningTable.getNames(users);
 
         // Roles del empleado.
-        List<RoleStatus> roles = employees.stream().flatMap(employee -> employee.getSalary().keySet().stream()).distinct().toList();
+        List<RoleStatus> roles = taskPerIssue.values().stream().flatMap(tasks -> tasks.stream().flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream())).map(Role::getStatus).distinct().toList();
         StringBuilder rolesString = new StringBuilder();
         for (var i = 0; i < roles.size(); i++) {
             rolesString.append(roles.get(i).toString().toLowerCase());
@@ -139,28 +113,35 @@ public class AutoDocService {
         return new String[]{taskTable, personalTable, cost + EURO, names, rolesString.toString()};
     }
 
+    @Transactional
     public String[] getPlanning(String repoName, String username, String title) {
-        List<TimeTask> timeTasks = autoDoc(repoName, username).stream().filter(task -> task.getTitle().contains(title)).sorted().toList();
-        List<Employee> employees = getEmployees(timeTasks);
+        autoDoc(repoName, username);
+        Map<String, List<Task>> taskPerIssue = issueService.getTaskPerIssueFilter(repoName, username, title);
+        List<User> users = getEmployees(taskPerIssue);
+        Group group = groupService.findGroupByName(repoName);
 
         // Obtenemos la tabla para las tareas.
-        String taskTable = planningTable.getTaskTable(timeTasks).serialize();
+        String taskTable = planningTable.getTaskTable(taskPerIssue).serialize();
 
         // Obtenemos la tabla para los empleados.
-        String personalTable = planningTable.getAllEmployeeTables(employees);
+        String personalTable = planningTable.getAllEmployeeTables(users, title);
 
         // Obtenemos el coste total.
-        double cost = Math.round(employees.stream().mapToDouble(employee -> employee.getSalary().values().stream().mapToDouble(i -> i).sum()).sum() * 100) / 100.;
+        double cost = Math.round(groupService.getCostByTitle(group, title).values()
+                .stream()
+                .map(v -> v == null ? 0: v) // TODO: Buscar una solución para no tener esta chapuza.
+                .mapToDouble(v -> v).sum()+100)/100.;
 
         // Nombres de los empleados.
-        String names = planningTable.getNames(employees);
+        String names = planningTable.getNames(users);
 
         return new String[]{taskTable, personalTable, cost + EURO, names};
     }
 
+    @Transactional
     public String getAnalysis(String repoName, String username, String individual, String title) {
-        List<TimeTask> timeTasks = autoDoc(repoName, username).stream().filter(task -> task.getEmployees().stream().anyMatch(employee -> employee.getName().equals(individual))
-        && task.getTitle().contains(title)).sorted().toList();
+        autoDoc(repoName, username);
+        Map<String, List<Task>> timeTasks = issueService.getTaskPerIssueFilter(repoName, username, title, individual);
 
         // Obtenemos los enunciados.
         StringBuilder output = analysisTable.getStatements(timeTasks);
@@ -171,8 +152,10 @@ public class AutoDocService {
         return output.toString();
     }
 
+    @Transactional
     public String getAnalysis(String repoName, String username, String title) {
-        List<TimeTask> timeTasks = autoDoc(repoName, username).stream().filter(task -> task.getTitle().contains(title)).sorted().toList();
+        autoDoc(repoName, username);
+        Map<String, List<Task>> timeTasks = issueService.getTaskPerIssueFilter(repoName, username, title);
 
         // Obtenemos los enunciados.
         StringBuilder output = analysisTable.getStatements(timeTasks);

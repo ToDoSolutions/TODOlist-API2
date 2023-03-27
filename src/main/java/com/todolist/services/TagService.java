@@ -36,7 +36,7 @@ public class TagService {
     // Finders ----------------------------------------------------------------
     @Transactional
     public Tag getTagById(Group group, String idTag) {
-        return tagRepository.findByClockifyId(idTag).orElse(getTagFromClockify(group, idTag));
+        return tagRepository.findById(idTag).orElse(getTagFromClockify(group, idTag));
     }
 
     @Transactional

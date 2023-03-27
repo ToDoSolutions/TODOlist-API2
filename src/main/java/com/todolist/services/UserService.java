@@ -3,10 +3,11 @@ package com.todolist.services;
 import com.todolist.component.DataManager;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.Status;
+import com.todolist.dtos.autodoc.RoleStatus;
+import com.todolist.entity.Role;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.NotFoundException;
-import com.todolist.repositories.TaskRepository;
 import com.todolist.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -15,7 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -27,14 +31,16 @@ public class UserService {
     // Components -------------------------------------------------------------
     private final DataManager dataManager;
     private final TaskService taskService;
+    private final RoleService roleService;
 
     // Constructors -----------------------------------------------------------
     @Autowired
     public UserService(UserRepository userRepository, DataManager dataManager,
-                       TaskService taskService) {
+                       TaskService taskService, RoleService roleService) {
         this.userRepository = userRepository;
         this.dataManager = dataManager;
         this.taskService = taskService;
+        this.roleService = roleService;
     }
 
     // Populate database ------------------------------------------------------
@@ -58,6 +64,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findUserById(Integer idUser) {
         return userRepository.findById(idUser).orElseThrow(() -> new NotFoundException("The user with idUser " + idUser + " does not exist."));
+    }
+
+    @Transactional(readOnly = true)
+    public User findUserByIdClockify(String idClockify) {
+        return userRepository.findByClockifyId(idClockify).stream().findFirst().orElseThrow(() -> new NotFoundException("The user with idUser " + idClockify + " does not exist."));
     }
 
     @Transactional(readOnly = true)
@@ -98,6 +109,20 @@ public class UserService {
         return user.getTasks().stream().map(ShowTask::new).toList();
     }
 
+
+
+    @Transactional(readOnly = true)
+    public List<Task> getTask(User user) {
+        return taskService.findAllTasks().stream().filter(task -> task.getUser().getId().equals(user.getId())).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Task> getGroupTask(User user) {
+        List<String> userTask = getTask(user).stream()
+                .filter(task -> task.getStudent().equals(0)).map(Task::getTitle).toList();
+        return taskService.findAllTasks().stream().filter(task -> task.getStudent().equals(0) && userTask.contains(task.getTitle())).toList();
+    }
+
     // Save and delete --------------------------------------------------------
     @Transactional
     public void addTaskToUser(User user, Task task) {
@@ -108,6 +133,7 @@ public class UserService {
             saveUser(user);
         }
     }
+
     @Transactional
     public void removeTaskFromUser(User user, Task task) {
         List<Task> tasks = user.getTasks().stream().filter(task1 -> task1.getId().equals(task.getId())).toList();
@@ -119,5 +145,59 @@ public class UserService {
     public void removeAllTasksFromUser(User user) {
         user.setTasks(null);
         saveUser(user);
+    }
+
+    /**
+     * ROLES
+     */
+    // Finders ----------------------------------------------------------------
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getCost(User user, String title) {
+        Map<RoleStatus, Double> cost = new HashMap<>();
+        for (Task task : getTask(user)) {
+            if (task.getTitle().contains(title)) {
+                for (Role role : roleService.findRoleByTaskId(task.getId())) {
+                    if (cost.containsKey(role.getStatus()))
+                        cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
+                    else
+                        cost.put(role.getStatus(), role.getSalary());
+                }
+            }
+        }
+        return cost;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getTotalCostByRole(User user) {
+        return getCost(user, "");
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getIndividualCost(User user) {
+        return getCost(user, "I");
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getGroupCost(User user) {
+        Map<RoleStatus, Double> cost = new HashMap<>();
+        List<Task> tasks = getGroupTask(user);
+        for (Task task : tasks)
+            for (Role role : roleService.findRoleByTaskId(task.getId())) {
+                if (cost.containsKey(role.getStatus()))
+                    cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
+                else
+                    cost.put(role.getStatus(), role.getSalary());
+            }
+        return cost;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<RoleStatus, Double> getCostByTitle(User user, String title) {
+        if (Objects.equals(title, "I"))
+            return getIndividualCost(user);
+        else if (Objects.equals(title, "G"))
+            return getGroupCost(user);
+        else
+            return getTotalCostByRole(user);
     }
 }

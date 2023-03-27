@@ -15,13 +15,14 @@
  */
 package com.todolist.model;
 
+import com.todolist.dtos.autodoc.RoleStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 /**
@@ -41,5 +42,11 @@ public class NamedEntity extends BaseEntity {
 	@Size(min = 3, max = 50)
 	@Column(name = "name")
 	private String name;
+
+	// Derived attributes -----------------------------------------------------
+	@Transient
+	public RoleStatus getStatus() {
+		return RoleStatus.valueOf(this.name.toUpperCase());
+	}
 
 }

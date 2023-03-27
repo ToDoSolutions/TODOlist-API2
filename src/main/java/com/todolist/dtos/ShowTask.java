@@ -22,7 +22,6 @@ public class ShowTask extends ShowEntity{
 
     private Integer idTask;
     private String title, description, annotation;
-    private Status status;
     private LocalDate finishedDate, startDate;
     private Long priority;
     private Difficulty difficulty;
@@ -35,9 +34,6 @@ public class ShowTask extends ShowEntity{
         this.title = task.getTitle();
         this.description = task.getDescription();
         this.annotation = task.getAnnotation();
-        this.status = task.getStatus();
-        this.finishedDate = task.getFinishedDate();
-        this.startDate = task.getStartDate();
         this.priority = task.getPriority();
         this.difficulty = task.getDifficulty();
     }
