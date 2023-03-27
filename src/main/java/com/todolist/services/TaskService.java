@@ -81,11 +81,7 @@ public class TaskService {
 
     @Transactional
     public void deleteTask(Task task) {
+        roleService.deleteAllRoles(task);
         taskRepository.delete(task);
-    }
-
-
-    public void deleteAll() {
-        taskRepository.deleteAll();
     }
 }

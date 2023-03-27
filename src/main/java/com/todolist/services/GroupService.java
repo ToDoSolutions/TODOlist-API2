@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +31,7 @@ public class GroupService {
     private final GroupUserRepository groupUserRepository;
 
     private final UserService userService;
+    private final TaskService taskService;
 
     // Components -------------------------------------------------------------
     private final DataManager dataManager;
@@ -41,10 +39,11 @@ public class GroupService {
 
     // Constructors -----------------------------------------------------------
     @Autowired
-    public GroupService(GroupRepository groupRepository, GroupUserRepository groupUserRepository, UserService userService, DataManager dataManager) {
+    public GroupService(GroupRepository groupRepository, GroupUserRepository groupUserRepository, UserService userService, TaskService taskService, DataManager dataManager) {
         this.groupRepository = groupRepository;
         this.groupUserRepository = groupUserRepository;
         this.userService = userService;
+        this.taskService = taskService;
         this.dataManager = dataManager;
     }
 
@@ -228,5 +227,20 @@ public class GroupService {
         for (User user : users) {
             userService.removeAllTasksFromUser(user);
         }
+    }
+
+    public void deleteAllTask(Group group) {
+        List<Task> tasks = getTasksFromGroup(group);
+        for (Task task : tasks) {
+            taskService.deleteTask(task);
+        }
+    }
+
+    private List<Task> getTasksFromGroup(Group group) {
+        List<Task> tasks = new ArrayList<>();
+        for (User user : getUsersFromGroup(group)) {
+            tasks.addAll(userService.getTask(user));
+        }
+        return tasks;
     }
 }

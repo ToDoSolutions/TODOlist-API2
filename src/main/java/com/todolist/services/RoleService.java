@@ -79,6 +79,7 @@ public class RoleService {
         roleRepository.delete(role);
     }
 
+    @Transactional
     public Role saveRole(RoleStatus roleStatus, LocalDateTime start, LocalDateTime end, Task task) {
         Optional<Role> optionalRole = getRole(task, roleStatus);
         Role role;
@@ -92,5 +93,10 @@ public class RoleService {
             role.setTask(task);
         }
         return roleRepository.save(role);
+    }
+
+    @Transactional
+    public void deleteAllRoles(Task task) {
+        roleRepository.deleteAll(findRoleByTaskId(task.getId()));
     }
 }

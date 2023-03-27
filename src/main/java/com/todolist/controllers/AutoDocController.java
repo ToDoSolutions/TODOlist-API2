@@ -86,7 +86,6 @@ public class AutoDocController {
 
     @RequestMapping("/analysis/{repoName}/{username}/individual/{individual}/md")
     public ResponseEntity<String> getAnalysisIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException {
-        taskService.deleteAll();
         String output = autoDocService.getAnalysis(repoName, username, individual, title);
         WriterManager writerManager = templateManager.getIndividualAnalysisTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))

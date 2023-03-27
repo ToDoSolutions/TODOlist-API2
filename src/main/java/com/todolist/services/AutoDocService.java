@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class AutoDocService {
@@ -50,7 +53,8 @@ public class AutoDocService {
     // Methods ----------------------------------------------------------------
     @Transactional
     public void autoDoc(String repoName, String username) {
-        taskService.deleteAll();
+        Group group = groupService.findGroupByName(repoName);
+        groupService.deleteAllTask(group);
         groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName, username), repoName);
     }
 
