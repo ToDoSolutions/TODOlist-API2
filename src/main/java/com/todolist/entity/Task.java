@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Entity
 @Getter
@@ -81,21 +82,40 @@ public class Task extends BaseEntity implements Comparable<Task> {
             this.description = body;
         }
         this.title = title;
-        /**
-         * TODO: Implement the regex patterns.
-         * Indivual pattern: ^Task\s+\d+\(I\d+\):\s+.+$
-         * Group pattern: ^Task\s+\d+\(G\):\s+.+$
-         *
-         * Other option
-         * Individual pattern: ^Task \d+ : I#\d+ - .+$
-         * Group pattern: ^Task \d+ : G - .+$
-         */
-        try {
+        if (Pattern.matches("^Task\\s+\\d+\\(\\s\\d+\\):\\s+.+$", title))
+            firstWay(title);
+        else if (Pattern.matches("^Task \\d+ : \\s#\\d+ - .+$", title))
+            secondWay(title);
+        else
+            throw new IllegalArgumentException("The title is not valid.");
+    }
+
+    private void secondWay(String title) {
+        if (Pattern.matches("^Task \\d+ : I#\\d+ - .+$", title)) {
+            String id = title.split("-")[0].trim();
+            this.student = Integer.parseInt(id.split(":")[1].trim().split("#")[1].trim());
+            this.position = Integer.parseInt(id.split(":")[0].trim().replace("Task", "").trim());
+        } else if (Pattern.matches("^Task \\d+ : G - .+$", title)) {
+            String id = title.split("-")[0].trim().split(":")[0].trim();
+            this.student = 0;
+            this.position = Integer.parseInt(id.replace("Task", "").trim());
+        } else {
+            this.title = ":V : " + this.title;
+            this.student = -1;
+            this.position = -1;
+        }
+    }
+
+    private void firstWay(String title) {
+        if (Pattern.matches("^Task\\s+\\d+\\(I\\d+\\):\\s+.+$", title)) {
             String id = title.split(":")[0].trim();
-            this.student = id.contains("(G)") ? 0 : Integer.parseInt(id.substring(title.indexOf("I") + 1, title.indexOf(")")));
-            this.position = (student == 0) ? Integer.parseInt(id.replace("Task", "").replace("(G)", "").trim()) :
-                    Integer.parseInt(id.replace("Task", "").replace("(I" + student + ")", "").trim());
-        } catch (Exception e) {
+            this.student = Integer.parseInt(id.substring(title.indexOf("I") + 1, title.indexOf(")")));
+            this.position = Integer.parseInt(id.replace("Task", "").replace("(I" + student + ")", "").trim());
+        } else if (Pattern.matches("^Task\\s+\\d+\\(G\\):\\s+.+$", title)) {
+            String id = title.split(":")[0].trim();
+            this.student = 0;
+            this.position = Integer.parseInt(id.replace("Task", "").replace("(G)", "").trim());
+        } else {
             this.title = "Task 0(U): " + this.title;
             this.student = -1;
             this.position = -1;
