@@ -5,7 +5,12 @@
 
 version: 2
 updates:
-  - package-ecosystem: "" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "maven" # el ecosistema de tu proyecto (en este caso, Maven)
+    directory: "/" # La ubicación de los archivos de manifiesto (en este caso, la raíz del proyecto)
     schedule:
-      interval: "daily"
+      interval: "daily" # Dependabot buscará actualizaciones diarias
+    filters:
+      - update-ignore:
+          - dependency-name: "nombre de la dependencia a excluir"
+    "maven":
+      "pom": "pom.xml" # La ubicación exacta del archivo pom.xml en tu proyecto
