@@ -23,6 +23,7 @@ public class PlanningTable {
     protected static final Object[] HEADER_PLANNING = {"Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste"};
     public static final String JUMP_LINE = "\n";
     public static final String EURO = "€";
+    public static final Object[] HEADER_PERSONAL_TABLE = {"Rol", "Coste"};
 
     // Services ---------------------------------------------------------------
     private final UserService userService;
@@ -42,7 +43,7 @@ public class PlanningTable {
         for (Map.Entry<String, List<Task>> entry : timeTasks.entrySet()) {
             String id = entry.getValue().get(0).getIdIssue();
             String title = entry.getValue().get(0).getTitleIssue();
-            String names = entry.getValue().stream().map(task -> task.getUser().getFullName()).reduce((s, s2) -> s + ", " + s2).orElse("");
+            String names = entry.getValue().stream().map(task -> task.getUser().getFullName()).distinct().reduce((s, s2) -> s + ", " + s2).orElse("");
             String roles = entry.getValue().stream().flatMap(task -> roleService.getStatus(task).stream())
                     .map(RoleStatus::getInSpanish)
                     .reduce((s, s2) -> s + ", " + s2).orElse("");
@@ -56,6 +57,7 @@ public class PlanningTable {
     public Table getEmployeeTable(User user, String title) {
         Map<RoleStatus, Double> salary = userService.getCostByTitle(user, title);
         Table.Builder table = new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT);
+        table.addRow(HEADER_PERSONAL_TABLE);
         for (Map.Entry<RoleStatus, Double> entry: salary.entrySet()) {
             table.addRow(entry.getKey().getInSpanish(), Math.round(entry.getValue()*100)/100. + EURO);
         }

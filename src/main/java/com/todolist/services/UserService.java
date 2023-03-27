@@ -118,8 +118,9 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<Task> getGroupTask(User user) {
-        List<String> userTask = user.getTasks().stream().filter(task -> task.getPosition().equals(0)).map(Task::getTitle).toList();
-        return taskService.findAllTasks().stream().filter(task -> task.getPosition().equals(0) && userTask.contains(task.getTitle())).toList();
+        List<String> userTask = getTask(user).stream()
+                .filter(task -> task.getStudent().equals(0)).map(Task::getTitle).toList();
+        return taskService.findAllTasks().stream().filter(task -> task.getStudent().equals(0) && userTask.contains(task.getTitle())).toList();
     }
 
     // Save and delete --------------------------------------------------------
@@ -154,12 +155,8 @@ public class UserService {
     public Map<RoleStatus, Double> getCost(User user, String title) {
         Map<RoleStatus, Double> cost = new HashMap<>();
         for (Task task : getTask(user)) {
-            System.out.println(title);
-            System.out.println(task.getTitle());
             if (task.getTitle().contains(title)) {
                 for (Role role : roleService.findRoleByTaskId(task.getId())) {
-                    System.out.println(role.getStatus());
-                    System.out.println(cost);
                     if (cost.containsKey(role.getStatus()))
                         cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
                     else
