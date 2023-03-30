@@ -94,9 +94,8 @@ public class AutoDocService {
         String personalTable = planningTable.getAllEmployeeTables(users, title);
 
         // Obtenemos el coste total.
-        double cost = Math.round(userService.getCostByTitle(individualEmployee, title).values().stream()
-                .map(v -> v == null ? 0: v) // TODO: Buscar una solución para no tener esta chapuza.
-                .mapToDouble(v -> v).sum()*100)/100.;
+        double cost = Math.round(userService.getCostByTitle(individualEmployee, title).values()
+                .stream().mapToDouble(v -> v == null ? 0: v).sum()*100)/100.;
 
 
         // Nombres de los empleados.
@@ -131,9 +130,7 @@ public class AutoDocService {
 
         // Obtenemos el coste total.
         double cost = Math.round(groupService.getCostByTitle(group, title).values()
-                .stream()
-                .map(v -> v == null ? 0: v) // TODO: Buscar una solución para no tener esta chapuza.
-                .mapToDouble(v -> v).sum()+100)/100.;
+                .stream().mapToDouble(v -> v == null ? 0: v).sum()+100)/100.;
 
         // Nombres de los empleados.
         String names = planningTable.getNames(users);
