@@ -24,7 +24,7 @@ To check out URIs and request bodies, refer to our [SwaggerHub Page](https://loc
 Using the interactive documentation you will be able to check out URIs, response and request bodies...etc.
 
 # Resources
-Here is an overview of the resources Harmony offers in the form
+Here is an overview of the resources TODOlist offers in the form
 of their response bodies and a short description of the relationship between them.
 A basic schema of the organization is the next:
 <div align="center">
