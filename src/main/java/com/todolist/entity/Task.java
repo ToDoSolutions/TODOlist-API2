@@ -2,26 +2,27 @@ package com.todolist.entity;
 
 import com.todolist.dtos.Difficulty;
 import com.todolist.dtos.Status;
-import com.todolist.dtos.autodoc.RoleStatus;
+import com.todolist.exceptions.BadRequestException;
 import com.todolist.model.BaseEntity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.time.Duration;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = {"student", "position"}, callSuper = false)
 public class Task extends BaseEntity implements Comparable<Task> {
 
     // Attributes -------------------------------------------------------------
@@ -72,8 +73,9 @@ public class Task extends BaseEntity implements Comparable<Task> {
     // Constructors
     public Task(String title, String body) {
         // TODO: Define in other way.
-        if (body != null && body.contains("\r\n\r\n") && body.split("\r\n\r\n").length == 3) {
-            String[] text = body.split("\r\n\r\n");
+        String jump = "\r\n\r\n";
+        if (body != null && body.contains(jump) && body.split(jump).length == 3) {
+            String[] text = body.split(jump);
             this.description = text[0];
             this.conclusion = text[1];
             this.decision = text[2];
@@ -81,21 +83,40 @@ public class Task extends BaseEntity implements Comparable<Task> {
             this.description = body;
         }
         this.title = title;
-        /**
-         * TODO: Implement the regex patterns.
-         * Indivual pattern: ^Task\s+\d+\(I\d+\):\s+.+$
-         * Group pattern: ^Task\s+\d+\(G\):\s+.+$
-         *
-         * Other option
-         * Individual pattern: ^Task \d+ : I#\d+ - .+$
-         * Group pattern: ^Task \d+ : G - .+$
-         */
-        try {
+        if (Pattern.compile("^Task\\s\\d+\\((I\\d+|G?)\\):\\s+").split(title).length == 2)
+            firstWay(title);
+        else if (Pattern.compile("^Task \\d+ : \\s#\\d+ -\\s+").split(title).length == 2)
+            secondWay(title);
+        else
+            throw new BadRequestException("The title is not valid it is '" + title + "' and it must follow the pattern: 'Task <number>(<student>): <title>', 'Task <number> : I#<student> - <title>' or 'Task <number> : G - <title>)'.");
+    }
+
+    private void secondWay(String title) {
+        if (Pattern.compile("^Task \\d+ : I#\\d+ -\\s+").split(title).length == 2) {
+            String id = title.split("-")[0].trim();
+            this.student = Integer.parseInt(id.split(":")[1].trim().split("#")[1].trim());
+            this.position = Integer.parseInt(id.split(":")[0].trim().replace("Task", "").trim());
+        } else if (Pattern.compile("^Task \\d+ : G - .+$").split(title).length == 2) {
+            String id = title.split("-")[0].trim().split(":")[0].trim();
+            this.student = 0;
+            this.position = Integer.parseInt(id.replace("Task", "").trim());
+        } else {
+            this.title = ":V : " + this.title;
+            this.student = -1;
+            this.position = -1;
+        }
+    }
+
+    private void firstWay(String title) {
+        if (Pattern.compile("^Task\\s+\\d+\\(I\\d+\\):\\s+").split(title).length == 2) {
             String id = title.split(":")[0].trim();
-            this.student = id.contains("(G)") ? 0 : Integer.parseInt(id.substring(title.indexOf("I") + 1, title.indexOf(")")));
-            this.position = (student == 0) ? Integer.parseInt(id.replace("Task", "").replace("(G)", "").trim()) :
-                    Integer.parseInt(id.replace("Task", "").replace("(I" + student + ")", "").trim());
-        } catch (Exception e) {
+            this.student = Integer.parseInt(id.substring(title.indexOf("I") + 1, title.indexOf(")")));
+            this.position = Integer.parseInt(id.replace("Task", "").replace("(I" + student + ")", "").trim());
+        } else if (Pattern.compile("^Task\\s+\\d+\\(G\\):\\s+").split(title).length == 2) {
+            String id = title.split(":")[0].trim();
+            this.student = 0;
+            this.position = Integer.parseInt(id.replace("Task", "").replace("(G)", "").trim());
+        } else {
             this.title = "Task 0(U): " + this.title;
             this.student = -1;
             this.position = -1;
@@ -113,5 +134,18 @@ public class Task extends BaseEntity implements Comparable<Task> {
             return 1;
         }
         return student.compareTo(o.student);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Task task = (Task) o;
+        return getId() != null && Objects.equals(getId(), task.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

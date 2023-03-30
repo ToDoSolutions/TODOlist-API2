@@ -4,7 +4,6 @@ package com.todolist.controllers;
 import com.fadda.common.io.WriterManager;
 import com.todolist.component.TemplateManager;
 import com.todolist.services.AutoDocService;
-import com.todolist.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,25 +26,19 @@ public class AutoDocController {
     public static final String LINE = "_";
     public static final String ANALYSIS_GROUP = "Informe de análisis - Grupal.md";
     public static final String ANALYSIS_INDIVIDUAL = "Informe de análisis - {username}.md";
-    public static final String TEMPLATES_ANALYSIS_GROUP = "templates/analysis_group.txt";
-    public static final String TEMPLATES_ANALYSIS_INDIVIDUAL = "templates/analysis_individual.txt";
-    public static final String TEMPLATES_PLANNING_GROUP = "templates/planning_group.txt";
-    public static final String TEMPLATES_PLANNING_INDIVIDUAL = "templates/planning_individual.txt";
     public static final String GROUP = "G";
     public static final String INDIVIDUAL = "I";
 
     // Services ---------------------------------------------------------------
     private final AutoDocService autoDocService;
-    private final TaskService taskService;
 
     // Components -------------------------------------------------------------
     private final TemplateManager templateManager;
 
     // Constructors -----------------------------------------------------------
     @Autowired
-    public AutoDocController(AutoDocService autoDocService, TaskService taskService, TemplateManager templateManager) {
+    public AutoDocController(AutoDocService autoDocService, TemplateManager templateManager) {
         this.autoDocService = autoDocService;
-        this.taskService = taskService;
         this.templateManager = templateManager;
     }
 
@@ -86,7 +79,6 @@ public class AutoDocController {
 
     @RequestMapping("/analysis/{repoName}/{username}/individual/{individual}/md")
     public ResponseEntity<String> getAnalysisIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException {
-        taskService.deleteAll();
         String output = autoDocService.getAnalysis(repoName, username, individual, title);
         WriterManager writerManager = templateManager.getIndividualAnalysisTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
@@ -94,5 +86,4 @@ public class AutoDocController {
                 .map(s -> s.replace("{individual}", individual));
         return templateManager.getResponseEntity(writerManager, ANALYSIS_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE)));
     }
-
 }

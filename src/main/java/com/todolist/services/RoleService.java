@@ -79,7 +79,8 @@ public class RoleService {
         roleRepository.delete(role);
     }
 
-    public Role saveRole(RoleStatus roleStatus, LocalDateTime start, LocalDateTime end, Task task) {
+    @Transactional
+    public void saveRole(RoleStatus roleStatus, LocalDateTime start, LocalDateTime end, Task task) {
         Optional<Role> optionalRole = getRole(task, roleStatus);
         Role role;
         if (optionalRole.isPresent()) {
@@ -91,6 +92,11 @@ public class RoleService {
             role.setDuration(Duration.between(start, end));
             role.setTask(task);
         }
-        return roleRepository.save(role);
+        roleRepository.save(role);
+    }
+
+    @Transactional
+    public void deleteAllRoles(Task task) {
+        roleRepository.deleteAll(findRoleByTaskId(task.getId()));
     }
 }

@@ -5,17 +5,19 @@ import com.todolist.component.AnalysisTable;
 import com.todolist.component.PlanningTable;
 import com.todolist.dtos.autodoc.RoleStatus;
 import com.todolist.dtos.autodoc.clockify.ClockifyTask;
-import com.todolist.dtos.autodoc.github.Issue;
 import com.todolist.entity.Group;
 import com.todolist.entity.Role;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
-import com.todolist.services.github.IssueService;
+import org.kohsuke.github.GHIssue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class AutoDocService {
@@ -50,14 +52,15 @@ public class AutoDocService {
     // Methods ----------------------------------------------------------------
     @Transactional
     public void autoDoc(String repoName, String username) {
-        taskService.deleteAll();
+        Group group = groupService.findGroupByName(repoName);
+        groupService.deleteAllTask(group);
         groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName, username), repoName);
     }
 
     @Transactional
-    public void groupIssuesWithHisTime(List<Issue> issues, ClockifyTask[] clockifyTasks, String repoName) {
+    public void groupIssuesWithHisTime(List<GHIssue> issues, ClockifyTask[] clockifyTasks, String repoName) {
         Group group = groupService.findGroupByName(repoName);
-        for (Issue issue : issues) {
+        for (GHIssue issue : issues) {
             for (ClockifyTask clockifyTask : clockifyTasks) {
                 if (clockifyTask.getDescription().contains(issue.getTitle())) {
                     User user = userService.findUserByIdClockify(clockifyTask.getUserId());

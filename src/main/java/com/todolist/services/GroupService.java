@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +31,7 @@ public class GroupService {
     private final GroupUserRepository groupUserRepository;
 
     private final UserService userService;
+    private final TaskService taskService;
 
     // Components -------------------------------------------------------------
     private final DataManager dataManager;
@@ -41,10 +39,11 @@ public class GroupService {
 
     // Constructors -----------------------------------------------------------
     @Autowired
-    public GroupService(GroupRepository groupRepository, GroupUserRepository groupUserRepository, UserService userService, DataManager dataManager) {
+    public GroupService(GroupRepository groupRepository, GroupUserRepository groupUserRepository, UserService userService, TaskService taskService, DataManager dataManager) {
         this.groupRepository = groupRepository;
         this.groupUserRepository = groupUserRepository;
         this.userService = userService;
+        this.taskService = taskService;
         this.dataManager = dataManager;
     }
 
@@ -79,12 +78,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public List<Group> findGroupsWithUser(User user) {
-        System.out.println("user: " + user.getFullName());
-        System.out.println("user id: " + user.getId());
-        List<Group> groups = groupRepository.findAll().stream().filter(group -> {
-            System.out.println("group: " + getUsersFromGroup(group).stream().map(User::getFullName).toList());
-            return getUsersFromGroup(group).stream().map(User::getId).toList().contains(user.getId());
-        }).toList();
+        List<Group> groups = groupRepository.findAll().stream().filter(group -> getUsersFromGroup(group).stream().map(User::getId).toList().contains(user.getId())).toList();
         if (groups.isEmpty())
             throw new BadRequestException("The user with idUser " + user.getId() + " does not belong to any group.");
         return groups;
@@ -143,7 +137,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public Map<RoleStatus, Double> getCost(Group group, String title) {
-        Map<RoleStatus, Double> cost = new HashMap<>();
+        Map<RoleStatus, Double> cost = new EnumMap<>(RoleStatus.class);
         for (User user : getUsersFromGroup(group)) {
             Map<RoleStatus, Double> costUser = userService.getCost(user, title);
             for (RoleStatus role : RoleStatus.values()) {
@@ -228,5 +222,20 @@ public class GroupService {
         for (User user : users) {
             userService.removeAllTasksFromUser(user);
         }
+    }
+
+    public void deleteAllTask(Group group) {
+        List<Task> tasks = getTasksFromGroup(group);
+        for (Task task : tasks) {
+            taskService.deleteTask(task);
+        }
+    }
+
+    private List<Task> getTasksFromGroup(Group group) {
+        List<Task> tasks = new ArrayList<>();
+        for (User user : getUsersFromGroup(group)) {
+            tasks.addAll(userService.getTask(user));
+        }
+        return tasks;
     }
 }

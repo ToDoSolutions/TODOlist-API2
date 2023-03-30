@@ -71,45 +71,45 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.4.1</version>
+            <version>2.14.2</version>
         </dependency>
         <!--	Parameter names	-->
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-parameter-names</artifactId>
-            <version>2.13.4</version>
+            <version>2.14.2</version>
         </dependency>
 
         <!--	Java 8 Date/time	-->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.13.4</version>
+            <version>2.14.2</version>
         </dependency>
 
         <!--	Java 8 Datatypes	-->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
-            <version>2.13.4</version>
+            <version>2.14.2</version>
         </dependency>
         <!-- En la nube -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version>
+            <version>8.0.32</version>
         </dependency>
         <!-- En local -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.0.6</version>
+            <version>3.1.2</version>
         </dependency>
 
         <dependency>
@@ -138,13 +138,33 @@
             <version>4.7.3</version>
             <scope>compile</scope>
         </dependency>
-             <dependency>
-             <groupId>org.jacoco</groupId>
-             <artifactId>org.jacoco.agent</artifactId>
-             <version>0.8.7</version>
-             <classifier>runtime</classifier>
-             <scope>test</scope>
-             </dependency>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.agent</artifactId>
+            <version>0.8.8</version>
+            <classifier>runtime</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kohsuke</groupId>
+            <artifactId>github-api</artifactId>
+            <version>1.314</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>9.0.69</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
