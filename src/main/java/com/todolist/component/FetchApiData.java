@@ -1,8 +1,6 @@
 package com.todolist.component;
 
 import org.javatuples.Pair;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 

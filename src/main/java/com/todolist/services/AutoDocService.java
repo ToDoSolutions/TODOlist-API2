@@ -5,12 +5,11 @@ import com.todolist.component.AnalysisTable;
 import com.todolist.component.PlanningTable;
 import com.todolist.dtos.autodoc.RoleStatus;
 import com.todolist.dtos.autodoc.clockify.ClockifyTask;
-import com.todolist.dtos.autodoc.github.Issue;
 import com.todolist.entity.Group;
 import com.todolist.entity.Role;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
-import com.todolist.services.github.IssueService;
+import org.kohsuke.github.GHIssue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,9 +58,9 @@ public class AutoDocService {
     }
 
     @Transactional
-    public void groupIssuesWithHisTime(List<Issue> issues, ClockifyTask[] clockifyTasks, String repoName) {
+    public void groupIssuesWithHisTime(List<GHIssue> issues, ClockifyTask[] clockifyTasks, String repoName) {
         Group group = groupService.findGroupByName(repoName);
-        for (Issue issue : issues) {
+        for (GHIssue issue : issues) {
             for (ClockifyTask clockifyTask : clockifyTasks) {
                 if (clockifyTask.getDescription().contains(issue.getTitle())) {
                     User user = userService.findUserByIdClockify(clockifyTask.getUserId());
