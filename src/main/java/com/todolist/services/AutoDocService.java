@@ -129,9 +129,10 @@ public class AutoDocService {
         String personalTable = planningTable.getAllEmployeeTables(users, title);
 
         // Obtenemos el coste total.
+        System.out.println(groupService.getCostByTitle(group, title));
         double cost = Math.round(groupService.getCostByTitle(group, title).values()
-                .stream().mapToDouble(v -> v == null ? 0: v).sum()+100)/100.;
-
+                .stream().mapToDouble(v -> v == null ? 0: v).sum()*100)/100.;
+        System.out.println(cost);
         // Nombres de los empleados.
         String names = planningTable.getNames(users);
 
