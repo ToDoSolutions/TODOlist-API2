@@ -66,7 +66,7 @@ public class PlanningTable {
     public String getAllEmployeeTables(List<User> users, String title) {
         StringBuilder personalTable = new StringBuilder();
         for (User employee : users) {
-            personalTable.append(JUMP_LINE).append(new Heading(employee.getName(), 3)).append(JUMP_LINE);
+            personalTable.append(JUMP_LINE).append(new Heading(employee.getFullName(), 3)).append(JUMP_LINE);
             personalTable.append(getEmployeeTable(employee, title).serialize());
         }
         return personalTable.toString();
