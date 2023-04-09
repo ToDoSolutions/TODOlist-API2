@@ -9,19 +9,21 @@ import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     // Repositories -----------------------------------------------------------
@@ -32,16 +34,6 @@ public class UserService {
     private final DataManager dataManager;
     private final TaskService taskService;
     private final RoleService roleService;
-
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public UserService(UserRepository userRepository, DataManager dataManager,
-                       TaskService taskService, RoleService roleService) {
-        this.userRepository = userRepository;
-        this.dataManager = dataManager;
-        this.taskService = taskService;
-        this.roleService = roleService;
-    }
 
     // Populate database ------------------------------------------------------
     @PostConstruct
@@ -153,18 +145,10 @@ public class UserService {
     // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)
     public Map<RoleStatus, Double> getCost(User user, String title) {
-        Map<RoleStatus, Double> cost = new HashMap<>();
-        for (Task task : getTask(user)) {
-            if (task.getTitle().contains(title)) {
-                for (Role role : roleService.findRoleByTaskId(task.getId())) {
-                    if (cost.containsKey(role.getStatus()))
-                        cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
-                    else
-                        cost.put(role.getStatus(), role.getSalary());
-                }
-            }
-        }
-        return cost;
+        return getTask(user).stream()
+                .filter(task -> task.getTitle().contains(title))
+                .flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream())
+                .collect(Collectors.groupingBy(Role::getStatus, Collectors.summingDouble(Role::getSalary)));
     }
 
     @Transactional(readOnly = true)
@@ -179,25 +163,19 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Map<RoleStatus, Double> getGroupCost(User user) {
-        Map<RoleStatus, Double> cost = new HashMap<>();
-        List<Task> tasks = getGroupTask(user);
-        for (Task task : tasks)
-            for (Role role : roleService.findRoleByTaskId(task.getId())) {
-                if (cost.containsKey(role.getStatus()))
-                    cost.put(role.getStatus(), cost.get(role.getStatus()) + role.getSalary());
-                else
-                    cost.put(role.getStatus(), role.getSalary());
-            }
+        EnumMap<RoleStatus, Double> cost = new EnumMap<>(RoleStatus.class);
+        getGroupTask(user).forEach(task ->
+                roleService.findRoleByTaskId(task.getId()).forEach(role ->
+                        cost.merge(role.getStatus(), role.getSalary(), Double::sum)));
         return cost;
     }
 
     @Transactional(readOnly = true)
     public Map<RoleStatus, Double> getCostByTitle(User user, String title) {
-        if (Objects.equals(title, "I"))
-            return getIndividualCost(user);
-        else if (Objects.equals(title, "G"))
-            return getGroupCost(user);
-        else
-            return getTotalCostByRole(user);
+        return switch (title) {
+            case "I" -> getIndividualCost(user);
+            case "G" -> getGroupCost(user);
+            default -> getTotalCostByRole(user);
+        };
     }
 }

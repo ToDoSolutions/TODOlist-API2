@@ -10,8 +10,8 @@ import com.todolist.entity.Task;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,18 +23,15 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1")
+@AllArgsConstructor
 public class TaskController {
 
 
+    // Services ---------------------------------------------------------------
     private final TaskService taskService;
     private final DTOManager dtoManager;
 
-    @Autowired
-    public TaskController(TaskService taskService, DTOManager dtoManager) {
-        this.taskService = taskService;
-        this.dtoManager = dtoManager;
-    }
-
+    // Methods ----------------------------------------------------------------
     @DeleteMapping("/task/{idTask}") // DeleteTest
     public Map<String, Object> deleteTask(@PathVariable("idTask") Integer idTask) {
         Task task = taskService.findTaskById(idTask);

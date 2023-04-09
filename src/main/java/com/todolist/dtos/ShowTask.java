@@ -26,9 +26,6 @@ public class ShowTask extends ShowEntity{
     private Long priority;
     private Difficulty difficulty;
 
-    public ShowTask() {
-    }
-
     public ShowTask(Task task) {
         this.idTask = task.getId();
         this.title = task.getTitle();

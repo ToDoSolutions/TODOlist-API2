@@ -3,6 +3,7 @@ package com.todolist.controllers;
 import com.fadda.common.Preconditions;
 import com.fadda.iterables.iterator.IterableRangeObject;
 import com.todolist.component.DTOManager;
+import com.todolist.dtos.Order;
 import com.todolist.dtos.ShowGroup;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
@@ -15,12 +16,10 @@ import com.todolist.filters.NumberFilter;
 import com.todolist.services.GroupService;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import com.todolist.dtos.Order;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -30,6 +29,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1")
+@AllArgsConstructor
 public class GroupController {
 
     private final GroupService groupService;
@@ -39,16 +39,7 @@ public class GroupController {
     private final UserService userService;
     private final DTOManager dtoManager;
 
-
-    @Autowired
-    public GroupController(GroupService groupService, TaskService taskService, UserService userService, DTOManager dtoManager) {
-        this.groupService = groupService;
-        this.taskService = taskService;
-        this.userService = userService;
-        this.dtoManager = dtoManager;
-    }
     /* GROUP OPERATIONS */
-
     @DeleteMapping("/group/{idGroup}") // DeleteTest
     public Map<String, Object> deleteGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup) {
         Group group = groupService.findGroupById(idGroup);

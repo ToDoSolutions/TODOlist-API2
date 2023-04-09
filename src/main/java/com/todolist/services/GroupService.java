@@ -11,7 +11,7 @@ import com.todolist.exceptions.BadRequestException;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.GroupRepository;
 import com.todolist.repositories.GroupUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class GroupService {
 
     // Services ---------------------------------------------------------------
@@ -35,17 +39,6 @@ public class GroupService {
 
     // Components -------------------------------------------------------------
     private final DataManager dataManager;
-
-
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public GroupService(GroupRepository groupRepository, GroupUserRepository groupUserRepository, UserService userService, TaskService taskService, DataManager dataManager) {
-        this.groupRepository = groupRepository;
-        this.groupUserRepository = groupUserRepository;
-        this.userService = userService;
-        this.taskService = taskService;
-        this.dataManager = dataManager;
-    }
 
     // Populate database ------------------------------------------------------
     @PostConstruct
@@ -139,14 +132,7 @@ public class GroupService {
     public Map<RoleStatus, Double> getCost(Group group, String title) {
         Map<RoleStatus, Double> cost = new EnumMap<>(RoleStatus.class);
         for (User user : getUsersFromGroup(group)) {
-            Map<RoleStatus, Double> costUser = userService.getCost(user, title);
-            for (RoleStatus role : RoleStatus.values()) {
-                Double add = costUser.containsKey(role) ? costUser.get(role): 0;
-                if (cost.containsKey(role))
-                    cost.put(role, cost.get(role) + add);
-                else
-                    cost.put(role, add);
-            }
+            userService.getCost(user, title).forEach((role, add) -> cost.merge(role, add, Double::sum));
         }
         return cost;
     }
@@ -170,12 +156,11 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public Map<RoleStatus, Double> getCostByTitle(Group group, String title) {
-        if (Objects.equals(title, "I"))
-            return getIndividualCost(group);
-        else if (Objects.equals(title, "G"))
-            return getGroupCost(group);
-        else
-            return getTotalCostByRole(group);
+        return switch (title) {
+            case "I" -> getIndividualCost(group);
+            case "G" -> getGroupCost(group);
+            default -> getTotalCostByRole(group);
+        };
     }
 
     // Save and delete --------------------------------------------------------

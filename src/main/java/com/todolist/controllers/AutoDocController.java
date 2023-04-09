@@ -4,7 +4,7 @@ package com.todolist.controllers;
 import com.fadda.common.io.WriterManager;
 import com.todolist.component.TemplateManager;
 import com.todolist.services.AutoDocService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +16,7 @@ import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/api/v1/autodoc")
+@AllArgsConstructor
 public class AutoDocController {
 
     // Constants --------------------------------------------------------------
@@ -34,13 +35,6 @@ public class AutoDocController {
 
     // Components -------------------------------------------------------------
     private final TemplateManager templateManager;
-
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public AutoDocController(AutoDocService autoDocService, TemplateManager templateManager) {
-        this.autoDocService = autoDocService;
-        this.templateManager = templateManager;
-    }
 
     // Methods ----------------------------------------------------------------
     @RequestMapping("/planning/{repoName}/{username}/md")

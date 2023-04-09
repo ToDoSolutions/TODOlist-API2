@@ -1,9 +1,9 @@
 package com.todolist.component;
 
+import com.fadda.common.io.WriterManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import com.fadda.common.io.WriterManager;
 
 import java.io.IOException;
 
@@ -39,5 +39,4 @@ public class TemplateManager {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + title + "\"")
                 .body(writerManager.get());
     }
-
 }

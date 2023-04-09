@@ -1,15 +1,10 @@
 package com.todolist.dtos.autodoc.clockify;
 
 import com.fasterxml.jackson.annotation.*;
-import com.todolist.dtos.autodoc.Employee;
-import com.todolist.dtos.autodoc.RoleStatus;
 import lombok.Getter;
 
 import javax.annotation.Generated;
 import javax.validation.Valid;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,11 +55,5 @@ public class ClockifyTask {
         this.additionalProperties.put(name, value);
     }
 
-    public Duration calculateSalary(List<RoleStatus> roles, Employee employee) {
-        LocalDateTime start = LocalDateTime.parse(getTimeInterval().getStart(), DateTimeFormatter.ISO_DATE_TIME);
-        LocalDateTime end = LocalDateTime.parse(getTimeInterval().getEnd(), DateTimeFormatter.ISO_DATE_TIME);
-        Duration difference = Duration.between(start, end);
-        roles.forEach(role -> employee.keepSalary(role, difference));
-        return difference;
-    }
+
 }

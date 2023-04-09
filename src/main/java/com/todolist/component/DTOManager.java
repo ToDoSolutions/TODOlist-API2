@@ -9,12 +9,13 @@ import com.todolist.entity.User;
 import com.todolist.services.GroupService;
 import com.todolist.services.UserService;
 import com.todolist.validators.FieldValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
+@AllArgsConstructor
 public class DTOManager {
 
     // Services ---------------------------------------------------------------
@@ -24,13 +25,6 @@ public class DTOManager {
     // Components -------------------------------------------------------------
     private final FieldValidator fieldValidator;
 
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public DTOManager(UserService userService, GroupService groupService, FieldValidator fieldValidator) {
-        this.userService = userService;
-        this.groupService = groupService;
-        this.fieldValidator = fieldValidator;
-    }
 
     // Methods ----------------------------------------------------------------
     public ShowTask getShowTask(Task task) {
@@ -46,10 +40,6 @@ public class DTOManager {
         return getShowTask(task).toJson();
     }
 
-    public Map<String, Object> getShowTaskAsJsonWithOutTimes(Task task, String fieldsTask) {
-        return getShowTask(task).toJson(fieldsTask.replace("finishedDate", "").replace("priority", "").replace("difficulty", "").replace("duration", "").replace("idTask", ""));
-    }
-
     public ShowUser getShowUser(User user) {
         return new ShowUser(user, userService.getShowTaskFromUser(user));
     }
@@ -58,11 +48,6 @@ public class DTOManager {
         fieldValidator.userFieldValidate(fieldsUser);
         fieldValidator.taskFieldValidate(fieldsTask);
         return getShowUser(user).toJson(fieldsUser, fieldsTask);
-    }
-
-    public Map<String, Object> getShowUserAsJson(User user, String fieldsUser) {
-        fieldValidator.userFieldValidate(fieldsUser);
-        return getShowUser(user).toJson(fieldsUser);
     }
 
     public Map<String, Object> getShowUserAsJson(User user) {
@@ -80,20 +65,7 @@ public class DTOManager {
         return getShowGroup(group).toJson(fieldsGroup, fieldsUser, fieldsTask);
     }
 
-    public Map<String, Object> getShowGroupAsJson(Group group, String fieldsGroup, String fieldsUser) {
-        fieldValidator.groupFieldValidate(fieldsGroup);
-        fieldValidator.userFieldValidate(fieldsUser);
-        return getShowGroup(group).toJson(fieldsGroup, fieldsUser);
-    }
-
-    public Map<String, Object> getShowGroupAsJson(Group group, String fieldsGroup) {
-        fieldValidator.groupFieldValidate(fieldsGroup);
-        return getShowGroup(group).toJson(fieldsGroup);
-    }
-
     public Map<String, Object> getShowGroupAsJson(Group group) {
         return getShowGroup(group).toJson();
     }
-
-
 }

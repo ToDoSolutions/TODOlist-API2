@@ -3,6 +3,7 @@ package com.todolist.controllers;
 import com.fadda.common.Preconditions;
 import com.fadda.iterables.iterator.IterableRangeObject;
 import com.todolist.component.DTOManager;
+import com.todolist.dtos.Order;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Task;
@@ -11,12 +12,10 @@ import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.NumberFilter;
 import com.todolist.services.TaskService;
 import com.todolist.services.UserService;
-import com.todolist.dtos.Order;
 import com.todolist.validators.FieldValidator;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,28 +29,24 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1")
-@Validated
+@AllArgsConstructor
 public class UserController {
 
+    // Validators -------------------------------------------------------------
     private final Validator validator;
+
+    // Services ---------------------------------------------------------------
     private final TaskService taskService;
 
     private final UserService userService;
+
+    // Components -------------------------------------------------------------
     private final FieldValidator fieldValidator;
     private final DTOManager dtoManager;
 
-
-    @Autowired
-    public UserController(Validator validator, TaskService taskService, UserService userService, FieldValidator fieldValidator, DTOManager dtoManager) {
-        this.validator = validator;
-        this.taskService = taskService;
-        this.userService = userService;
-        this.fieldValidator = fieldValidator;
-        this.dtoManager = dtoManager;
-    }
+    // Methods ----------------------------------------------------------------
 
     /* USER OPERATIONS */
-
     @DeleteMapping("/user/{idUser}") // DeleteTest
     public Map<String, Object> deleteUser(@PathVariable("idUser") Integer idUser) {
         User user = userService.findUserById(idUser);
@@ -115,7 +110,6 @@ public class UserController {
     }
 
     /* TASK OPERATIONS */
-
     @DeleteMapping("/user/{idUser}/tasks") // DeleteTest
     public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Integer idUser) {
         User user = userService.findUserById(idUser);

@@ -34,13 +34,11 @@ public class TagService {
     }
 
     // Finders ----------------------------------------------------------------
-    @Transactional
-    public Tag getTagById(Group group, String idTag) {
-        return tagRepository.findById(idTag).orElse(getTagFromClockify(group, idTag));
-    }
 
     @Transactional
     public Tag getTagFromClockify(Group group, String idTag) {
+        if (idTag == null)
+            return new Tag();
         String url = tagsUrl.replace(WORKSPACE_ID, group.getWorkSpaceId()).replace(TAG_ID, idTag);
         Tag tag = fetchApiData.getApiDataWithToken(url, Tag.class, new Pair<>(X_API_KEY, token));
         tagRepository.save(tag);

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 
 import javax.annotation.Generated;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,5 +31,13 @@ public class TimeInterval {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public LocalDateTime getStartAsLocalDateTime() {
+        return LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME);
+    }
+
+    public LocalDateTime getEndAsLocalDateTime() {
+        return LocalDateTime.parse(end, DateTimeFormatter.ISO_DATE_TIME);
     }
 }

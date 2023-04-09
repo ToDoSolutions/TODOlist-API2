@@ -1,11 +1,10 @@
 package com.todolist.services;
 
-import com.todolist.component.FetchApiData;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.NotFoundException;
+import lombok.AllArgsConstructor;
 import org.kohsuke.github.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,18 +12,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class IssueService {
 
     // Services ---------------------------------------------------------------
     private final UserService userService;
     private final TaskService taskService;
-
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public IssueService(UserService userService, FetchApiData fetchApiData, TaskService taskService) {
-        this.userService = userService;
-        this.taskService = taskService;
-    }
 
     // Methods ----------------------------------------------------------------
     public List<GHIssue> findByUsernameAndRepo(String username, String repoName) { // Get all issues from a repo

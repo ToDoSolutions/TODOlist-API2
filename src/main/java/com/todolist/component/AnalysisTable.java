@@ -2,12 +2,15 @@ package com.todolist.component;
 
 import com.todolist.entity.Task;
 import net.steppschuh.markdowngenerator.table.Table;
+import net.steppschuh.markdowngenerator.table.TableRow;
 import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
 import net.steppschuh.markdowngenerator.text.heading.Heading;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class AnalysisTable {
@@ -23,28 +26,31 @@ public class AnalysisTable {
 
     // Methods ----------------------------------------------------------------
     public StringBuilder getStatements(Map<String, List<Task>> timeTasks) {
-        StringBuilder output = new StringBuilder(new Heading(STATEMENTS, 3).toString()).append(JUMP_LINE);
-        for (Map.Entry<String, List<Task>> entry : timeTasks.entrySet()) {
-            Task task = entry.getValue().get(0);
-            output.append(LIST_ELEMENTS).append(new BoldText(task.getIdIssue()))
-                    .append(SEPARATOR_ID)
-                    .append(task.getTitleIssue()).append(JUMP_LINE);
-        }
-        return output;
+        return new StringBuilder()
+                .append(new Heading(STATEMENTS, 3)).append(JUMP_LINE)
+                .append(timeTasks.values().stream()
+                        .map(tasks -> {
+                            Task task = tasks.get(0);
+                            return String.format("%s%s%s%s%s%n",
+                                    LIST_ELEMENTS, new BoldText(task.getIdIssue()), SEPARATOR_ID, task.getTitleIssue(), JUMP_LINE);
+                        })
+                        .collect(Collectors.joining()));
     }
 
     public StringBuilder getAnalysis(Map<String, List<Task>> timeTasks) {
-        StringBuilder output = new StringBuilder(new Heading(ANALYSIS, 3).toString()).append(JUMP_LINE);
-        Table.Builder table = new Table.Builder()
-                .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                .addRow(HEADER_ANALYSIS);
-        for (Map.Entry<String, List<Task>> entry : timeTasks.entrySet()) {
-            Task timeTask = entry.getValue().get(0);
-            String conclusion = timeTask.getConclusion() != null ? timeTask.getConclusion().trim() : "";
-            String decision = timeTask.getDecision() != null ? timeTask.getDecision().trim() : "";
-            table.addRow(timeTask.getIdIssue(), conclusion, decision);
-        }
-        return output.append(table.build().serialize());
+        return new StringBuilder()
+                .append(new Heading(ANALYSIS, 3)).append(JUMP_LINE)
+                .append(new Table.Builder()
+                        .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
+                        .addRow(HEADER_ANALYSIS)
+                        .withRows(timeTasks.values().stream()
+                                .map(tasks -> {
+                                    Task timeTask = tasks.get(0);
+                                    String conclusion = Optional.ofNullable(timeTask.getConclusion()).orElse("").trim();
+                                    String decision = Optional.ofNullable(timeTask.getDecision()).orElse("").trim();
+                                    return new TableRow(List.of(timeTask.getIdIssue(), conclusion, decision));
+                                }).toList())
+                        .build().serialize());
 
     }
 }

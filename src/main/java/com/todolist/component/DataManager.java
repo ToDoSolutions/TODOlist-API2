@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import com.todolist.entity.*;
+import com.todolist.entity.Group;
+import com.todolist.entity.GroupUser;
+import com.todolist.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
