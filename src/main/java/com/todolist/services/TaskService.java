@@ -53,11 +53,17 @@ public class TaskService {
     public void saveTask(GHIssue issue, ClockifyTask clockifyTask, Group group, User user) {
         Task task = findAllTasks().stream().filter(t -> t.getTitleIssue().equals(issue.getTitle())).findFirst()
                 .orElse(new Task(issue.getTitle(), issue.getBody()));
-        RoleStatus roleStatus = RoleStatus.parseTag(clockifyTask.getTagIds().stream().map(tagId -> tagService.getTagFromClockify(group, tagId))
-                .filter(tag -> tag.getName() != null).findFirst().orElse(new Tag()));
+        RoleStatus roleStatus = RoleStatus.parseTag(getTag(clockifyTask, group));
         task.setUser(user);
         saveTask(task);
         roleService.saveRole(roleStatus, clockifyTask.getTimeInterval(), task);
+    }
+
+    private Tag getTag(ClockifyTask clockifyTask, Group group) {
+        if (clockifyTask.getTagIds() == null)
+            return new Tag();
+        return clockifyTask.getTagIds().stream().map(tagId -> tagService.getTagFromClockify(group, tagId))
+                .filter(tag -> tag.getName() != null).findFirst().orElse(new Tag());
     }
 
     @Transactional

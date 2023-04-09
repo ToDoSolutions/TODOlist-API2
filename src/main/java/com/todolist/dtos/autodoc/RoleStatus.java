@@ -24,7 +24,7 @@ public enum RoleStatus {
     }
 
     public static RoleStatus parseTag(Tag tag) {
-        if (tag == null)
+        if (tag.getName() == null)
             return UNDEFINED;
         String name = tag.getName().toUpperCase();
         return switch (name) {

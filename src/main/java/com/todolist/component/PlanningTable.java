@@ -37,24 +37,33 @@ public class PlanningTable {
         return duration.toHours() + " horas y " + duration.toMinutes() % 60 + " minutos";
     }
 
+    private static String join(List<String> list) {
+        return list.isEmpty() ? "" :
+                list.size() == 1 ? list.get(0) :
+                        list.stream().limit(list.size() - 1)
+                                .collect(Collectors.joining(", ")) + " y " + list.get(list.size() - 1);
+    }
+
     // Methods ----------------------------------------------------------------
     public Table getTaskTable(Map<String, List<Task>> timeTasks) {
-        List<TableRow> rowTasks = timeTasks.values().stream()
-                .map(this::getRow).toList();
+        List<TableRow> rowTasks = new java.util.ArrayList<>(timeTasks.values().stream()
+                .map(this::getRow).toList());
+        rowTasks.add(0, new TableRow(List.of(HEADER_PLANNING)));
         return new Table.Builder().withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT, Table.ALIGN_LEFT)
-                .addRow(HEADER_PLANNING)
                 .withRows(rowTasks).build();
     }
 
     private TableRow getRow(List<Task> tasks) {
         String id = tasks.get(0).getIdIssue();
         String title = tasks.get(0).getTitleIssue();
-        String names = tasks.stream().map(task -> task.getUser().getFullName()).distinct().collect(Collectors.joining(", ", "", " y "));
-        String roles = tasks.stream().flatMap(task -> roleService.getStatus(task).stream())
-                .map(RoleStatus::getInSpanish).collect(Collectors.joining(", ", "", " y "));
+        List<String> names = tasks.stream().map(task -> task.getUser().getFullName()).distinct().toList();
+        String namesAsString = join(names);
+        List<String> roles = tasks.stream().flatMap(task -> roleService.getStatus(task).stream())
+                .map(RoleStatus::getInSpanish).toList();
+        String rolesAsString = join(roles);
         Duration duration = tasks.stream().map(roleService::getDuration).reduce(Duration.ZERO, Duration::plus);
         Double cost = tasks.stream().mapToDouble(roleService::getCost).sum();
-        return new TableRow(List.of(id, title, names, roles, "x", getTime(duration), String.format("%.2f %s", cost, EURO)));
+        return new TableRow(List.of(id, title, namesAsString, rolesAsString, "x", getTime(duration), String.format("%.2f %s", cost, EURO)));
     }
 
     public Table getEmployeeTable(User user, String title) {
@@ -71,6 +80,7 @@ public class PlanningTable {
         users.forEach(user -> personalTable
                 .append(JUMP_LINE)
                 .append(new Heading(user.getFullName(), 3))
+                .append(JUMP_LINE)
                 .append(getEmployeeTable(user, title).serialize()));
         return personalTable.toString();
     }

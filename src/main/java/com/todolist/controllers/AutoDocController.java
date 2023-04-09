@@ -7,12 +7,14 @@ import com.todolist.services.AutoDocService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.concurrent.TimeoutException;
 
 @Controller
 @RequestMapping("/api/v1/autodoc")
@@ -37,8 +39,8 @@ public class AutoDocController {
     private final TemplateManager templateManager;
 
     // Methods ----------------------------------------------------------------
-    @RequestMapping("/planning/{repoName}/{username}/md")
-    public ResponseEntity<String> getPlanningGroup(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = GROUP) String title) throws IOException {
+    @GetMapping("/planning/{repoName}/{username}/md")
+    public ResponseEntity<String> getPlanningGroup(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = GROUP) String title) throws IOException, TimeoutException {
         String[] output = autoDocService.getPlanning(repoName, username, title);
         WriterManager writerManager = templateManager.getGroupPlanningTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
@@ -48,8 +50,8 @@ public class AutoDocController {
         return templateManager.getResponseEntity(writerManager, PLANNING_GROUP);
     }
 
-    @RequestMapping("/analysis/{repoName}/{username}/md")
-    public ResponseEntity<String> getAnalysisGroup(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = GROUP) String title) throws IOException {
+    @GetMapping("/analysis/{repoName}/{username}/md")
+    public ResponseEntity<String> getAnalysisGroup(@PathVariable String repoName, @PathVariable String username, @RequestParam(defaultValue = GROUP) String title) throws IOException, TimeoutException {
         String output = autoDocService.getAnalysis(repoName, username, title);
         WriterManager writerManager = templateManager.getGroupAnalysisTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
@@ -57,8 +59,8 @@ public class AutoDocController {
         return templateManager.getResponseEntity(writerManager, ANALYSIS_GROUP);
     }
 
-    @RequestMapping("/planning/{repoName}/{username}/individual/{individual}/md")
-    public ResponseEntity<String> getPlanningIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException {
+    @GetMapping("/planning/{repoName}/{username}/individual/{individual}/md")
+    public ResponseEntity<String> getPlanningIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException, TimeoutException {
         String[] output = autoDocService.getPlanning(repoName, username, individual, title);
         WriterManager writerManager = templateManager.getIndividualPlanningTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))
@@ -71,8 +73,8 @@ public class AutoDocController {
         return templateManager.getResponseEntity(writerManager, PLANNING_INDIVIDUAL.replace(USERNAME, individual.toLowerCase().replace(SPACE, LINE)));
     }
 
-    @RequestMapping("/analysis/{repoName}/{username}/individual/{individual}/md")
-    public ResponseEntity<String> getAnalysisIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException {
+    @GetMapping("/analysis/{repoName}/{username}/individual/{individual}/md")
+    public ResponseEntity<String> getAnalysisIndividual(@PathVariable String repoName, @PathVariable String username, @PathVariable String individual, @RequestParam(defaultValue = INDIVIDUAL) String title) throws IOException, TimeoutException {
         String output = autoDocService.getAnalysis(repoName, username, individual, title);
         WriterManager writerManager = templateManager.getIndividualAnalysisTemplate()
                 .map(s -> s.replace("{creationDate}", LocalDate.now().toString()))

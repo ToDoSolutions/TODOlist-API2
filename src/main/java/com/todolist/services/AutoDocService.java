@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +36,7 @@ public class AutoDocService {
 
     // Methods ----------------------------------------------------------------
     @Transactional
-    public void autoDoc(String repoName, String username) {
+    public void autoDoc(String repoName, String username) throws TimeoutException {
         Group group = groupService.findGroupByName(repoName);
         groupService.deleteAllTask(group);
         groupIssuesWithHisTime(issueService.findByUsernameAndRepo(username, repoName), clockifyService.getTaskFromWorkspace(repoName, username), repoName);
@@ -62,7 +63,7 @@ public class AutoDocService {
     }
 
     @Transactional
-    public String[] getPlanning(String repoName, String username, String individual, String title) {
+    public String[] getPlanning(String repoName, String username, String individual, String title) throws TimeoutException {
         autoDoc(repoName, username);
         Map<String, List<Task>> taskPerIssue = issueService.getTaskPerIssueFilter(repoName, username, title, individual);
         List<User> users = getEmployees(taskPerIssue);
@@ -94,11 +95,11 @@ public class AutoDocService {
                         .flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream()))
                 .map(role -> role.getStatus().toString().toLowerCase())
                 .distinct()
-                .collect(Collectors.joining(", ", "", " y "));
+                .collect(Collectors.joining(", ", "", " y ")); // TODO: CORREGIR ESTO, llevar función a Fadda.
     }
 
     @Transactional
-    public String[] getPlanning(String repoName, String username, String title) {
+    public String[] getPlanning(String repoName, String username, String title) throws TimeoutException {
         autoDoc(repoName, username);
         Map<String, List<Task>> taskPerIssue = issueService.getTaskPerIssueFilter(repoName, username, title);
         List<User> users = getEmployees(taskPerIssue);
@@ -122,7 +123,7 @@ public class AutoDocService {
     }
 
     @Transactional
-    public String getAnalysis(String repoName, String username, String individual, String title) {
+    public String getAnalysis(String repoName, String username, String individual, String title) throws TimeoutException {
         autoDoc(repoName, username);
         Map<String, List<Task>> timeTasks = issueService.getTaskPerIssueFilter(repoName, username, title, individual);
 
@@ -136,7 +137,7 @@ public class AutoDocService {
     }
 
     @Transactional
-    public String getAnalysis(String repoName, String username, String title) {
+    public String getAnalysis(String repoName, String username, String title) throws TimeoutException {
         autoDoc(repoName, username);
         Map<String, List<Task>> timeTasks = issueService.getTaskPerIssueFilter(repoName, username, title);
 

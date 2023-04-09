@@ -58,6 +58,7 @@ public class RoleService {
         Optional<Role> optionalRole = getRole(task, roleStatus);
         Role role = optionalRole.orElseGet(() -> {
             Role newRole = new Role();
+            newRole.setDuration(Duration.ZERO);
             newRole.setStatus(roleStatus);
             newRole.setTask(task);
             return newRole;
