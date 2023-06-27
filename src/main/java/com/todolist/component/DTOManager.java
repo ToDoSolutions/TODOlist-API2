@@ -1,71 +1,63 @@
 package com.todolist.component;
 
-import com.todolist.dtos.ShowGroup;
-import com.todolist.dtos.ShowTask;
-import com.todolist.dtos.ShowUser;
-import com.todolist.entity.Group;
-import com.todolist.entity.Task;
-import com.todolist.entity.User;
-import com.todolist.services.GroupService;
-import com.todolist.services.UserService;
+import com.todolist.dtos.ShowEntity;
+import com.todolist.dtos.ToJson;
 import com.todolist.validators.FieldValidator;
-import lombok.AllArgsConstructor;
+import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 @Component
-@AllArgsConstructor
 public class DTOManager {
+    private final Reflections reflections;
 
-    // Services ---------------------------------------------------------------
-    private final UserService userService;
-    private final GroupService groupService;
-
-    // Components -------------------------------------------------------------
-    private final FieldValidator fieldValidator;
-
-
-    // Methods ----------------------------------------------------------------
-    public ShowTask getShowTask(Task task) {
-        return new ShowTask(task);
+    @Autowired
+    public DTOManager(FieldValidator fieldValidator) {
+        this.reflections = new Reflections(new ConfigurationBuilder()
+                .setScanners(new MethodAnnotationsScanner())
+                .setUrls(ClasspathHelper.forPackage("com.todolist.dtos")));
     }
 
-    public Map<String, Object> getShowTaskAsJson(Task task, String fieldsTask) {
-        fieldValidator.taskFieldValidate(fieldsTask);
-        return getShowTask(task).toJson(fieldsTask);
+    public Map<String, Object> getEntityAsJson(ShowEntity entity) {
+        String entityName = entity.getClass().getSimpleName();
+        Method toJsonMethod = findToJsonMethod(entityName);
+        return invokeToJsonMethod(toJsonMethod, entity, null);
     }
 
-    public Map<String, Object> getShowTaskAsJson(Task task) {
-        return getShowTask(task).toJson();
+    public Map<String, Object> getEntityAsJson(ShowEntity entity, Consumer<String[]> validator, String... fields) {
+        String entityName = entity.getClass().getSimpleName();
+        validator.accept(fields);
+        Method toJsonMethod = findToJsonMethod(entityName);
+        return invokeToJsonMethod(toJsonMethod, entity, fields);
     }
 
-    public ShowUser getShowUser(User user) {
-        return new ShowUser(user, userService.getShowTaskFromUser(user));
+    private Method findToJsonMethod(String entityName) {
+        Set<Method> methods = reflections.getMethodsAnnotatedWith(ToJson.class);
+        for (Method method : methods) {
+
+            Class<?> declaringClass = method.getDeclaringClass();
+            if (declaringClass.getSimpleName().equals(entityName)) {
+                return method;
+            }
+        }
+        throw new IllegalArgumentException("Could not find toJson method for entity: " + entityName);
     }
 
-    public Map<String, Object> getShowUserAsJson(User user, String fieldsUser, String fieldsTask) {
-        fieldValidator.userFieldValidate(fieldsUser);
-        fieldValidator.taskFieldValidate(fieldsTask);
-        return getShowUser(user).toJson(fieldsUser, fieldsTask);
-    }
-
-    public Map<String, Object> getShowUserAsJson(User user) {
-        return getShowUser(user).toJson();
-    }
-
-    public ShowGroup getShowGroup(Group group) {
-        return new ShowGroup(group, groupService.getShowUserFromGroup(group));
-    }
-
-    public Map<String, Object> getShowGroupAsJson(Group group, String fieldsGroup, String fieldsUser, String fieldsTask) {
-        fieldValidator.groupFieldValidate(fieldsGroup);
-        fieldValidator.userFieldValidate(fieldsUser);
-        fieldValidator.taskFieldValidate(fieldsTask);
-        return getShowGroup(group).toJson(fieldsGroup, fieldsUser, fieldsTask);
-    }
-
-    public Map<String, Object> getShowGroupAsJson(Group group) {
-        return getShowGroup(group).toJson();
+    private Map<String, Object> invokeToJsonMethod(Method toJsonMethod, Object entity, String[] fields) {
+        try {
+            return (Map<String, Object>) toJsonMethod.invoke(entity, fields);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalStateException("Error invoking toJson method for entity: " + entity.getClass().getSimpleName(), e);
+        }
     }
 }
+

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -51,8 +52,10 @@ public class TaskService {
 
     @Transactional
     public void saveTask(GHIssue issue, ClockifyTask clockifyTask, Group group, User user) {
-        Task task = findAllTasks().stream().filter(t -> t.getTitleIssue().equals(issue.getTitle())).findFirst()
-                .orElse(new Task(issue.getTitle(), issue.getBody()));
+        Task task = findAllTasks().stream()
+                .filter(t -> t.getTitleIssue().equals(issue.getTitle()))
+                .findFirst()
+                .orElseGet(() -> new Task(issue.getTitle(), issue.getBody()));
         RoleStatus roleStatus = RoleStatus.parseTag(getTag(clockifyTask, group));
         task.setUser(user);
         saveTask(task);
@@ -60,10 +63,12 @@ public class TaskService {
     }
 
     private Tag getTag(ClockifyTask clockifyTask, Group group) {
-        if (clockifyTask.getTagIds() == null)
-            return new Tag();
-        return clockifyTask.getTagIds().stream().map(tagId -> tagService.getTagFromClockify(group, tagId))
-                .filter(tag -> tag.getName() != null).findFirst().orElse(new Tag());
+        return Optional.ofNullable(clockifyTask.getTagIds())
+                .flatMap(tagIds -> tagIds.stream()
+                        .map(tagId -> tagService.getTagFromClockify(group, tagId))
+                        .filter(tag -> tag.getName() != null)
+                        .findFirst())
+                .orElseGet(Tag::new);
     }
 
     @Transactional

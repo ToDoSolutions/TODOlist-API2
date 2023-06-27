@@ -15,10 +15,10 @@ import java.util.Map;
 @Setter
 @ToString
 @EqualsAndHashCode(of = {"idTask"}, callSuper = false)
-public class ShowTask extends ShowEntity{
+public class ShowTask extends ShowEntity {
 
-    public static final List<String> ALL_ATTRIBUTES = List.of("idTask", "title", "description", "status", "finishedDate", "startDate", "annotation", "priority", "difficulty", "duration");
-    public static final String ALL_ATTRIBUTES_STRING = "idTask,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration";
+    public static final List<String> ALL_ATTRIBUTES = List.of("id", "title", "description", "status", "finishedDate", "startDate", "annotation", "priority", "difficulty", "duration");
+    public static final String ALL_ATTRIBUTES_STRING = "id,title,description,status,finishedDate,startDate,annotation,priority,difficulty,duration";
 
     private Integer idTask;
     private String title, description, annotation;
@@ -35,13 +35,9 @@ public class ShowTask extends ShowEntity{
         this.difficulty = task.getDifficulty();
     }
 
+    @ToJson
     public Map<String, Object> toJson(String fields) {
         return toJson(fields, ALL_ATTRIBUTES);
-    }
-
-
-    public Map<String, Object> toJson() {
-        return toJson(getFieldsAsString());
     }
 
     public static String getFieldsAsString() {

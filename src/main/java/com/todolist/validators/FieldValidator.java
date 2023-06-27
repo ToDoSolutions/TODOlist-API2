@@ -11,9 +11,10 @@ import java.util.List;
 
 @Component
 public class FieldValidator {
-
     public void taskFieldValidate(String fieldsTask) {
         List<String> lowerAll = ShowTask.ALL_ATTRIBUTES.stream().map(String::toLowerCase).toList();
+        System.out.println("fieldsTask = " + fieldsTask);
+        System.out.println("lowerAll = " + lowerAll);
         if (!(Arrays.stream(fieldsTask.split(",")).allMatch(field -> lowerAll.contains(field.toLowerCase()))))
             throw new BadRequestException("The tasks' fields are invalid.");
     }

@@ -11,6 +11,7 @@ import java.util.Map;
 
 public abstract class ShowEntity {
 
+
     protected Map<String, Object> toJson(String fields, List<String> allAttributes) {
 
         List<String> attributesNotNeeded = allAttributes.stream().map(String::trim).filter(attribute -> !fields.contains(attribute.toLowerCase())).toList();

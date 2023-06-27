@@ -10,27 +10,13 @@ import java.io.IOException;
 @Component
 public class TemplateManager {
 
-    public static final String TEMPLATES_ANALYSIS_GROUP = "templates/analysis_group.txt";
-    public static final String TEMPLATES_ANALYSIS_INDIVIDUAL = "templates/analysis_individual.txt";
-    public static final String TEMPLATES_PLANNING_GROUP = "templates/planning_group.txt";
-    public static final String TEMPLATES_PLANNING_INDIVIDUAL = "templates/planning_individual.txt";
+    private static final String TEMPLATES_DIRECTORY = "templates/";
+    private static final String TEMPLATE_EXTENSION = ".txt";
 
 
-
-    public WriterManager getGroupAnalysisTemplate() throws IOException {
-        return new WriterManager(TEMPLATES_ANALYSIS_GROUP);
-    }
-
-    public WriterManager getIndividualAnalysisTemplate() throws IOException {
-        return new WriterManager(TEMPLATES_ANALYSIS_INDIVIDUAL);
-    }
-
-    public WriterManager getGroupPlanningTemplate() throws IOException {
-        return new WriterManager(TEMPLATES_PLANNING_GROUP);
-    }
-
-    public WriterManager getIndividualPlanningTemplate() throws IOException {
-        return new WriterManager(TEMPLATES_PLANNING_INDIVIDUAL);
+    public WriterManager getTemplate(TemplateType templateType) throws IOException {
+        String templatePath = TEMPLATES_DIRECTORY + templateType.getFileName() + TEMPLATE_EXTENSION;
+        return new WriterManager(templatePath);
     }
 
     public ResponseEntity<String> getResponseEntity(WriterManager writerManager, String title) {
@@ -40,3 +26,9 @@ public class TemplateManager {
                 .body(writerManager.get());
     }
 }
+
+
+
+
+
+

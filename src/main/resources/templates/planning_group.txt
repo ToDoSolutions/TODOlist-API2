@@ -28,7 +28,7 @@ Tras llevar a cabo una reunión de grupo analizando los requisitos necesarios pa
 El contenido de este reporte se va a dividir en tres partes: En primer lugar los costes fijos del equipamiento.En segundo lugar las tareas comunes, que son aquellas que se tienen que realizar en todos los entregables y que se basan en la organización del mismo. Por otra parte las tareas específicas, que son aquellas que se requieren en cada de los entregables, las cuales han sido representadas en una tabla que recoge tanto las tareas grupales (Task X(G)), como las tareas individuales (Task X(IX)). Finalmente el presupuesto, en donde se calcula en función de los distintos roles de cada miembro del equipo, respecto a las horas realizadas por estos, más los costes fijos teniendo en cuenta la amortización.
 
 A cada uno de los integrantes del grupo se les ha asignado un número de estudiante el cual les representara a lo largo de todas las entregas:
-{content3}
+{content0}
 
 Por ejemplo (Task 2(I1))dictamina que Maria Vico Martín es la encargada de la Task 2.
 
@@ -57,7 +57,7 @@ Durante el desarrollo del entregable se han llevado a cabo ciertas tareas las cu
 
 ## Coste personal
 ---
-{content0}
+{content1}
 
 ## Presupesto
 ---
@@ -71,7 +71,7 @@ Amortización lineal = $\frac{Valor\ inicial}{Vida\ útil\ estimada}$
 
 ## Coste total del personal
 ---
-{content1}
+{content2}
 
 ## Coste total
 ---
@@ -79,7 +79,7 @@ Amortización lineal = $\frac{Valor\ inicial}{Vida\ útil\ estimada}$
 |:-|:-|
 |Coste fijo|5415€|
 |Coste común|1.84€|
-|Coste personal|{content2}|
+|Coste personal|{content3}|
 
 # Conclusiones
 ---

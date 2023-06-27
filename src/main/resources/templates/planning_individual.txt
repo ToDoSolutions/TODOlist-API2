@@ -17,21 +17,21 @@
 ---
 El presente documento tiene como propósito realizar una análisis anticipado de los costes asociados al proyecto.
 
-Con el fin de llevar a cabo una proyección precisa de los costes asociados al proyecto, se procederá a detallar en este documento las tareas necesarias para la entrega, así como la información pertinente de cada una de ellas. Luego se elaborará una estimación de los costes personales teniendo en cuenta las horas estimadas de {individual}, en función de su rol en el proyecto.
+Con el fin de llevar a cabo una proyección precisa de los costes asociados al proyecto, se procederá a detallar en este documento las tareas necesarias para la entrega, así como la información pertinente de cada una de ellas. Luego se elaborará una estimación de los costes personales teniendo en cuenta las horas estimadas de {content0}, en función de su rol en el proyecto.
 
 
 # Introducción
 ---
 Tras llevar a cabo una reunión de grupo analizando los requisitos necesarios para el entregable a realizar, se ha efectuado una planificación dentro de la cual se recogen cada una de las tareas a realizar durante dicho entregable, asimismo de cada una de las tareas se recogen ciertos aspectos que hemos considerado que pueden tener cierta relevancia como es una descripción breve acerca de la tarea a realizar, el responsable de ejecutar dicha tarea, el rol que posee el responsable que hemos comentado en el equipo, así como el tiempo que en principio tras un análisis se estima que se tardaría en realizar cada tarea y el tiempo real usado para ello, el cuál ha sido medido usando la herramienta de Clockify.
 
-En este caso, se llevará a cabo un informe de planificación específico para uno de los miembros del equipo, concretamente para {individual}, quien ha desempeñado el rol de {roles} en este entregable. El informe detalla sus tareas y responsabilidades, así como su desempeño y aportes al proyecto
+En este caso, se llevará a cabo un informe de planificación específico para uno de los miembros del equipo, concretamente para {content0}, quien ha desempeñado el rol de {content1} en este entregable. El informe detalla sus tareas y responsabilidades, así como su desempeño y aportes al proyecto
 
 # Contenido
 ---
 El contenido de este reporte se va a dividir en tres partes: En primer lugar los costes fijos del equipamiento.En segundo lugar las tareas comunes, que son aquellas que se tienen que realizar en todos los entregables y que se basan en la organización del mismo. Por otra parte las tareas específicas, que son aquellas que se requieren en cada de los entregables, las cuales han sido representadas en una tabla que recoge tanto las tareas grupales (Task X(G)), como las tareas individuales (Task X(IX)). Finalmente el presupuesto, en donde se calcula en función de los distintos roles de cada miembro del equipo, respecto a las horas realizadas por estos, más los costes fijos teniendo en cuenta la amortización.
 
 A cada uno de los integrantes del grupo se les ha asignado un número de estudiante el cual les representara a lo largo de todas las entregas:
-{content3}
+{content2}
 
 Por ejemplo (Task 2(I1))dictamina que Maria Vico Martín es la encargada de la Task 2.
 
@@ -60,7 +60,7 @@ Durante el desarrollo del entregable se han llevado a cabo ciertas tareas las cu
 
 ## Coste personal
 ---
-{content0}
+{content3}
 
 ## Presupesto
 ---
@@ -74,7 +74,7 @@ Amortización lineal = $\frac{Valor\ inicial}{Vida\ útil\ estimada}$
 
 ## Coste total del personal
 ---
-{content1}
+{content4}
 
 ## Coste total
 ---
@@ -82,7 +82,7 @@ Amortización lineal = $\frac{Valor\ inicial}{Vida\ útil\ estimada}$
 |:-|:-|
 |Coste fijo|5415€|
 |Coste común|1.84€|
-|Coste personal|{content2}|
+|Coste personal|{content5}|
 
 # Conclusiones
 ---

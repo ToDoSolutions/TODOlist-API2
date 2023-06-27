@@ -1,4 +1,4 @@
-package com.todolist.controllers;
+package com.todolist.controllers.user;
 
 import com.fadda.common.Preconditions;
 import com.fadda.iterables.iterator.IterableRangeObject;
@@ -6,58 +6,63 @@ import com.todolist.component.DTOManager;
 import com.todolist.dtos.Order;
 import com.todolist.dtos.ShowTask;
 import com.todolist.dtos.ShowUser;
-import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.NumberFilter;
-import com.todolist.services.TaskService;
-import com.todolist.services.UserService;
+import com.todolist.services.user.UserService;
+import com.todolist.services.user.UserTaskService;
 import com.todolist.validators.FieldValidator;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.Validator;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 @RestController
 @RequestMapping("/api/v1")
-@AllArgsConstructor
 public class UserController {
 
-    // Validators -------------------------------------------------------------
-    private final Validator validator;
-
     // Services ---------------------------------------------------------------
-    private final TaskService taskService;
 
     private final UserService userService;
+    private final UserTaskService userTaskService;
 
     // Components -------------------------------------------------------------
-    private final FieldValidator fieldValidator;
+    private final Consumer<String[]> fieldValidator;
     private final DTOManager dtoManager;
 
-    // Methods ----------------------------------------------------------------
+    public UserController(UserService userService, UserTaskService userTaskService, FieldValidator fieldValidator, DTOManager dtoManager) {
+        this.userService = userService;
+        this.userTaskService = userTaskService;
+        this.fieldValidator = fields -> {
+            fieldValidator.taskFieldValidate(fields[0]);
+            fieldValidator.userFieldValidate(fields[1]);
+            fieldValidator.groupFieldValidate(fields[2]);
+        };
+        this.dtoManager = dtoManager;
+    }
 
-    /* USER OPERATIONS */
-    @DeleteMapping("/user/{idUser}") // DeleteTest
+    // Methods ----------------------------------------------------------------
+    @DeleteMapping("/user/{idUser}")
     public Map<String, Object> deleteUser(@PathVariable("idUser") Integer idUser) {
         User user = userService.findUserById(idUser);
         userService.deleteUser(user);
-        return dtoManager.getShowUserAsJson(user);
+        ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
+        return dtoManager.getEntityAsJson(showUser);
     }
 
-    @GetMapping("/users") // GetAllTest
+    @GetMapping("/users")
     public List<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = Integer.MAX_VALUE + "") @Min(value = 0, message = "The limit must be positive.") Integer limit,
-                                                 @RequestParam(defaultValue = "+idUser") Order order,
+                                                 @RequestParam(defaultValue = "+id") Order order,
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
                                                  @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES_STRING) String fieldsUser,
                                                  @RequestParam(required = false) String name,
@@ -78,80 +83,37 @@ public class UserController {
                         Preconditions.isNullOrValid(taskCompleted, t -> t.isValid(userService.getTaskCompleted(user))) &&
                         Preconditions.isNullOrValid(bio, b -> user.getBio().contains(b)) &&
                         Preconditions.isNullOrValid(avatar, a -> user.getAvatar().equals(a))).toList();
-        return result.stream().map(user -> dtoManager.getShowUserAsJson(user, fieldsUser, fieldsTask)).toList();
+        return result.stream()
+                .map(user -> new ShowUser(user, userTaskService.getShowTasksFromUser(user)))
+                .map(user -> dtoManager.getEntityAsJson(user, fieldValidator, fieldsTask, fieldsUser)).toList();
     }
 
-    @GetMapping("/user/{idUser}") // GetSoloTest
+    @GetMapping("/user/{idUser}")
     public Map<String, Object> getUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser,
                                        @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
                                        @RequestParam(defaultValue = ShowUser.ALL_ATTRIBUTES_STRING) String fieldsUser) {
         User user = userService.findUserById(idUser);
-        fieldValidator.userFieldValidate(fieldsUser);
-        fieldValidator.taskFieldValidate(fieldsTask);
-        return dtoManager.getShowUserAsJson(user, fieldsUser, fieldsTask);
+        ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
+        return dtoManager.getEntityAsJson(showUser, fieldValidator, fieldsTask, fieldsUser);
     }
 
-    @PostMapping("/user") // PostTest
-    public Map<String, Object> addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+    @PostMapping("/user")
+    public ResponseEntity<ShowUser> addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BadRequestException("The user is invalid.");
         user = userService.saveUser(user);
-        return dtoManager.getShowUserAsJson(user);
+        ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
+        return ResponseEntity.ok(showUser);
     }
 
-    @PutMapping("/user") // PutTest
-    public Map<String, Object> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+    @PutMapping("/user")
+    public ResponseEntity<ShowUser> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BadRequestException("The user is invalid.");
         User oldUser = userService.findUserById(user.getId());
         BeanUtils.copyProperties(user, oldUser, "idUser", "password", "token", "tasks");
         oldUser = userService.saveUser(oldUser);
-        return dtoManager.getShowUserAsJson(oldUser);
-    }
-
-    /* TASK OPERATIONS */
-    @DeleteMapping("/user/{idUser}/tasks") // DeleteTest
-    public Map<String, Object> deleteAllTasksFromUser(@PathVariable("idUser") Integer idUser) {
-        User user = userService.findUserById(idUser);
-        userService.removeAllTasksFromUser(user);
-        return dtoManager.getShowUserAsJson(user);
-    }
-
-    @DeleteMapping("/user/{idUser}/task/{idTask}") // DeleteAllTest
-    public Map<String, Object> deleteTaskFromUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
-        User user = userService.findUserById(idUser);
-        Task task = taskService.findTaskById(idTask);
-        if (user.getTasks().contains(task)) userService.removeTaskFromUser(user, task);
-        return dtoManager.getShowUserAsJson(user);
-    }
-
-    @GetMapping("/users/task/{idTask}") // GetAllTest
-    public List<Map<String, Object>> getUserWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
-        Task task = taskService.findTaskById(idTask);
-        List<User> users = userService.findUsersWithTask(task);
-        return users.stream().map(dtoManager::getShowUserAsJson).toList();
-    }
-
-    @PutMapping("/user/{idUser}/task/{idTask}") // PutTest
-    public Map<String, Object> addTaskToUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
-        User user = userService.findUserById(idUser);
-        Task task = taskService.findTaskById(idTask);
-        if (!user.getTasks().contains(task)) userService.addTaskToUser(user, task);
-        return dtoManager.getShowUserAsJson(user);
-    }
-
-    /* TOKEN OPERATION */
-
-    @PutMapping("/user/{idUser}/token") // TokenTest
-    public Map<String, Object> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser,
-                                           @RequestHeader("Authorization") String token) {
-        User user = userService.findUserById(idUser);
-        if (token == null || token.isEmpty())
-            throw new BadRequestException("The token is required.");
-        if (token.contains("Bearer")) token = token.replace("Bearer", "").trim();
-        validator.validate(user);
-        user.setToken(token);
-        user = userService.saveUser(user);
-        return dtoManager.getShowUserAsJson(user);
+        ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
+        return ResponseEntity.ok(showUser);
     }
 }

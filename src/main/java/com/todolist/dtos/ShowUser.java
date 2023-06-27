@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 @ToString
 @EqualsAndHashCode(of = {"idUser"}, callSuper = false)
 public class ShowUser extends ShowEntity {
-    public static final List<String> ALL_ATTRIBUTES = List.of("idUser", "name", "surname", "email", "avatar", "bio", "location", "taskCompleted", "tasks");
-    public static final String ALL_ATTRIBUTES_STRING = "idUser,name,surname,email,avatar,bio,location,taskCompleted,tasks";
+    public static final List<String> ALL_ATTRIBUTES = List.of("id", "name", "surname", "email", "avatar", "bio", "location", "taskCompleted", "tasks");
+    public static final String ALL_ATTRIBUTES_STRING = "id,name,surname,email,avatar,bio,location,taskCompleted,tasks";
     public static final String TASKS = "tasks";
     public static final String COMMA = ",";
     private Integer idUser;
@@ -42,20 +42,13 @@ public class ShowUser extends ShowEntity {
         this.tasks = tasks;
     }
 
-    public Map<String, Object> toJson(String fieldsUser, String fieldsTask) {
+    @ToJson
+    public Map<String, Object> toJson(String fieldsTask, String fieldsUser) {
         Map<String, Object> map = toJson(fieldsUser, ALL_ATTRIBUTES);
         List<String> attributes = Stream.of(fieldsUser.split(COMMA)).map(attribute -> attribute.trim().toLowerCase()).toList();
         if (attributes.contains(TASKS))
             map.put(TASKS, getTasks().stream().map(task -> task.toJson(fieldsTask)).toList());
         return map;
-    }
-
-    public Map<String, Object> toJson(String fieldsUser) {
-        return toJson(fieldsUser, ShowTask.getFieldsAsString());
-    }
-
-    public Map<String, Object> toJson() {
-        return toJson(getFieldsAsString(), ShowTask.getFieldsAsString());
     }
 
     public static String getFieldsAsString() {

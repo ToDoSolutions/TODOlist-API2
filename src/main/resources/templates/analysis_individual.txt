@@ -35,7 +35,7 @@ En resumen, el objetivo de este informe es proporcionar un análisis exhaustivo 
 
 # Conclusiones
 ---
-En este informe se ha realizado un análisis detallado de los requisitos del estudiante {individual}. Para lograr esto, se registraron todos los requisitos mencionados por el estudiante y se analizaron cada uno de ellos en profundidad para comprender su alcance y requisitos específicos.
+En este informe se ha realizado un análisis detallado de los requisitos del estudiante {content0}. Para lograr esto, se registraron todos los requisitos mencionados por el estudiante y se analizaron cada uno de ellos en profundidad para comprender su alcance y requisitos específicos.
 
 # Bibliografía
 ---

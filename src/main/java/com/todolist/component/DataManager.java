@@ -1,61 +1,103 @@
 package com.todolist.component;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fadda.common.tuples.pair.Pair;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import com.todolist.entity.Group;
-import com.todolist.entity.GroupUser;
-import com.todolist.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class DataManager {
 
-    // Data files -------------------------------------------------------------
-    public static final String DATA_GROUP = "db/data/group.json";
-    public static final String DATA_GROUP_USER = "db/data/group_user.json";
+    // Data files
+    private final String DATA = "src/main/resources/db/data/";
 
-    // Loaders ----------------------------------------------------------------
-    public List<User> loadUser() throws IOException {
-        ObjectMapper mapper = new ObjectMapper()
+    // ObjectMapper instance
+    private final ObjectMapper mapper;
+    private final Connection connection;
+
+
+    @Autowired
+    public DataManager(Environment environment) throws SQLException {
+        mapper = new ObjectMapper()
                 .registerModule(new ParameterNamesModule())
                 .registerModule(new Jdk8Module())
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("db/data/user.json");
-        return mapper.readValue(inputStream, new TypeReference<>() {
-        });
+        String dbUrl = environment.getProperty("spring.datasource.url");
+        String dbUser = environment.getProperty("spring.datasource.username");
+        String dbPassword = environment.getProperty("spring.datasource.password");
+        connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
     }
 
-    public List<Group> loadGroup() throws IOException {
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(DATA_GROUP);
-        return mapper.readValue(inputStream, new TypeReference<>() {
-        });
+    public Pair<String, List<String>> loadCSVData(String entityName) throws IOException {
+        List<String> dataList = new ArrayList<>();
+        String headers = null;
+
+        // Lee el fichero
+        try (BufferedReader reader = new BufferedReader(new FileReader(DATA + entityName))) {
+            String line;
+
+
+            while ((line = reader.readLine()) != null) {
+
+                if (headers == null) {
+                    headers = line;
+                } else {
+                    dataList.add(line);
+                }
+            }
+        }
+
+        return Pair.of(headers, dataList);
     }
 
-    public List<GroupUser> loadGroupUser() throws IOException {
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(DATA_GROUP_USER);
-        return mapper.readValue(inputStream, new TypeReference<>() {
-        });
+    private void saveData(Pair<String, List<String>> data, String entityName) {
+        String tableName = "`" + entityName + "`"; // Encerrar el nombre de la tabla entre comillas invertidas
+
+        String sql = "INSERT INTO " + tableName + " (" + data.first() + ") VALUES (";
+
+        // Construir la cadena de placeholders para los valores
+        String placeholders = data.first().replaceAll("\\w+", "?");
+
+        // Agregar los placeholders a la consulta SQL
+        sql += placeholders + ")";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (String line : data.second()) {
+                String[] values = line.split(",");
+
+                for (int i = 0; i < values.length; i++) {
+                    statement.setString(i + 1, values[i].trim());
+                }
+
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void loadAndSaveData(String filePath, String entityName) throws IOException {
+        Pair<String, List<String>> data = loadCSVData(filePath);
+        saveData(data, entityName);
     }
 }
+

@@ -1,5 +1,11 @@
 package com.todolist;
 
+import com.todolist.component.DataManager;
+import com.todolist.entity.SaveData;
+import org.reflections.Reflections;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,11 +14,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SpringBootApplication
-public class TODOlistApplication {
+public class TODOlistApplication implements ApplicationRunner {
     public static final String MODE = "mode";
     public static final String PROFILES = "spring.profiles.active";
     public static final String LOCAL = "local";
@@ -25,6 +32,9 @@ public class TODOlistApplication {
     public static final String PASSWORD = "password";
     public static final String DATASOURCE_PASSWORD = "spring.datasource.password";
     public static final String DATASOURCE_USERNAME = "spring.datasource.username";
+
+    @Autowired
+    private DataManager dataManager;
 
     public static void main(String[] args) throws IOException {
         if (args.length > 0)
@@ -45,11 +55,16 @@ public class TODOlistApplication {
             }
         }
         // Se debe de modificar el mismo archivo properties
-
-
         try (OutputStream output = new FileOutputStream(APPLICATION_PROPERTIES)) {
             properties.store(output, null);
         }
+
+
+    }
+
+    private static Set<Class<?>> findSaveDataEntities() {
+        Reflections reflections = new Reflections("com.todolist.entity"); // Reemplaza por el paquete donde se encuentran tus entidades
+        return reflections.getTypesAnnotatedWith(SaveData.class);
     }
 
     private static void localEnvironment(Map<String, String> commands) throws IOException {
@@ -65,5 +80,20 @@ public class TODOlistApplication {
             localProperties.store(output, null);
         }
 
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        Set<Class<?>> saveDataClasses = findSaveDataEntities();
+        // Ejecuta la lógica basada en la anotación @SaveData
+        for (Class<?> saveDataClass : saveDataClasses) {
+            if (saveDataClass.isAnnotationPresent(SaveData.class)) {
+
+                SaveData saveDataAnnotation = saveDataClass.getAnnotation(SaveData.class);
+                String entityName = saveDataAnnotation.entityName();
+                String fileName = saveDataAnnotation.fileName();
+                dataManager.loadAndSaveData(fileName, entityName);
+            }
+        }
     }
 }

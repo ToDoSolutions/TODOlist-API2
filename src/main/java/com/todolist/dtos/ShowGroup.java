@@ -43,25 +43,15 @@ public class ShowGroup extends ShowEntity{
                 .collect(Collectors.toSet()).size();
     }
 
-    public Map<String, Object> toJson(String fieldsGroup, String fieldsUser, String fieldsTask) {
+    @ToJson
+    public Map<String, Object> toJson(String fieldsTask, String fieldsUser, String fieldsGroup) {
         Map<String, Object> map = toJson(fieldsGroup, ALL_ATTRIBUTES);
         List<String> attributes = Stream.of(fieldsGroup.split(COMMA)).map(attribute -> attribute.trim().toLowerCase()).toList();
         if (attributes.contains(USERS))
-            map.put(USERS, getUsers().stream().map(task -> task.toJson(fieldsUser, fieldsTask)).toList());
+            map.put(USERS, getUsers().stream().map(task -> task.toJson(fieldsTask, fieldsUser)).toList());
         return map;
     }
 
-    public Map<String, Object> toJson(String fieldsGroup, String fieldsUser) {
-        return toJson(fieldsGroup, fieldsUser, ShowTask.ALL_ATTRIBUTES.toString());
-    }
-
-    public Map<String, Object> toJson(String fieldsGroup) {
-        return toJson(fieldsGroup, ShowUser.getFieldsAsString(), ShowTask.getFieldsAsString());
-    }
-
-    public Map<String, Object> toJson() {
-        return toJson(getFieldsAsString(), ShowUser.getFieldsAsString(), ShowTask.getFieldsAsString());
-    }
 
     public static String getFieldsAsString() {
         return ALL_ATTRIBUTES.toString().replace("[", "").replace("]", "");

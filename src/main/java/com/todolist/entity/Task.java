@@ -72,7 +72,12 @@ public class Task extends BaseEntity implements Comparable<Task> {
 
     // Constructors
     public Task(String title, String body) {
-        // TODO: Define in other way.
+        parseBody(body);
+        this.title = title;
+        parseTitle(title);
+    }
+
+    private void parseBody(String body) {
         String jump = "\r\n\r\n";
         if (body != null && body.contains(jump) && body.split(jump).length == 3) {
             String[] text = body.split(jump);
@@ -82,32 +87,22 @@ public class Task extends BaseEntity implements Comparable<Task> {
         } else {
             this.description = body;
         }
-        this.title = title;
-        if (Pattern.compile("^Task\\s\\d+\\((I\\d+|G?)\\):\\s+").split(title).length == 2)
-            firstWay(title);
-        else if (Pattern.compile("^Task \\d+ : \\s#\\d+ -\\s+").split(title).length == 2)
-            secondWay(title);
+    }
+
+    private void parseTitle(String title) {
+        if (isFirstWay(title))
+            parseFirstWay(title);
+        else if (isSecondWay(title))
+            parseSecondWay(title);
         else
-            throw new BadRequestException("The title is not valid it is '" + title + "' and it must follow the pattern: 'Task <number>(<student>): <title>', 'Task <number> : I#<student> - <title>' or 'Task <number> : G - <title>)'.");
+            throw new BadRequestException("The title is not valid. It must follow the pattern: 'Task <number>(<student>): <title>', 'Task <number> : I#<student> - <title>', or 'Task <number> : G - <title>'.");
     }
 
-    private void secondWay(String title) {
-        if (Pattern.compile("^Task \\d+ : I#\\d+ -\\s+").split(title).length == 2) {
-            String id = title.split("-")[0].trim();
-            this.student = Integer.parseInt(id.split(":")[1].trim().split("#")[1].trim());
-            this.position = Integer.parseInt(id.split(":")[0].trim().replace("Task", "").trim());
-        } else if (Pattern.compile("^Task \\d+ : G - .+$").split(title).length == 2) {
-            String id = title.split("-")[0].trim().split(":")[0].trim();
-            this.student = 0;
-            this.position = Integer.parseInt(id.replace("Task", "").trim());
-        } else {
-            this.title = ":V : " + this.title;
-            this.student = -1;
-            this.position = -1;
-        }
+    private boolean isFirstWay(String title) {
+        return Pattern.compile("^Task\\s\\d+\\((I\\d+|G?)\\):\\s+").split(title).length == 2;
     }
 
-    private void firstWay(String title) {
+    private void parseFirstWay(String title) {
         if (Pattern.compile("^Task\\s+\\d+\\(I\\d+\\):\\s+").split(title).length == 2) {
             String id = title.split(":")[0].trim();
             this.student = Integer.parseInt(id.substring(title.indexOf("I") + 1, title.indexOf(")")));
@@ -118,6 +113,26 @@ public class Task extends BaseEntity implements Comparable<Task> {
             this.position = Integer.parseInt(id.replace("Task", "").replace("(G)", "").trim());
         } else {
             this.title = "Task 0(U): " + this.title;
+            this.student = -1;
+            this.position = -1;
+        }
+    }
+
+    private boolean isSecondWay(String title) {
+        return Pattern.compile("^Task \\d+ : \\s#\\d+ -\\s+").split(title).length == 2;
+    }
+
+    private void parseSecondWay(String title) {
+        if (Pattern.compile("^Task \\d+ : I#\\d+ -\\s+").split(title).length == 2) {
+            String id = title.split("-")[0].trim();
+            this.student = Integer.parseInt(id.split(":")[1].trim().split("#")[1].trim());
+            this.position = Integer.parseInt(id.split(":")[0].trim().replace("Task", "").trim());
+        } else if (Pattern.compile("^Task \\d+ : G - .+$").split(title).length == 2) {
+            String id = title.split("-")[0].trim().split(":")[0].trim();
+            this.student = 0;
+            this.position = Integer.parseInt(id.replace("Task", "").trim());
+        } else {
+            this.title = ":V : " + this.title;
             this.student = -1;
             this.position = -1;
         }

@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@SaveData(entityName = "group_user", fileName = "group_user.csv")
 public class GroupUser extends BaseEntity {
 
     // Attributes -------------------------------------------------------------
