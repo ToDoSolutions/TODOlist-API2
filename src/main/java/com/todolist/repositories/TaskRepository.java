@@ -14,4 +14,7 @@ public interface TaskRepository extends JpaRepository<Task, Serializable>, Pagin
 
     List<Task> findAll();
 
+
+    List<Task> findAllByUserId(Integer idUser);
+
 }

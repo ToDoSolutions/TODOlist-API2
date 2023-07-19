@@ -76,4 +76,16 @@ public class TaskService {
         roleService.deleteAllRoles(task);
         taskRepository.delete(task);
     }
+
+    @Transactional
+    public void saveTask(ClockifyTask clockifyTask, Group group, User user) {
+        Task task = findAllTasks().stream()
+                .filter(t -> t.getTitleIssue().equals(clockifyTask.getDescription()))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("The task with title " + clockifyTask.getDescription() + " does not exist."));
+        RoleStatus roleStatus = RoleStatus.parseTag(getTag(clockifyTask, group));
+        task.setUser(user);
+        saveTask(task);
+        roleService.saveRole(roleStatus, clockifyTask.getTimeInterval(), task);
+    }
 }

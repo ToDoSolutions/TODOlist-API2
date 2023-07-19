@@ -44,26 +44,40 @@ public class AutoDocService {
     // Methods ----------------------------------------------------------------
     @Transactional
     public void autoDoc(Request request) throws IOException {
-        Group group = groupService.findGroupByName(request.getRepoName());
-        groupTaskService.deleteAllTasks(group);
         groupIssuesWithTime(request);
     }
 
     @Transactional
     public void groupIssuesWithTime(Request request) throws IOException {
         Group group = groupService.findGroupByName(request.getRepoName());
-        List<GHIssue> issues = issueService.findByUsernameAndRepo(request);
-        List<ClockifyTask> clockifyTasks = clockifyService.getTaskFromWorkspace(request.getRepoName(), request.getUsername());
 
-        for (GHIssue issue : issues) {
-            for (ClockifyTask clockifyTask : clockifyTasks) {
-                if (clockifyTask.getDescription().contains(issue.getTitle())) {
-                    User user = userService.findUserByIdClockify(clockifyTask.getUserId());
-                    taskService.saveTask(issue, clockifyTask, group, user);
+        List<ClockifyTask> clockifyTasks = clockifyService.getTaskFromWorkspace(request.getRepoName(), request.getUsername());
+        if (isANewTask(clockifyTasks, group)) {
+            List<GHIssue> issues = issueService.findByUsernameAndRepo(request);
+            for (GHIssue issue : issues) {
+                for (ClockifyTask clockifyTask : clockifyTasks) {
+                    if (clockifyTask.getDescription().contains(issue.getTitle())) {
+                        User user = userService.findUserByIdClockify(clockifyTask.getUserId());
+                        taskService.saveTask(issue, clockifyTask, group, user);
+                    }
                 }
+            }
+        } else {
+            for (ClockifyTask clockifyTask : clockifyTasks) {
+                User user = userService.findUserByIdClockify(clockifyTask.getUserId());
+                taskService.saveTask(clockifyTask, group, user);
             }
         }
     }
 
+    public boolean isANewTask(List<ClockifyTask> clockifyTasks, Group group) {
+        return clockifyTasks.stream()
+                .noneMatch(clockifyTask -> {
+                    User user = userService.findUserByIdClockify(clockifyTask.getUserId());
+                    return groupTaskService.getTasksFromGroup(group).stream()
+                            .filter(task -> task.getUser().equals(user))
+                            .anyMatch(task -> task.getTitleIssue().equals(clockifyTask.getDescription()));
+                });
 
+    }
 }
