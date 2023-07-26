@@ -34,7 +34,6 @@ public class TagService {
     }
 
     // Finders ----------------------------------------------------------------
-
     @Transactional
     public Tag getTagFromClockify(Group group, String idTag) {
         if (idTag == null)

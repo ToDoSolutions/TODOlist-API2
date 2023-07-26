@@ -2,7 +2,6 @@ package com.todolist.component;
 
 import com.todolist.dtos.ShowEntity;
 import com.todolist.dtos.ToJson;
-import com.todolist.validators.FieldValidator;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -21,7 +20,7 @@ public class DTOManager {
     private final Reflections reflections;
 
     @Autowired
-    public DTOManager(FieldValidator fieldValidator) {
+    public DTOManager() {
         this.reflections = new Reflections(new ConfigurationBuilder()
                 .setScanners(new MethodAnnotationsScanner())
                 .setUrls(ClasspathHelper.forPackage("com.todolist.dtos")));

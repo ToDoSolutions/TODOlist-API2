@@ -30,7 +30,4 @@ public interface UserRepository extends JpaRepository<User, Serializable>, Pagin
     @Query(value = "SELECT t FROM User u JOIN u.tasks t WHERE u.id = ?1")
     List<Task> findAllTaskByUserId(Integer idUser);
 
-    @Query(value = "SELECT t FROM User u JOIN u.tasks t WHERE u.id = ?1 AND t.student = 0")
-    List<Task> findAllGroupTaskByUserId(Integer idUser);
-
 }

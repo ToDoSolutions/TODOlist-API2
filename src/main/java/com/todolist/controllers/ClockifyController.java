@@ -2,7 +2,7 @@ package com.todolist.controllers;
 
 import com.todolist.dtos.autodoc.clockify.ClockifyTask;
 import com.todolist.services.ClockifyService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/api/v1/clockify")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ClockifyController {
 
     // Services ---------------------------------------------------------------

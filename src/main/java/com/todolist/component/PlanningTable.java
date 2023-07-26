@@ -2,13 +2,13 @@ package com.todolist.component;
 
 import com.todolist.dtos.autodoc.Area;
 import com.todolist.dtos.autodoc.Request;
-import com.todolist.dtos.autodoc.RoleStatus;
 import com.todolist.entity.Group;
+import com.todolist.entity.Role;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import com.todolist.services.RoleService;
 import com.todolist.services.autodoc.PlanningService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.steppschuh.markdowngenerator.list.ListBuilder;
 import net.steppschuh.markdowngenerator.table.Table;
 import net.steppschuh.markdowngenerator.table.TableRow;
@@ -23,14 +23,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PlanningTable {
 
     // Constants --------------------------------------------------------------
     protected static final Object[] HEADER_PLANNING = {"Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste"};
     public static final String JUMP_LINE = "\n";
     public static final String EURO = "€";
-    public static final Object[] HEADER_PERSONAL_TABLE = {"Rol", "Coste"};
+    protected static final Object[] HEADER_PERSONAL_TABLE = {"Rol", "Coste"};
+    public static final String MONEY_REPRESENTATION = "%.2f %s";
 
     // Services ---------------------------------------------------------------
     private final RoleService roleService;
@@ -44,7 +45,7 @@ public class PlanningTable {
         String names = getNames(planningData.users());
         String rolesString = getRolesString(planningData.taskPerIssue());
 
-        return new String[]{taskTable, personalTable, String.format("%.2f %s", planningData.cost(), EURO), names, rolesString};
+        return new String[]{taskTable, personalTable, String.format(MONEY_REPRESENTATION, planningData.cost(), EURO), names, rolesString};
     }
 
     private static String getTime(Duration duration) {
@@ -93,7 +94,7 @@ public class PlanningTable {
     private String getDistinctRoles(List<Task> tasks) {
         return join(tasks.stream()
                 .flatMap(task -> roleService.getStatus(task).stream())
-                .map(RoleStatus::getInSpanish)
+                .map(Role::getName)
                 .distinct()
                 .toList());
     }
@@ -111,15 +112,15 @@ public class PlanningTable {
     }
 
     private String formatCost(double cost) {
-        return String.format("%.2f %s", cost, EURO);
+        return String.format(MONEY_REPRESENTATION, cost, EURO);
     }
 
     public Table getEmployeeTable(User user, Group group, Area area) {
-        Map<RoleStatus, Double> salary = planningService.getTotalCostByRole(user, group, area); // TODO: Eliminar
+        Map<String, Double> salary = planningService.getTotalCostByRole(user, group, area);
         Table.Builder table = new Table.Builder()
                 .withAlignments(Table.ALIGN_LEFT, Table.ALIGN_LEFT)
                 .addRow(HEADER_PERSONAL_TABLE);
-        salary.forEach((roleStatus, cost) -> table.addRow(roleStatus.getInSpanish(), String.format("%.2f %s", cost, EURO)));
+        salary.forEach((name, cost) -> table.addRow(name, String.format(MONEY_REPRESENTATION, cost, EURO)));
         return table.build();
     }
 
@@ -140,11 +141,10 @@ public class PlanningTable {
     }
 
     private String getRolesString(Map<String, List<Task>> taskPerIssue) {
-        return taskPerIssue.values().stream()
+        return join(taskPerIssue.values().stream()
                 .flatMap(tasks -> tasks.stream()
                         .flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream()))
-                .map(role -> role.getStatus().toString().toLowerCase())
-                .distinct()
-                .collect(Collectors.joining(", ", "", " y "));
+                .map(role -> role.getName().toLowerCase())
+                .distinct().toList());
     }
 }

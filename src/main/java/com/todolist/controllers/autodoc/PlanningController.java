@@ -5,7 +5,7 @@ import com.todolist.component.PlanningTable;
 import com.todolist.component.TemplateManager;
 import com.todolist.component.TemplateType;
 import com.todolist.dtos.autodoc.Request;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,7 @@ import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/api/v1/autodoc")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PlanningController {
 
     private final PlanningTable planningTable;
@@ -26,16 +26,12 @@ public class PlanningController {
     @GetMapping("/planning/md")
     public ResponseEntity<String> getPlanningGroup(@ModelAttribute Request requestDto) throws IOException {
         String[] output = planningTable.createPlanningTable(requestDto);
-        WriterManager writerManager = getWriterManager(TemplateType.PLANNING_GROUP, output);
-        return templateManager.getResponseEntity(writerManager, "Informe de planificación - Grupal.md");
-    }
-
-    @GetMapping("/planning/individual/md")
-    public ResponseEntity<String> getPlanningIndividual(@ModelAttribute Request requestDto) throws IOException {
-        String[] output = planningTable.createPlanningTable(requestDto);
-        String individual = requestDto.getIndividual();
-        WriterManager writerManager = getWriterManager(TemplateType.PLANNING_INDIVIDUAL, output, individual);
-        String filename = "Informe de planificación - " + formatFilename(individual) + ".md";
+        WriterManager writerManager = requestDto.isIndividual() ?
+                getWriterManager(TemplateType.PLANNING_INDIVIDUAL, requestDto.getIndividual(), output) :
+                getWriterManager(TemplateType.PLANNING_GROUP, "", output);
+        String filename = requestDto.isIndividual() ?
+                "Informe de planificación - " + formatFilename(requestDto.getIndividual()) + ".md" :
+                "Informe de planificación - Grupal.md";
         return templateManager.getResponseEntity(writerManager, filename);
     }
 

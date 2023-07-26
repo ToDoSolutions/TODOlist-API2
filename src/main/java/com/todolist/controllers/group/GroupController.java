@@ -11,7 +11,6 @@ import com.todolist.entity.Group;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.filters.DateFilter;
 import com.todolist.filters.NumberFilter;
-import com.todolist.services.TaskService;
 import com.todolist.services.group.GroupService;
 import com.todolist.services.group.GroupUserService;
 import com.todolist.validators.FieldValidator;

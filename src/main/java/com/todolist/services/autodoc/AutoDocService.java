@@ -50,7 +50,11 @@ public class AutoDocService {
     @Transactional
     public void groupIssuesWithTime(Request request) throws IOException {
         Group group = groupService.findGroupByName(request.getRepoName());
-
+        if (Boolean.TRUE.equals(request.isIndividual())) {
+            groupService.resetRolesForUser(request.getIndividual(), group);
+        } else {
+            groupService.resetRolesForGroup(group);
+        }
         List<ClockifyTask> clockifyTasks = clockifyService.getTaskFromWorkspace(request.getRepoName(), request.getUsername());
         if (isANewTask(clockifyTasks, group)) {
             List<GHIssue> issues = issueService.findByUsernameAndRepo(request);

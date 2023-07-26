@@ -1,11 +1,10 @@
 package com.todolist.services;
 
-import com.todolist.dtos.autodoc.RoleStatus;
 import com.todolist.dtos.autodoc.clockify.TimeInterval;
 import com.todolist.entity.Role;
 import com.todolist.entity.Task;
 import com.todolist.repositories.RoleRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +13,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RoleService {
 
+    // Repositories -----------------------------------------------------------
     private final RoleRepository roleRepository;
 
     public List<Role> findRoleByTaskId(Integer taskId) {
@@ -28,7 +28,7 @@ public class RoleService {
                 .reduce(Duration.ZERO, Duration::plus);
     }
 
-    public List<RoleStatus> getStatus(Task task) {
+    public List<Role> getStatus(Task task) {
         return roleRepository.findAllStatusByTaskId(task.getId());
     }
 
@@ -39,9 +39,11 @@ public class RoleService {
     }
 
     @Transactional
-    public void saveRole(RoleStatus roleStatus, TimeInterval timeInterval, Task task) {
-        Role role = roleRepository.findRoleByTaskIdAndStatus(task.getId(), roleStatus)
-                .orElseGet(() -> createNewRole(roleStatus, task));
+    public void saveRole(String name, TimeInterval timeInterval, Task task) {
+        if (name == null)
+            return;
+        Role role = roleRepository.findRoleByTaskIdAndTagName(task.getId(), name)
+                .orElseGet(() -> createNewRole(name, task));
         LocalDateTime start = timeInterval.getStartAsLocalDateTime();
         LocalDateTime end = timeInterval.getEndAsLocalDateTime();
         role.addDuration(start, end);
@@ -53,11 +55,21 @@ public class RoleService {
         roleRepository.deleteAll(findRoleByTaskId(task.getId()));
     }
 
-    private Role createNewRole(RoleStatus roleStatus, Task task) {
+    private Role createNewRole(String tagName, Task task) {
         Role newRole = new Role();
         newRole.setDuration(Duration.ZERO);
-        newRole.setStatus(roleStatus);
+        String[] data = tagName.split("-");
+        String name = data[0];
+        Double salary = Double.parseDouble(data[1]);
+        newRole.setTagName(tagName);
+        newRole.setName(name);
         newRole.setTask(task);
+        newRole.setSalary(salary);
         return newRole;
+    }
+
+    public void resetRole(Role role) {
+        role.setDuration(Duration.ZERO);
+        roleRepository.save(role);
     }
 }

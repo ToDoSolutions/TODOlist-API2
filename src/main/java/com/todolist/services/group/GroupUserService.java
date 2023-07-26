@@ -10,13 +10,14 @@ import com.todolist.repositories.GroupRepository;
 import com.todolist.repositories.GroupUserRepository;
 import com.todolist.services.user.UserService;
 import com.todolist.services.user.UserTaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GroupUserService {
 
     // Services ---------------------------------------------------------------
@@ -26,15 +27,6 @@ public class GroupUserService {
     // Repositories -----------------------------------------------------------
     private final GroupRepository groupRepository;
     private final GroupUserRepository groupUserRepository;
-
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public GroupUserService(GroupRepository groupRepository, GroupUserRepository groupUserRepository, UserService userService, UserTaskService userTaskService) {
-        this.groupRepository = groupRepository;
-        this.groupUserRepository = groupUserRepository;
-        this.userService = userService;
-        this.userTaskService = userTaskService;
-    }
 
     @Transactional
     public List<ShowUser> getShowUsersFromGroup(Group group) {

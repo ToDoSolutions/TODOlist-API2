@@ -1,9 +1,7 @@
 package com.todolist.services.autodoc;
 
-import com.todolist.component.PlanningTable;
 import com.todolist.dtos.autodoc.Area;
 import com.todolist.dtos.autodoc.Request;
-import com.todolist.dtos.autodoc.RoleStatus;
 import com.todolist.entity.Group;
 import com.todolist.entity.Role;
 import com.todolist.entity.Task;
@@ -20,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,6 +55,7 @@ public class PlanningService {
         autoDocService.autoDoc(request);
         Map<String, List<Task>> taskPerIssue = issueService.getTaskPerIssueFilter(request);
         List<User> users = getEmployees(taskPerIssue);
+        System.out.println(users);
         Group group = groupService.findGroupByName(request.getRepoName());
         double cost = calculateCost(request, group);
         return new PlanningData(taskPerIssue, users, group, cost);
@@ -77,8 +76,8 @@ public class PlanningService {
 
     // Grupal -------------------------------------------------------
     @Transactional(readOnly = true)
-    public Map<RoleStatus, Double> getGroupCost(Group group, Area area) {
-        Map<RoleStatus, Double> cost = new EnumMap<>(RoleStatus.class);
+    public Map<String, Double> getGroupCost(Group group, Area area) {
+        Map<String, Double> cost = new HashMap<>();
         for (User user : groupUserService.getUsersFromGroup(group)) {
             getTotalCostByRole(user, group, area).forEach((role, add) -> cost.merge(role, add, Double::sum));
         }
@@ -87,17 +86,17 @@ public class PlanningService {
 
     // User -------------------------------------------------------
     @Transactional(readOnly = true)
-    public Map<RoleStatus, Double> getTotalCostByRole(User user, Group group, Area area) {
+    public Map<String, Double> getTotalCostByRole(User user, Group group, Area area) {
         return getTaskFromGroupAndUser(user, group, area).stream()
                 .flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream())
-                .collect(Collectors.groupingBy(Role::getStatus, Collectors.summingDouble(Role::getSalary)));
+                .collect(Collectors.groupingBy(Role::getName, Collectors.summingDouble(Role::getSalary)));
     }
 
     private List<Task> getTaskFromGroupAndUser(User user, Group group, Area area) {
         List<Task> allMyTasks = planningRepository.findAllTaskByUserId(user.getId());
         List<Task> groupTask = groupTaskService.getTasksFromGroup(group);
         return allMyTasks.stream()
-                .filter(task -> !groupTask.contains(task) && isTaskInArea(task, area))
+                .filter(task -> groupTask.contains(task) && isTaskInArea(task, area))
                 .toList();
     }
 

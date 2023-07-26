@@ -6,8 +6,8 @@ import com.todolist.entity.User;
 import com.todolist.exceptions.RequestTimeoutException;
 import com.todolist.services.TaskService;
 import com.todolist.services.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,18 +19,12 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class IssueService {
 
     // Services ---------------------------------------------------------------
     private final UserService userService;
     private final TaskService taskService;
-
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public IssueService(UserService userService, TaskService taskService) {
-        this.userService = userService;
-        this.taskService = taskService;
-    }
 
     // Finders ----------------------------------------------------------------
     public List<GHIssue> findByUsernameAndRepo(Request request) throws IOException {
@@ -39,7 +33,7 @@ public class IssueService {
         GHRepository repository = github.getRepository(request.getPath());
         return repository.getIssues(GHIssueState.ALL)
                 .stream()
-                .filter(issue -> !issue.isPullRequest())
+                .filter(issue -> !issue.isPullRequest() && ((issue.getAssignees().stream().anyMatch(assignee -> assignee.getLogin().equals(request.getIndividual())) || issue.getLabels().stream().anyMatch(label -> label.getName().equals(request.getIndividual())) || !request.isIndividual())))
                 .toList();
     }
 

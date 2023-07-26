@@ -7,7 +7,7 @@ import com.todolist.services.TaskService;
 import com.todolist.services.group.GroupService;
 import com.todolist.services.group.GroupTaskService;
 import com.todolist.services.group.GroupUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,20 +16,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class GroupTaskController {
 
     private final GroupService groupService;
     private final GroupTaskService groupTaskService;
     private final GroupUserService groupUserService;
     private final TaskService taskService;
-
-    @Autowired
-    public GroupTaskController(GroupService groupService, GroupTaskService groupTaskService, GroupUserService groupUserService, TaskService taskService) {
-        this.groupService = groupService;
-        this.groupTaskService = groupTaskService;
-        this.groupUserService = groupUserService;
-        this.taskService = taskService;
-    }
 
 
     @DeleteMapping("/group/{idGroup}/tasks")

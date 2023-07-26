@@ -1,13 +1,11 @@
 package com.todolist.services.group;
 
-import com.todolist.dtos.ShowGroup;
-import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Group;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.GroupRepository;
-import com.todolist.services.user.UserService;
+import com.todolist.services.RoleService;
 import com.todolist.services.user.UserTaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,24 +15,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GroupService {
-
     // Services ---------------------------------------------------------------
-    private final UserService userService;
     private final GroupUserService groupUserService;
     private final UserTaskService userTaskService;
+    private final RoleService roleService;
 
     // Repositories -----------------------------------------------------------
     private final GroupRepository groupRepository;
-
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public GroupService(GroupRepository groupRepository, UserService userService, GroupUserService groupUserService, UserTaskService userTaskService) {
-        this.groupRepository = groupRepository;
-        this.userService = userService;
-        this.groupUserService = groupUserService;
-        this.userTaskService = userTaskService;
-    }
 
     // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)
@@ -69,5 +58,18 @@ public class GroupService {
     @Transactional
     public void deleteGroup(Group group) {
         groupRepository.delete(group);
+    }
+
+    public void resetRolesForUser(String individual, Group group) {
+        groupUserService.getUsersFromGroup(group).stream()
+                .filter(user -> user.getUsername().equals(individual))
+                .flatMap(user -> userTaskService.getTasksFromUser(user).stream().flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream()))
+                .forEach(roleService::resetRole);
+    }
+
+    public void resetRolesForGroup(Group group) {
+        groupUserService.getUsersFromGroup(group).stream()
+                .flatMap(user -> userTaskService.getTasksFromUser(user).stream().flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream()))
+                .forEach(roleService::resetRole);
     }
 }

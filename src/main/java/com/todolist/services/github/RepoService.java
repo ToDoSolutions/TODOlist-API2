@@ -4,23 +4,17 @@ import com.todolist.entity.Group;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.services.group.GroupUserService;
 import com.todolist.services.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class RepoService {
 
     // Services ---------------------------------------------------------------
     private final GroupUserService groupUserService;
     private final UserService userService;
-
-    // Constructors -----------------------------------------------------------
-    @Autowired
-    public RepoService(GroupUserService groupUserService, UserService userService) {
-        this.groupUserService = groupUserService;
-        this.userService = userService;
-    }
 
     // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)

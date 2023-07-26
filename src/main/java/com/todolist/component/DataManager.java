@@ -1,11 +1,6 @@
 package com.todolist.component;
 
 import com.fadda.common.tuples.pair.Pair;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -24,20 +19,14 @@ import java.util.List;
 public class DataManager {
 
     // Data files
-    private final String DATA = "src/main/resources/db/data/";
+    private static final String DATA = "src/main/resources/db/data/";
 
     // ObjectMapper instance
-    private final ObjectMapper mapper;
     private final Connection connection;
 
 
     @Autowired
     public DataManager(Environment environment) throws SQLException {
-        mapper = new ObjectMapper()
-                .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         String dbUrl = environment.getProperty("spring.datasource.url");
         String dbUser = environment.getProperty("spring.datasource.username");
         String dbPassword = environment.getProperty("spring.datasource.password");

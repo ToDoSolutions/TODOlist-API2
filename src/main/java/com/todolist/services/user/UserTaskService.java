@@ -6,25 +6,21 @@ import com.todolist.entity.User;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.UserRepository;
 import com.todolist.services.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserTaskService {
-
-    private final UserRepository userRepository;
+    // Services ---------------------------------------------------------------
     private final UserService userService;
     private final TaskService taskService;
 
-    @Autowired
-    public UserTaskService(UserRepository userRepository, UserService userService, TaskService taskService) {
-        this.userRepository = userRepository;
-        this.userService = userService;
-        this.taskService = taskService;
-    }
+    // Repositories -----------------------------------------------------------
+    private final UserRepository userRepository;
 
     @Transactional
     public List<ShowTask> getShowTasksFromUser(User user) {

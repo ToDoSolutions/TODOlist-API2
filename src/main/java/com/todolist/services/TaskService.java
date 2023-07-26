@@ -1,6 +1,5 @@
 package com.todolist.services;
 
-import com.todolist.dtos.autodoc.RoleStatus;
 import com.todolist.dtos.autodoc.clockify.ClockifyTask;
 import com.todolist.entity.Group;
 import com.todolist.entity.Tag;
@@ -16,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 @AllArgsConstructor
@@ -56,17 +56,16 @@ public class TaskService {
                 .filter(t -> t.getTitleIssue().equals(issue.getTitle()))
                 .findFirst()
                 .orElseGet(() -> new Task(issue.getTitle(), issue.getBody()));
-        RoleStatus roleStatus = RoleStatus.parseTag(getTag(clockifyTask, group));
         task.setUser(user);
         saveTask(task);
-        roleService.saveRole(roleStatus, clockifyTask.getTimeInterval(), task);
+        roleService.saveRole(getTag(clockifyTask, group).getName(), clockifyTask.getTimeInterval(), task);
     }
 
     private Tag getTag(ClockifyTask clockifyTask, Group group) {
         return Optional.ofNullable(clockifyTask.getTagIds())
                 .flatMap(tagIds -> tagIds.stream()
                         .map(tagId -> tagService.getTagFromClockify(group, tagId))
-                        .filter(tag -> tag.getName() != null)
+                        .filter(tag -> Pattern.compile("^\\w+-\\d+$").matcher(tag.getName()).matches())
                         .findFirst())
                 .orElseGet(Tag::new);
     }
@@ -83,9 +82,8 @@ public class TaskService {
                 .filter(t -> t.getTitleIssue().equals(clockifyTask.getDescription()))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("The task with title " + clockifyTask.getDescription() + " does not exist."));
-        RoleStatus roleStatus = RoleStatus.parseTag(getTag(clockifyTask, group));
         task.setUser(user);
         saveTask(task);
-        roleService.saveRole(roleStatus, clockifyTask.getTimeInterval(), task);
+        roleService.saveRole(getTag(clockifyTask, group).getName(), clockifyTask.getTimeInterval(), task);
     }
 }

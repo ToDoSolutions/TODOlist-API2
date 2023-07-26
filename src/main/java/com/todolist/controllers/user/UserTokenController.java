@@ -5,7 +5,7 @@ import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.services.user.UserService;
 import com.todolist.services.user.UserTaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +14,7 @@ import javax.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class UserTokenController {
 
     // Validators -------------------------------------------------------------
@@ -24,13 +25,6 @@ public class UserTokenController {
     private final UserService userService;
     private final UserTaskService userTaskService;
 
-
-    @Autowired
-    public UserTokenController(Validator validator, UserService userService, UserTaskService userTaskService) {
-        this.validator = validator;
-        this.userService = userService;
-        this.userTaskService = userTaskService;
-    }
 
     @PutMapping("/user/{idUser}/token") // TokenTest
     public ResponseEntity<ShowUser> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser,

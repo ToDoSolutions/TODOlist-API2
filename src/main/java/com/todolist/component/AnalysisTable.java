@@ -3,11 +3,11 @@ package com.todolist.component;
 import com.todolist.dtos.autodoc.Request;
 import com.todolist.entity.Task;
 import com.todolist.services.autodoc.AnalysisService;
+import lombok.RequiredArgsConstructor;
 import net.steppschuh.markdowngenerator.table.Table;
 import net.steppschuh.markdowngenerator.table.TableRow;
 import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
 import net.steppschuh.markdowngenerator.text.heading.Heading;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class AnalysisTable {
 
     private static final String JUMP_LINE = "\n";
@@ -27,11 +28,6 @@ public class AnalysisTable {
     private static final String STATEMENTS = "Enunciados";
 
     private final AnalysisService analysisService;
-
-    @Autowired
-    public AnalysisTable(AnalysisService analysisService) {
-        this.analysisService = analysisService;
-    }
 
     public String createAnalysisTable(Request requestDto) throws IOException {
         Map<String, List<Task>> timeTasks = analysisService.getAnalysis(requestDto);
@@ -66,8 +62,7 @@ public class AnalysisTable {
                                     String conclusion = Optional.ofNullable(timeTask.getConclusion()).orElse("").trim();
                                     String decision = Optional.ofNullable(timeTask.getDecision()).orElse("").trim();
                                     return new TableRow<>(List.of(timeTask.getIdIssue(), conclusion, decision));
-                                })
-                                .collect(Collectors.toList()))
+                                }).collect(Collectors.toList()))
                         .build().serialize());
     }
 }

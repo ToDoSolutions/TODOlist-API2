@@ -6,6 +6,7 @@ import com.todolist.entity.User;
 import com.todolist.services.TaskService;
 import com.todolist.services.user.UserService;
 import com.todolist.services.user.UserTaskService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,18 +15,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class UserTaskController {
 
     // Services ---------------------------------------------------------------
     private final TaskService taskService;
     private final UserService userService;
     private final UserTaskService userTaskService;
-
-    public UserTaskController(TaskService taskService, UserService userService, UserTaskService userTaskService) {
-        this.taskService = taskService;
-        this.userService = userService;
-        this.userTaskService = userTaskService;
-    }
 
     @DeleteMapping("/user/{idUser}/tasks") // DeleteTest
     public ResponseEntity<ShowUser> deleteAllTasksFromUser(@PathVariable("idUser") Integer idUser) {

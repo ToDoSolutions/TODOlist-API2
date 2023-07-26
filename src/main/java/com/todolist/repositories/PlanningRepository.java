@@ -1,7 +1,6 @@
 package com.todolist.repositories;
 
 
-import com.todolist.entity.Role;
 import com.todolist.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

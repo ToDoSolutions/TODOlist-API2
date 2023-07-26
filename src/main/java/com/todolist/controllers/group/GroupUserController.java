@@ -6,7 +6,7 @@ import com.todolist.entity.User;
 import com.todolist.services.group.GroupService;
 import com.todolist.services.group.GroupUserService;
 import com.todolist.services.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class GroupUserController {
 
     private final GroupService groupService;
@@ -22,12 +23,6 @@ public class GroupUserController {
     private final UserService userService;
     private final GroupUserService groupUserService;
 
-    @Autowired
-    public GroupUserController(GroupService groupService, UserService userService, GroupUserService groupUserService) {
-        this.groupService = groupService;
-        this.userService = userService;
-        this.groupUserService = groupUserService;
-    }
 
     @DeleteMapping("/group/{idGroup}/users")
     public ResponseEntity<ShowGroup> deleteAllUsersFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup) {

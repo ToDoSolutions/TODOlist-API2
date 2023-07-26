@@ -1,13 +1,11 @@
 package com.todolist.entity;
 
-import com.todolist.dtos.autodoc.RoleStatus;
 import com.todolist.model.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
 
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -18,23 +16,29 @@ import java.time.LocalDateTime;
 public class Role extends BaseEntity {
 
     // Attributes -------------------------------------------------------------
-    @Enumerated
-    private RoleStatus status;
-
+    private String tagName;
+    private String name;
+    private Double salary;
     private Duration duration;
-
-    // Derived attributes -----------------------------------------------------
-    @Transient
-    public Double getSalary() {
-        return status.getFinalSalary(duration.toMinutes() / 60.);
-    }
+    @ManyToOne
+    private Group group;
 
     @Transient
     public void addDuration(LocalDateTime start, LocalDateTime end) {
         duration = duration.plus(Duration.between(start, end));
     }
 
+    // Derived attributes -----------------------------------------------------
+    @Transient
+    public Double getSalary() {
+        return getFinalSalary(duration.toMinutes() / 60.);
+    }
+
     // Relationships ----------------------------------------------------------
     @ManyToOne
     private Task task;
+
+    public double getFinalSalary(double hours) {
+        return hours * salary;
+    }
 }

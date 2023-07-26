@@ -1,6 +1,5 @@
 package com.todolist.services.autodoc;
 
-import com.todolist.component.AnalysisTable;
 import com.todolist.dtos.autodoc.Request;
 import com.todolist.entity.Task;
 import com.todolist.services.github.IssueService;
