@@ -4,7 +4,6 @@ import com.todolist.entity.Group;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.GroupRepository;
 import com.todolist.services.RoleService;
-import com.todolist.services.user.UserTaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -12,15 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GroupService {
     // Services ---------------------------------------------------------------
-    private final GroupUserService groupUserService;
-    private final UserTaskService userTaskService;
     private final RoleService roleService;
+    private final GroupTaskService groupTaskService;
 
     // Repositories -----------------------------------------------------------
     private final GroupRepository groupRepository;
@@ -43,9 +40,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public Long getNumTasks(Group group) {
-        return (long) groupUserService.getUsersFromGroup(group).stream()
-                .flatMap(user -> user.getTasks().stream())
-                .collect(Collectors.toSet()).size();
+        return groupRepository.countTaskInGroup(group.getId());
     }
 
     // Save and delete --------------------------------------------------------
@@ -61,15 +56,15 @@ public class GroupService {
     }
 
     public void resetRolesForUser(String individual, Group group) {
-        groupUserService.getUsersFromGroup(group).stream()
-                .filter(user -> user.getUsername().equals(individual))
-                .flatMap(user -> userTaskService.getTasksFromUser(user).stream().flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream()))
+        groupTaskService.getTasksFromGroup(group).stream()
+                .filter(task -> task.getUser().getUsername().equalsIgnoreCase(individual))
+                .flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream())
                 .forEach(roleService::resetRole);
     }
 
     public void resetRolesForGroup(Group group) {
-        groupUserService.getUsersFromGroup(group).stream()
-                .flatMap(user -> userTaskService.getTasksFromUser(user).stream().flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream()))
+        groupTaskService.getTasksFromGroup(group).stream()
+                .flatMap(task -> roleService.findRoleByTaskId(task.getId()).stream())
                 .forEach(roleService::resetRole);
     }
 }

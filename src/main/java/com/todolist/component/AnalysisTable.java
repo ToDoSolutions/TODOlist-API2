@@ -19,16 +19,10 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class AnalysisTable {
-
-    private static final String JUMP_LINE = "\n";
-    private static final String SEPARATOR_ID = ": ";
-    private static final String LIST_ELEMENTS = "- ";
-    private static final Object[] HEADER_ANALYSIS = {"ID", "Conclusiones", "Decisiones tomadas"};
-    private static final String ANALYSIS = "Análisis";
-    private static final String STATEMENTS = "Enunciados";
-
+    // Services ----------------------------------------------------------------
     private final AnalysisService analysisService;
 
+    // Methods -----------------------------------------------------------------
     public String createAnalysisTable(Request requestDto) throws IOException {
         Map<String, List<Task>> timeTasks = analysisService.getAnalysis(requestDto);
 
@@ -37,13 +31,12 @@ public class AnalysisTable {
                 .toString();
     }
 
-
     public StringBuilder getStatements(Map<String, List<Task>> timeTasks) {
         return new StringBuilder()
                 .append(new Heading(STATEMENTS, 3)).append(JUMP_LINE)
                 .append(timeTasks.values().stream()
                         .map(tasks -> {
-                            Task task = tasks.get(0);
+                            Task task = tasks.get(FIRST_INDEX);
                             return String.format("%s%s%s%s%s%n",
                                     LIST_ELEMENTS, new BoldText(task.getIdIssue()), SEPARATOR_ID, task.getTitleIssue(), JUMP_LINE);
                         })
@@ -58,11 +51,21 @@ public class AnalysisTable {
                         .addRow(HEADER_ANALYSIS)
                         .withRows(timeTasks.values().stream()
                                 .map(tasks -> {
-                                    Task timeTask = tasks.get(0);
-                                    String conclusion = Optional.ofNullable(timeTask.getConclusion()).orElse("").trim();
-                                    String decision = Optional.ofNullable(timeTask.getDecision()).orElse("").trim();
+                                    Task timeTask = tasks.get(FIRST_INDEX);
+                                    String conclusion = Optional.ofNullable(timeTask.getConclusion()).orElse(EMPTY).trim();
+                                    String decision = Optional.ofNullable(timeTask.getDecision()).orElse(EMPTY).trim();
                                     return new TableRow<>(List.of(timeTask.getIdIssue(), conclusion, decision));
                                 }).collect(Collectors.toList()))
                         .build().serialize());
     }
+
+    // Constants ---------------------------------------------------------------
+    public static final int FIRST_INDEX = 0;
+    public static final String EMPTY = "";
+    private static final String JUMP_LINE = "\n";
+    private static final String SEPARATOR_ID = ": ";
+    private static final String LIST_ELEMENTS = "- ";
+    private static final Object[] HEADER_ANALYSIS = {"ID", "Conclusiones", "Decisiones tomadas"};
+    private static final String ANALYSIS = "Análisis";
+    private static final String STATEMENTS = "Enunciados";
 }

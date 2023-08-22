@@ -3,7 +3,7 @@ package com.todolist.services.group;
 import com.todolist.entity.Group;
 import com.todolist.entity.Task;
 import com.todolist.exceptions.BadRequestException;
-import com.todolist.repositories.GroupRepository;
+import com.todolist.repositories.GroupTaskRepository;
 import com.todolist.services.TaskService;
 import com.todolist.services.user.UserTaskService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,25 +22,23 @@ public class GroupTaskService {
     private final UserTaskService userTaskService;
 
     // Repositories -----------------------------------------------------------
-    private final GroupRepository groupRepository;
+    private final GroupTaskRepository groupTaskRepository;
 
     // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<Group> findGroupsWithTask(Task task) {
-        List<Group> groups = groupRepository.findAll().stream()
-                .filter(group -> hasGroupTheTask(group, task))
-                .toList();
-        if (groups.isEmpty()) {
+        List<Group> groups = groupTaskRepository.findAllGroupsByTaskId(task.getId());
+        if (groups.isEmpty())
             throw new BadRequestException("The task with idTask " + task.getId() + " does not belong to any group.");
-        }
         return groups;
     }
 
     @Transactional
     public List<Task> getTasksFromGroup(Group group) {
-        return groupUserService.getUsersFromGroup(group).stream()
-                .flatMap(user -> userTaskService.getTasksFromUser(user).stream())
-                .collect(Collectors.toList());
+        List<Task> tasks = groupTaskRepository.findAllTasksFromGroupId(group.getId());
+        if (tasks.isEmpty())
+            throw new BadRequestException("The group with idGroup " + group.getId() + " does not have any task.");
+        return tasks;
     }
 
     // Save and Delete --------------------------------------------------------

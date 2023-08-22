@@ -5,12 +5,21 @@
 
 version: 2
 updates:
-  - package-ecosystem: "maven" # el ecosistema de tu proyecto (en este caso, Maven)
-    directory: "/" # La ubicación de los archivos de manifiesto (en este caso, la raíz del proyecto)
+  - package-ecosystem: "maven"
+    directory: "/"
     schedule:
-      interval: "daily" # Dependabot buscará actualizaciones diarias
+      interval: "daily"
+    # Agrega una lista de dependencias que quieres excluir de las actualizaciones automáticas.
+    # Esto es útil si tienes dependencias que son propensas a romper con actualizaciones automáticas.
+    # Aquí tienes un ejemplo, pero puedes agregar más dependencias según tus necesidades:
     filters:
       - update-ignore:
-          - dependency-name: "nombre de la dependencia a excluir"
+          - dependency-name: "nombre-de-la-dependencia-a-excluir"
+          - dependency-name: "otra-dependencia-a-excluir"
+
     "maven":
-      "pom": "pom.xml" # La ubicación exacta del archivo pom.xml en tu proyecto
+      "pom":
+        # Si tu archivo pom.xml está en la raíz del proyecto, no necesitas especificar nada aquí.
+        # Si está en una subcarpeta, por ejemplo, "backend/pom.xml", asegúrate de especificar la ruta completa.
+        - "pom.xml"
+

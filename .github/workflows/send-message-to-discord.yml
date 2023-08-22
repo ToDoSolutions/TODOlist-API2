@@ -1,0 +1,29 @@
+name: Discord Notifications
+
+on:
+  push:
+    # Este flujo de trabajo se activará cuando se hagan cambios en cualquier rama.
+  pull_request:
+    # Este flujo de trabajo se activará cuando se abra o actualice una Pull Request.
+    # Si no se especifican las ramas de destino en el evento de Pull Request, se activará para todas las ramas.
+
+jobs:
+  notify:
+    name: Discord Notification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        # Clonar el código fuente del repositorio en la máquina de ejecución.
+        uses: actions/checkout@v2
+
+      # Asegúrate de tener una acción que realice las tareas necesarias de compilación, pruebas, etc.
+      # Puedes agregar aquí los pasos necesarios para realizar tus tareas de compilación y pruebas.
+
+      - name: Discord Notification
+        # Utilizar la acción "appleboy/discord-action@v0.2.0" para enviar una notificación a Discord.
+        uses: appleboy/discord-action@v0.2.0
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }} # Reemplazar con el nombre de tu secreto que contiene el webhook de Discord.
+          title: "GitHub Actions Notification"
+          description: "Workflow '${{ github.workflow }}' has been triggered on branch '${{ github.ref }}' by ${{ github.actor }}."
+          color: "42f54e" # Puedes cambiar el color del mensaje (en formato hexadecimal).

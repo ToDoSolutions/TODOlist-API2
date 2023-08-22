@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SpringBootApplication
+@EnableScheduling
 public class TODOlistApplication implements ApplicationRunner {
     public static final String MODE = "mode";
     public static final String PROFILES = "spring.profiles.active";

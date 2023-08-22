@@ -19,32 +19,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupTaskController {
 
+    // Services ---------------------------------------------------------------
     private final GroupService groupService;
     private final GroupTaskService groupTaskService;
     private final GroupUserService groupUserService;
     private final TaskService taskService;
 
-
-    @DeleteMapping("/group/{idGroup}/tasks")
-    public ResponseEntity<ShowGroup> deleteAllTasksFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup) {
-        Group group = groupService.findGroupById(idGroup);
-        groupTaskService.removeAllTasksFromGroup(group);
-        ShowGroup showGroup = new ShowGroup(group, groupUserService.getShowUsersFromGroup(group));
-        return ResponseEntity.ok(showGroup);
-    }
+    /* ------------ */
+    // CRUD Methods //
+    /* ------------ */
 
 
-    @DeleteMapping("group/{idGroup}/task/{idTask}")
-    public ResponseEntity<ShowGroup> deleteTaskFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
-                                                         @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
-        Group group = groupService.findGroupById(idGroup);
-        Task task = taskService.findTaskById(idTask);
-        if (groupTaskService.hasGroupTheTask(group, task))
-            groupTaskService.removeTaskFromGroup(group, task);
-        ShowGroup showGroup = new ShowGroup(group, groupUserService.getShowUsersFromGroup(group));
-        return ResponseEntity.ok(showGroup);
-    }
-
+    // Getters -----------------------------------------------------------------
     @GetMapping("/groups/task/{idTask}")
     public ResponseEntity<List<ShowGroup>> getGroupsWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
         Task task = taskService.findTaskById(idTask);
@@ -53,6 +39,7 @@ public class GroupTaskController {
         return ResponseEntity.ok(showGroups);
     }
 
+    // Adders ------------------------------------------------------------------
     @PutMapping("/group/{idGroup}/task/{idTask}")
     public ResponseEntity<ShowGroup> addTaskToGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
                                                     @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
@@ -60,6 +47,26 @@ public class GroupTaskController {
         Task task = taskService.findTaskById(idTask);
         if (groupTaskService.hasGroupTheTask(group, task))
             groupTaskService.addTaskToGroup(group, task);
+        ShowGroup showGroup = new ShowGroup(group, groupUserService.getShowUsersFromGroup(group));
+        return ResponseEntity.ok(showGroup);
+    }
+
+    // Deleters ----------------------------------------------------------------
+    @DeleteMapping("/group/{idGroup}/tasks")
+    public ResponseEntity<ShowGroup> deleteAllTasksFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup) {
+        Group group = groupService.findGroupById(idGroup);
+        groupTaskService.removeAllTasksFromGroup(group);
+        ShowGroup showGroup = new ShowGroup(group, groupUserService.getShowUsersFromGroup(group));
+        return ResponseEntity.ok(showGroup);
+    }
+
+    @DeleteMapping("group/{idGroup}/task/{idTask}")
+    public ResponseEntity<ShowGroup> deleteTaskFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
+                                                         @PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
+        Group group = groupService.findGroupById(idGroup);
+        Task task = taskService.findTaskById(idTask);
+        if (groupTaskService.hasGroupTheTask(group, task))
+            groupTaskService.removeTaskFromGroup(group, task);
         ShowGroup showGroup = new ShowGroup(group, groupUserService.getShowUsersFromGroup(group));
         return ResponseEntity.ok(showGroup);
     }

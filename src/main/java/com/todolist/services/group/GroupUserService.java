@@ -6,9 +6,7 @@ import com.todolist.entity.GroupUser;
 import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.exceptions.NotFoundException;
-import com.todolist.repositories.GroupRepository;
 import com.todolist.repositories.GroupUserRepository;
-import com.todolist.services.user.UserService;
 import com.todolist.services.user.UserTaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,11 +19,9 @@ import java.util.List;
 public class GroupUserService {
 
     // Services ---------------------------------------------------------------
-    private final UserService userService;
     private final UserTaskService userTaskService;
 
     // Repositories -----------------------------------------------------------
-    private final GroupRepository groupRepository;
     private final GroupUserRepository groupUserRepository;
 
     @Transactional
@@ -36,20 +32,18 @@ public class GroupUserService {
     // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<Group> findGroupsWithUser(User user) {
-        List<Group> groups = groupRepository.findAll().stream()
-                .filter(group -> hasUserInGroup(group, user))
-                .toList();
-        if (groups.isEmpty()) {
+        List<Group> groups = groupUserRepository.findAllByIdUser(user.getId());
+        if (groups.isEmpty())
             throw new BadRequestException("The user with idUser " + user.getId() + " does not belong to any group.");
-        }
         return groups;
     }
 
     @Transactional(readOnly = true)
     public List<User> getUsersFromGroup(Group group) {
-        return groupUserRepository.findByIdGroup(group.getId()).stream()
-                .map(groupUser -> userService.findUserById(groupUser.getIdUser()))
-                .toList();
+        List<User> users = groupUserRepository.findAllByIdGroup(group.getId());
+        if (users.isEmpty())
+            throw new BadRequestException("The group with idGroup " + group.getId() + " does not have any user.");
+        return users;
     }
 
 

@@ -70,6 +70,9 @@ public class Task extends BaseEntity implements Comparable<Task> {
     @ManyToOne
     private User user;
 
+    @ManyToOne
+    private Group group;
+
     // Constructors
     public Task(String title, String body) {
         parseBody(body);

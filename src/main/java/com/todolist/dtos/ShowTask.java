@@ -40,6 +40,12 @@ public class ShowTask extends ShowEntity {
         return toJson(fields, ALL_ATTRIBUTES);
     }
 
+    @ToJson
+    public Map<String, Object> toJson() {
+        return toJson(ShowTask.ALL_ATTRIBUTES_STRING);
+    }
+
+
     public static String getFieldsAsString() {
         return ALL_ATTRIBUTES.toString().replace("[", "").replace("]", "");
     }

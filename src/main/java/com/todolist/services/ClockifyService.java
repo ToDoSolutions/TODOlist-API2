@@ -16,10 +16,7 @@ import java.util.List;
 @Service
 public class ClockifyService {
 
-    // Constants ---------------------------------------------------------------
-    public static final String WORKSPACE_ID = "{workspaceId}";
-    public static final String CLOCKIFY_ID = "{clockifyId}";
-    public static final String X_API_KEY = "X-Api-Key";
+
     // Services ---------------------------------------------------------------
     private final RepoService repoService;
     private final GroupUserService groupUserService;
@@ -40,11 +37,16 @@ public class ClockifyService {
         this.groupUserService = groupUserService;
     }
 
+    // Constants ---------------------------------------------------------------
+    public static final String WORKSPACE_ID = "{workspaceId}";
+    public static final String CLOCKIFY_ID = "{clockifyId}";
+    public static final String X_API_KEY = "X-Api-Key";
+
     // Methods ----------------------------------------------------------------
     public List<ClockifyTask> getTaskFromWorkspace(String repoName, String username) { // Get all task from a workspace
-        Group task = repoService.findGroupByRepo(username, repoName);
-        return groupUserService.getUsersFromGroup(task).stream()
-                .flatMap(user -> Arrays.stream(fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, task.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair<>(X_API_KEY, token))))
+        Group repo = repoService.findGroupByRepo(username, repoName);
+        return groupUserService.getUsersFromGroup(repo).stream()
+                .flatMap(user -> Arrays.stream(fetchApiData.getApiDataWithToken(entriesUrl.replace(WORKSPACE_ID, repo.getWorkSpaceId()).replace(CLOCKIFY_ID, user.getClockifyId()), ClockifyTask[].class, new Pair<>(X_API_KEY, token))))
                 .toList();
     }
 }

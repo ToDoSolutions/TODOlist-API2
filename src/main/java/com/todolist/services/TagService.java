@@ -13,10 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TagService {
 
-    // Constants --------------------------------------------------------------
-    public static final String WORKSPACE_ID = "{workspaceId}";
-    public static final String TAG_ID = "{tagId}";
-    public static final String X_API_KEY = "X-Api-Key";
+
     // Repositories -----------------------------------------------------------
     private final TagRepository tagRepository;
     // Components -------------------------------------------------------------
@@ -27,11 +24,8 @@ public class TagService {
     @Value("${clockify.api.url.tags}")
     private String tagsUrl;
 
-    @Autowired
-    public TagService(TagRepository tagRepository, FetchApiData fetchApiData) {
-        this.tagRepository = tagRepository;
-        this.fetchApiData = fetchApiData;
-    }
+    // Constants --------------------------------------------------------------
+    public static final String WORKSPACE_ID = "{workspaceId}";
 
     // Finders ----------------------------------------------------------------
     @Transactional
@@ -42,5 +36,13 @@ public class TagService {
         Tag tag = fetchApiData.getApiDataWithToken(url, Tag.class, new Pair<>(X_API_KEY, token));
         tagRepository.save(tag);
         return tag;
+    }
+    public static final String TAG_ID = "{tagId}";
+    public static final String X_API_KEY = "X-Api-Key";
+    // Constructors -----------------------------------------------------------
+    @Autowired
+    public TagService(TagRepository tagRepository, FetchApiData fetchApiData) {
+        this.tagRepository = tagRepository;
+        this.fetchApiData = fetchApiData;
     }
 }

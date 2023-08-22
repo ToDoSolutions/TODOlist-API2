@@ -20,13 +20,22 @@ public class Role extends BaseEntity {
     private String name;
     private Double salary;
     private Duration duration;
+
+    // Relationships ----------------------------------------------------------
     @ManyToOne
     private Group group;
 
-    @Transient
-    public void addDuration(LocalDateTime start, LocalDateTime end) {
-        duration = duration.plus(Duration.between(start, end));
+    // Constructors -----------------------------------------------------------
+    public Role(String tagName, Task task) {
+        super();
+        duration = Duration.ZERO;
+        String[] data = tagName.split("-");
+        name = data[0];
+        salary = Double.parseDouble(data[1]);
+        this.tagName = tagName;
+        this.task = task;
     }
+
 
     // Derived attributes -----------------------------------------------------
     @Transient
@@ -34,11 +43,18 @@ public class Role extends BaseEntity {
         return getFinalSalary(duration.toMinutes() / 60.);
     }
 
+    public double getFinalSalary(double hours) {
+        return hours * salary;
+    }
+
     // Relationships ----------------------------------------------------------
     @ManyToOne
     private Task task;
 
-    public double getFinalSalary(double hours) {
-        return hours * salary;
+
+    // Auxiliary methods ------------------------------------------------------
+    @Transient
+    public void addDuration(LocalDateTime start, LocalDateTime end) {
+        duration = duration.plus(Duration.between(start, end));
     }
 }

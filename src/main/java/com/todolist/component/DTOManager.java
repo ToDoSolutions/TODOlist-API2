@@ -17,19 +17,16 @@ import java.util.function.Consumer;
 
 @Component
 public class DTOManager {
+
+    // Components --------------------------------------------------------------
     private final Reflections reflections;
 
+    // Constructor -------------------------------------------------------------
     @Autowired
     public DTOManager() {
         this.reflections = new Reflections(new ConfigurationBuilder()
                 .setScanners(new MethodAnnotationsScanner())
-                .setUrls(ClasspathHelper.forPackage("com.todolist.dtos")));
-    }
-
-    public Map<String, Object> getEntityAsJson(ShowEntity entity) {
-        String entityName = entity.getClass().getSimpleName();
-        Method toJsonMethod = findToJsonMethod(entityName);
-        return invokeToJsonMethod(toJsonMethod, entity, null);
+                .setUrls(ClasspathHelper.forPackage(PACKAGE_DTOS)));
     }
 
     public Map<String, Object> getEntityAsJson(ShowEntity entity, Consumer<String[]> validator, String... fields) {
@@ -58,5 +55,15 @@ public class DTOManager {
             throw new IllegalStateException("Error invoking toJson method for entity: " + entity.getClass().getSimpleName(), e);
         }
     }
+
+    // Methods -----------------------------------------------------------------
+    public Map<String, Object> getEntityAsJson(ShowEntity entity) {
+        String entityName = entity.getClass().getSimpleName();
+        Method toJsonMethod = findToJsonMethod(entityName);
+        return invokeToJsonMethod(toJsonMethod, entity, null);
+    }
+
+    // Constants ---------------------------------------------------------------
+    public static final String PACKAGE_DTOS = "com.todolist.dtos";
 }
 

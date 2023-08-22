@@ -18,12 +18,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupUserController {
 
+    // Services ---------------------------------------------------------------
     private final GroupService groupService;
-
     private final UserService userService;
     private final GroupUserService groupUserService;
 
+    /* ------------ */
+    // CRUD Methods //
+    /* ------------ */
 
+    // Getters -----------------------------------------------------------------
+    @GetMapping("/groups/user/{idUser}")
+    public ResponseEntity<List<ShowGroup>> getGroupsWithUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser) {
+        User user = userService.findUserById(idUser);
+        List<Group> groups = groupUserService.findGroupsWithUser(user);
+        List<ShowGroup> showGroups = groups.stream().map(group -> new ShowGroup(group, groupUserService.getShowUsersFromGroup(group))).toList();
+        return ResponseEntity.ok(showGroups);
+    }
+
+    // Adders ------------------------------------------------------------------
+    @PutMapping("/group/{idGroup}/user/{idUser}")
+    public ResponseEntity<ShowGroup> addUserToGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
+                                                    @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser) {
+        Group group = groupService.findGroupById(idGroup);
+        User user = userService.findUserById(idUser);
+        if (!groupUserService.hasUserInGroup(group, user))
+            groupUserService.addUserToGroup(group, user);
+        ShowGroup showGroup = new ShowGroup(group, groupUserService.getShowUsersFromGroup(group));
+        return ResponseEntity.ok(showGroup);
+    }
+
+    // Deleters ----------------------------------------------------------------
     @DeleteMapping("/group/{idGroup}/users")
     public ResponseEntity<ShowGroup> deleteAllUsersFromGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup) {
         Group group = groupService.findGroupById(idGroup);
@@ -40,27 +65,6 @@ public class GroupUserController {
         User user = userService.findUserById(idUser);
         if (groupUserService.hasUserInGroup(group, user))
             groupUserService.removeUserFromGroup(group, user);
-        ShowGroup showGroup = new ShowGroup(group, groupUserService.getShowUsersFromGroup(group));
-        return ResponseEntity.ok(showGroup);
-    }
-
-
-    @GetMapping("/groups/user/{idUser}")
-    public ResponseEntity<List<ShowGroup>> getGroupsWithUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser) {
-        User user = userService.findUserById(idUser);
-        List<Group> groups = groupUserService.findGroupsWithUser(user);
-        List<ShowGroup> showGroups = groups.stream().map(group -> new ShowGroup(group, groupUserService.getShowUsersFromGroup(group))).toList();
-        return ResponseEntity.ok(showGroups);
-    }
-
-
-    @PutMapping("/group/{idGroup}/user/{idUser}")
-    public ResponseEntity<ShowGroup> addUserToGroup(@PathVariable("idGroup") @Min(value = 0, message = "The idGroup must be positive.") Integer idGroup,
-                                                    @PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser) {
-        Group group = groupService.findGroupById(idGroup);
-        User user = userService.findUserById(idUser);
-        if (!groupUserService.hasUserInGroup(group, user))
-            groupUserService.addUserToGroup(group, user);
         ShowGroup showGroup = new ShowGroup(group, groupUserService.getShowUsersFromGroup(group));
         return ResponseEntity.ok(showGroup);
     }

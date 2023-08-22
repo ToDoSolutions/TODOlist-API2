@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class FetchApiData {
 
+    // Methods -----------------------------------------------------------------
     public <T> T getApiDataWithToken(String url, Class<T> classType, Pair<String, String> token) {
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.exchange(url, HttpMethod.GET, createHttpEntityWithToken(token), classType).getBody();

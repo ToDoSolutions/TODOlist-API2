@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -18,41 +20,17 @@ import java.util.List;
 @Component
 public class DataManager {
 
-    // Data files
-    private static final String DATA = "src/main/resources/db/data/";
 
-    // ObjectMapper instance
+    // Components --------------------------------------------------------------
     private final Connection connection;
 
-
+    // Constructor -------------------------------------------------------------
     @Autowired
     public DataManager(Environment environment) throws SQLException {
         String dbUrl = environment.getProperty("spring.datasource.url");
         String dbUser = environment.getProperty("spring.datasource.username");
         String dbPassword = environment.getProperty("spring.datasource.password");
         connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-    }
-
-    public Pair<String, List<String>> loadCSVData(String entityName) throws IOException {
-        List<String> dataList = new ArrayList<>();
-        String headers = null;
-
-        // Lee el fichero
-        try (BufferedReader reader = new BufferedReader(new FileReader(DATA + entityName))) {
-            String line;
-
-
-            while ((line = reader.readLine()) != null) {
-
-                if (headers == null) {
-                    headers = line;
-                } else {
-                    dataList.add(line);
-                }
-            }
-        }
-
-        return Pair.of(headers, dataList);
     }
 
     private void saveData(Pair<String, List<String>> data, String entityName) {
@@ -81,12 +59,44 @@ public class DataManager {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public void loadAndSaveData(String filePath, String entityName) throws IOException {
         Pair<String, List<String>> data = loadCSVData(filePath);
         saveData(data, entityName);
     }
+
+    // Methods -----------------------------------------------------------------
+    public Pair<String, List<String>> loadCSVData(String entityName) throws IOException {
+        List<String> dataList = new ArrayList<>();
+        String headers = null;
+
+        // Lee el fichero
+        try {
+            headers = readFileAndAddToDataList(DATA + entityName, headers, dataList);
+        } catch (IOException e) {
+            headers = readFileAndAddToDataList(OTHER + entityName, headers, dataList);
+        }
+
+        return Pair.of(headers, dataList);
+    }
+
+    private String readFileAndAddToDataList(String filePath, String headers, List<String> dataList) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (headers == null) {
+                    headers = line;
+                } else {
+                    dataList.add(line);
+                }
+            }
+        }
+        return headers;
+    }
+
+    // Constants ---------------------------------------------------------------
+    private static final String DATA = "src/main/resources/db/data/";
+    private static final String OTHER = "/resources/db/data/";
 }
 

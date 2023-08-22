@@ -1,0 +1,18 @@
+# Excluir archivos de construcción y dependencias de Maven
+target/
+*.jar
+
+# Excluir archivos de configuración local y caché de Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Excluir archivos de logs y temporales
+logs/
+temp/
+*.log
+
+# Excluir archivos y directorios innecesarios
+node_modules/
+.idea/
+.vscode/

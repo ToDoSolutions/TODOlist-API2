@@ -23,24 +23,12 @@ public class UserTaskController {
     private final UserService userService;
     private final UserTaskService userTaskService;
 
-    @DeleteMapping("/user/{idUser}/tasks") // DeleteTest
-    public ResponseEntity<ShowUser> deleteAllTasksFromUser(@PathVariable("idUser") Integer idUser) {
-        User user = userService.findUserById(idUser);
-        userTaskService.removeAllTasksFromUser(user);
-        ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
-        return ResponseEntity.ok(showUser);
-    }
+    /* ------------ */
+    // CRUD Methods //
+    /* ------------ */
 
-    @DeleteMapping("/user/{idUser}/task/{idTask}") // DeleteAllTest
-    public ResponseEntity<ShowUser> deleteTaskFromUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
-        User user = userService.findUserById(idUser);
-        Task task = taskService.findTaskById(idTask);
-        if (user.getTasks().contains(task)) userTaskService.removeTaskFromUser(user, task);
-        ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
-        return ResponseEntity.ok(showUser);
-    }
-
-    @GetMapping("/users/task/{idTask}") // GetAllTest
+    // Getters -----------------------------------------------------------------
+    @GetMapping("/users/task/{idTask}")
     public ResponseEntity<List<ShowUser>> getUserWithTask(@PathVariable("idTask") @Min(value = 0, message = "The idTask must be positive.") Integer idTask) {
         Task task = taskService.findTaskById(idTask);
         List<User> users = userTaskService.findUsersWithTask(task);
@@ -48,11 +36,30 @@ public class UserTaskController {
         return ResponseEntity.ok(showUsers);
     }
 
-    @PutMapping("/user/{idUser}/task/{idTask}") // PutTest
+    // Adders ------------------------------------------------------------------
+    @PutMapping("/user/{idUser}/task/{idTask}")
     public ResponseEntity<ShowUser> addTaskToUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
         User user = userService.findUserById(idUser);
         Task task = taskService.findTaskById(idTask);
         if (!user.getTasks().contains(task)) userTaskService.addTaskToUser(user, task);
+        ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
+        return ResponseEntity.ok(showUser);
+    }
+
+    // Deleters ----------------------------------------------------------------
+    @DeleteMapping("/user/{idUser}/tasks")
+    public ResponseEntity<ShowUser> deleteAllTasksFromUser(@PathVariable("idUser") Integer idUser) {
+        User user = userService.findUserById(idUser);
+        userTaskService.removeAllTasksFromUser(user);
+        ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
+        return ResponseEntity.ok(showUser);
+    }
+
+    @DeleteMapping("/user/{idUser}/task/{idTask}")
+    public ResponseEntity<ShowUser> deleteTaskFromUser(@PathVariable("idUser") Integer idUser, @PathVariable("idTask") Integer idTask) {
+        User user = userService.findUserById(idUser);
+        Task task = taskService.findTaskById(idTask);
+        if (user.getTasks().contains(task)) userTaskService.removeTaskFromUser(user, task);
         ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));
         return ResponseEntity.ok(showUser);
     }

@@ -26,39 +26,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlanningTable {
 
-    // Constants --------------------------------------------------------------
-    protected static final Object[] HEADER_PLANNING = {"Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste"};
-    public static final String JUMP_LINE = "\n";
-    public static final String EURO = "€";
-    protected static final Object[] HEADER_PERSONAL_TABLE = {"Rol", "Coste"};
-    public static final String MONEY_REPRESENTATION = "%.2f %s";
-
     // Services ---------------------------------------------------------------
     private final RoleService roleService;
     private final PlanningService planningService;
-
-    public String[] createPlanningTable(Request request) throws IOException {
-        PlanningService.PlanningData planningData = planningService.getPlanningData(request);
-
-        String taskTable = getTaskTable(planningData.taskPerIssue()).serialize();
-        String personalTable = getAllEmployeeTables(planningData.users(), planningData.group(), request.getArea());
-        String names = getNames(planningData.users());
-        String rolesString = getRolesString(planningData.taskPerIssue());
-
-        return new String[]{taskTable, personalTable, String.format(MONEY_REPRESENTATION, planningData.cost(), EURO), names, rolesString};
-    }
-
-    private static String getTime(Duration duration) {
-        if (duration.toHours() == 0)
-            return duration.toMinutes() + " minutos";
-        return duration.toHours() + " horas y " + duration.toMinutes() % 60 + " minutos";
-    }
-
-    // TODO: Trasladar a FADDA
-    private static String join(List<String> list) {
-        return list.isEmpty() ? "" : list.size() == 1 ? list.get(0) :
-                String.join(", ", list.subList(0, list.size() - 1)) + " y " + list.get(list.size() - 1);
-    }
 
     // Methods ----------------------------------------------------------------
     public Table getTaskTable(Map<String, List<Task>> timeTasks) {
@@ -71,18 +41,7 @@ public class PlanningTable {
                 .withRows(rowTasks)
                 .build();
     }
-
-    private TableRow<String> getRow(List<Task> tasks) {
-        Task firstTask = tasks.get(0);
-        String id = firstTask.getIdIssue();
-        String title = firstTask.getTitleIssue();
-        String namesAsString = getDistinctNames(tasks);
-        String rolesAsString = getDistinctRoles(tasks);
-        Duration duration = calculateTotalDuration(tasks);
-        double cost = calculateTotalCost(tasks);
-        String costAsString = formatCost(cost);
-        return new TableRow<>(List.of(id, title, namesAsString, rolesAsString, "x", getTime(duration), costAsString));
-    }
+    public static final String MIN = " minutos";
 
     private String getDistinctNames(List<Task> tasks) {
         return join(tasks.stream()
@@ -123,16 +82,7 @@ public class PlanningTable {
         salary.forEach((name, cost) -> table.addRow(name, String.format(MONEY_REPRESENTATION, cost, EURO)));
         return table.build();
     }
-
-    public String getAllEmployeeTables(List<User> users, Group group, Area area) {
-        StringBuilder personalTable = new StringBuilder();
-        users.forEach(user -> personalTable
-                .append(JUMP_LINE)
-                .append(new Heading(user.getFullName(), 3))
-                .append(JUMP_LINE)
-                .append(getEmployeeTable(user, group, area).serialize()));
-        return personalTable.toString();
-    }
+    public static final String HOURS = " horas y ";
 
     public String getNames(List<User> employees) {
         ListBuilder listBuilder = new ListBuilder();
@@ -147,4 +97,64 @@ public class PlanningTable {
                 .map(role -> role.getName().toLowerCase())
                 .distinct().toList());
     }
+
+    private static String getTime(Duration duration) {
+        if (duration.toHours() == NO_HOURS)
+            return duration.toMinutes() + MIN;
+        return duration.toHours() + HOURS + duration.toMinutes() % 60 + MIN;
+    }
+
+    // TODO: Trasladar a FADDA
+    private static String join(List<String> list) {
+        return list.isEmpty() ? EMPTY : list.size() == 1 ? list.get(FIST_INDEX) :
+                String.join(COMMA, list.subList(FIST_INDEX, list.size() - 1)) + AND + list.get(list.size() - 1);
+    }
+
+    // Methods -----------------------------------------------------------------
+    public String[] createPlanningTable(Request request) throws IOException {
+        PlanningService.PlanningData planningData = planningService.getPlanningData(request);
+
+        String taskTable = getTaskTable(planningData.taskPerIssue()).serialize();
+        String personalTable = getAllEmployeeTables(planningData.users(), planningData.group(), request.getArea());
+        String names = getNames(planningData.users());
+        String rolesString = getRolesString(planningData.taskPerIssue());
+
+        return new String[]{taskTable, personalTable, String.format(MONEY_REPRESENTATION, planningData.cost(), EURO), names, rolesString};
+    }
+
+    private TableRow<String> getRow(List<Task> tasks) {
+        Task firstTask = tasks.get(0);
+        String id = firstTask.getIdIssue();
+        String title = firstTask.getTitleIssue();
+        String namesAsString = getDistinctNames(tasks);
+        String rolesAsString = getDistinctRoles(tasks);
+        Duration duration = calculateTotalDuration(tasks);
+        double cost = calculateTotalCost(tasks);
+        String costAsString = formatCost(cost);
+        return new TableRow<>(List.of(id, title, namesAsString, rolesAsString, UNKNOWN_AMPLIFICATION, getTime(duration), costAsString));
+    }
+
+    public String getAllEmployeeTables(List<User> users, Group group, Area area) {
+        StringBuilder personalTable = new StringBuilder();
+        users.forEach(user -> personalTable
+                .append(JUMP_LINE)
+                .append(new Heading(user.getFullName(), SIZE_NAME))
+                .append(JUMP_LINE)
+                .append(getEmployeeTable(user, group, area).serialize()));
+        return personalTable.toString();
+    }
+
+    // Constants --------------------------------------------------------------
+    protected static final Object[] HEADER_PLANNING = {"Título", "Descripción", "Responsables", "Rol", "Tiempo planificado", "Tiempo real", "Coste"};
+    protected static final Object[] HEADER_PERSONAL_TABLE = {"Rol", "Coste"};
+    public static final String JUMP_LINE = "\n";
+    public static final String EURO = "€"; // No se coloca dentro de MOney Representation por si se quiere cambiar fácilmente.
+    public static final String MONEY_REPRESENTATION = "%.2f %s";
+    public static final String EMPTY = "";
+    public static final int FIST_INDEX = 0;
+    public static final int NO_HOURS = 0;
+    public static final String COMMA = ", ";
+    public static final String AND = " y ";
+    public static final int SIZE_NAME = 3;
+    public static final String UNKNOWN_AMPLIFICATION = "x";
 }

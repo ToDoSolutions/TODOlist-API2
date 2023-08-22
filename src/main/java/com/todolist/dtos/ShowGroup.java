@@ -52,6 +52,10 @@ public class ShowGroup extends ShowEntity{
         return map;
     }
 
+    public Map<String, Object> toJson() {
+        return toJson(ShowTask.ALL_ATTRIBUTES_STRING, ShowUser.ALL_ATTRIBUTES_STRING, ShowGroup.ALL_ATTRIBUTES_STRING);
+    }
+
 
     public static String getFieldsAsString() {
         return ALL_ATTRIBUTES.toString().replace("[", "").replace("]", "");

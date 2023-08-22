@@ -57,6 +57,10 @@ public class User extends NamedEntity {
 
     private String clockifyId;
 
+    // Spring Security --------------------------------------------------------
+    private String authority;
+    private String enable;
+
     // Derived attributes -----------------------------------------------------
     @Transient
     public String getFullName() {
@@ -66,5 +70,4 @@ public class User extends NamedEntity {
     // Relationships ----------------------------------------------------------
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Task> tasks;
-
 }

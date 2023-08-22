@@ -51,6 +51,12 @@ public class ShowUser extends ShowEntity {
         return map;
     }
 
+    @ToJson
+    public Map<String, Object> toJson() {
+        return toJson(ShowTask.ALL_ATTRIBUTES_STRING, ShowUser.ALL_ATTRIBUTES_STRING);
+    }
+
+
     public static String getFieldsAsString() {
         return ShowUser.ALL_ATTRIBUTES.toString().replace("[", "").replace("]", "");
     }

@@ -19,6 +19,7 @@ public class RoleService {
     // Repositories -----------------------------------------------------------
     private final RoleRepository roleRepository;
 
+    // Finders ----------------------------------------------------------------
     public List<Role> findRoleByTaskId(Integer taskId) {
         return roleRepository.findAllByTaskId(taskId);
     }
@@ -38,12 +39,13 @@ public class RoleService {
                 .sum();
     }
 
+    // Save and delete --------------------------------------------------------
     @Transactional
-    public void saveRole(String name, TimeInterval timeInterval, Task task) {
-        if (name == null)
+    public void saveRole(String tagName, TimeInterval timeInterval, Task task) {
+        if (tagName == null)
             return;
-        Role role = roleRepository.findRoleByTaskIdAndTagName(task.getId(), name)
-                .orElseGet(() -> createNewRole(name, task));
+        Role role = roleRepository.findRoleByTaskIdAndTagName(task.getId(), tagName)
+                .orElseGet(() -> new Role(tagName, task));
         LocalDateTime start = timeInterval.getStartAsLocalDateTime();
         LocalDateTime end = timeInterval.getEndAsLocalDateTime();
         role.addDuration(start, end);
@@ -53,19 +55,6 @@ public class RoleService {
     @Transactional
     public void deleteAllRoles(Task task) {
         roleRepository.deleteAll(findRoleByTaskId(task.getId()));
-    }
-
-    private Role createNewRole(String tagName, Task task) {
-        Role newRole = new Role();
-        newRole.setDuration(Duration.ZERO);
-        String[] data = tagName.split("-");
-        String name = data[0];
-        Double salary = Double.parseDouble(data[1]);
-        newRole.setTagName(tagName);
-        newRole.setName(name);
-        newRole.setTask(task);
-        newRole.setSalary(salary);
-        return newRole;
     }
 
     public void resetRole(Role role) {

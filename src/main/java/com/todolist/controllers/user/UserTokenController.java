@@ -17,16 +17,32 @@ import javax.validation.constraints.Min;
 @RequiredArgsConstructor
 public class UserTokenController {
 
-    // Validators -------------------------------------------------------------
-    private final Validator validator;
-
     // Services ---------------------------------------------------------------
-
     private final UserService userService;
     private final UserTaskService userTaskService;
 
+    // Validators -------------------------------------------------------------
+    private final Validator validator;
 
-    @PutMapping("/user/{idUser}/token") // TokenTest
+    /* ------------ */
+    // CRUD Methods //
+    /* ------------ */
+
+    // Getters -----------------------------------------------------------------
+    @GetMapping("/user/{idUser}/token")
+    public ResponseEntity<String> getTokenFromUser(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser, @RequestHeader("Password") String password) {
+
+        User user = userService.findUserById(idUser);
+        if (password == null || password.isEmpty())
+            throw new BadRequestException("The password is required.");
+        if (!user.getPassword().equals(password))
+            throw new BadRequestException("The password is incorrect.");
+        return ResponseEntity.ok(user.getToken());
+    }
+
+    // Updaters ----------------------------------------------------------------
+    // TODO: Check if the token is valid.
+    @PutMapping("/user/{idUser}/token")
     public ResponseEntity<ShowUser> updateToken(@PathVariable("idUser") @Min(value = 0, message = "The idUser must be positive.") Integer idUser,
                                                 @RequestHeader("Authorization") String token) {
         User user = userService.findUserById(idUser);

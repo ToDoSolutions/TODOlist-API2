@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  app:
+    image: alesanfel/todolist-api2:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/todolist-api2?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: acme_user
+      SPRING_DATASOURCE_PASSWORD: ACME-Us3r-P@ssw0rd
+
+  mariadb:
+    image: mariadb:10.10.5
+    environment:
+      MYSQL_ROOT_PASSWORD: ACME-Us3r-P@ssw0rd
+      MYSQL_DATABASE: todolist-api2
+      MYSQL_USER: acme_user
+      MYSQL_PASSWORD: ACME-Us3r-P@ssw0rd
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  mysql_data:
+

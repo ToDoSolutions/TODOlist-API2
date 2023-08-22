@@ -1,0 +1,32 @@
+name: Automatic Changelog Generation
+
+on:
+  push:
+    # Este flujo de trabajo se activará cuando se hagan cambios en la rama "main".
+    branches:
+      - main
+
+jobs:
+  changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        # Clonar el código fuente del repositorio en la máquina de ejecución.
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        # Configurar la versión de JDK 17 para el entorno de ejecución.
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generate Changelog
+        # Utilizar la acción "release-changelog-builder/action@v1" para generar el registro de cambios automáticamente.
+        uses: release-changelog-builder/action@v1
+        with:
+          version: '${{ github.ref }}' # Utilizar la referencia (tag o rama) que activó el flujo de trabajo como versión para el registro de cambios.
+          changelog_filename: 'CHANGELOG.md' # Especificar el nombre del archivo del registro de cambios generado.
+

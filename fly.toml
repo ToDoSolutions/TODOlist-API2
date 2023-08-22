@@ -1,0 +1,43 @@
+# fly.toml
+
+# Definimos la aplicación y las configuraciones básicas
+app = "todolist-api2"
+
+# Configuración para desplegar la aplicación usando Dockerfile
+[build]
+  # Utilizamos Dockerfile para construir la imagen de la aplicación
+  image = "Dockerfile"
+
+# Variables de entorno para la base de datos
+[env]
+  SPRING_DATASOURCE_URL = "jdbc:mysql://mariadb:3306/todolist-api2?useSSL=false&serverTimezone=UTC"
+  SPRING_DATASOURCE_USERNAME = "acme_user"
+  SPRING_DATASOURCE_PASSWORD = "ACME-Us3r-P@ssw0rd"
+
+# Configuración para desplegar la aplicación
+[deploy]
+
+  # Plataforma de despliegue (fly.io)
+  image = "flyio/todolist-api2"
+
+  # Puertos para exponer
+  ports = ["8080"]
+
+  # Comando para ejecutar la aplicación
+  cmd = "java -jar /app.jar"
+
+  # Configuración para la base de datos MariaDB
+  [deploy.database]
+
+    # Imagen para la base de datos MariaDB
+    image = "mariadb:10.10.5"
+
+    # Variables de entorno para la base de datos MariaDB
+    [deploy.database.env]
+      MYSQL_ROOT_PASSWORD = "ACME-Us3r-P@ssw0rd"
+      MYSQL_DATABASE = "todolist-api2"
+      MYSQL_USER = "acme_user"
+      MYSQL_PASSWORD = "ACME-Us3r-P@ssw0rd"
+
+    # Puertos para exponer la base de datos MariaDB
+    ports = ["3306"]
