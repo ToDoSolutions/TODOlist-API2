@@ -38,7 +38,6 @@ public class User extends NamedEntity {
     private String email;
 
     @Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z\\d+&@#/%?=~_|!:,.;]*[-a-zA-Z\\d+&@#/%=~_|]", message = "The avatar is invalid.")
-    @NotBlank(message = "The avatar is required.")
     private String avatar;
 
     @Size(max = 500, message = "The bio is too long.")

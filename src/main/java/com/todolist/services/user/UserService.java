@@ -1,6 +1,5 @@
 package com.todolist.services.user;
 
-import com.fadda.common.tuples.pair.Pair;
 import com.todolist.entity.User;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.UserRepository;

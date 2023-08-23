@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -72,13 +73,16 @@ public class GroupController {
                                                   @RequestParam(required = false) DateFilter createdDate) {
         order.validateOrder(fieldsGroup);
         List<Group> groups = groupService.findAllGroups(order.getSort());
-        return groups.stream().skip(offset).limit(limit).filter(group -> Objects.nonNull(group) &&
+        Stream<Group> result = groups.stream().skip(offset);
+        if (limit != -1)
+            result = result.limit(limit);
+        return result.filter(group -> Objects.nonNull(group) &&
                         Preconditions.isNullOrValid(name, n -> group.getName().equals(n)) &&
                         Preconditions.isNullOrValid(description, d -> group.getDescription().equals(d)) &&
                         Preconditions.isNullOrValid(numTasks, n -> n.isValid(groupService.getNumTasks(group))) &&
                         Preconditions.isNullOrValid(createdDate, c -> c.isValid(group.getCreatedDate())))
                 .map(group -> new ShowGroup(group, groupUserService.getShowUsersFromGroup(group))).map(group -> dtoManager.getEntityAsJson(group,
-                fieldValidator, fieldsTask, fieldsUser, fieldsGroup)).toList();
+                        fieldValidator, fieldsTask, fieldsUser, fieldsGroup)).toList();
     }
 
     @GetMapping("/group/{idGroup}")
@@ -92,7 +96,7 @@ public class GroupController {
     }
 
     // Adders ------------------------------------------------------------------
-    @PostMapping("/group") // PostTest
+    @PostMapping("/group")
     public ResponseEntity<ShowGroup> addGroup(@RequestBody @Valid Group group, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BadRequestException(bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -102,7 +106,7 @@ public class GroupController {
     }
 
     // Updaters ----------------------------------------------------------------
-    @PutMapping("/group") // PutTest
+    @PutMapping("/group")
     public ResponseEntity<ShowGroup> updateGroup(@RequestBody @Valid Group group, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BadRequestException(bindingResult.getAllErrors().get(0).getDefaultMessage());

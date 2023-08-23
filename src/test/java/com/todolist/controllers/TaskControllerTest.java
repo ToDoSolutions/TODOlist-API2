@@ -1,6 +1,7 @@
 package com.todolist.controllers;
 
 import com.todolist.component.DTOManager;
+import com.todolist.converters.OrderFormatter;
 import com.todolist.entity.Task;
 import com.todolist.services.TaskService;
 import com.todolist.services.group.GroupService;
@@ -13,7 +14,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -21,6 +24,7 @@ import java.util.Collections;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(TaskController.class)
+@ComponentScan(basePackages = "com.todolist.converters")
 class TaskControllerTest {
 
     @Autowired
@@ -38,7 +42,7 @@ class TaskControllerTest {
     @MockBean
     private DTOManager dtoManager;
 
-    @Mock
+    @MockBean
     private FieldValidator fieldValidator;
 
     @BeforeEach

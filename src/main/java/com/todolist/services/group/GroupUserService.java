@@ -1,6 +1,5 @@
 package com.todolist.services.group;
 
-import com.fadda.common.tuples.pair.Pair;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Group;
 import com.todolist.entity.GroupUser;

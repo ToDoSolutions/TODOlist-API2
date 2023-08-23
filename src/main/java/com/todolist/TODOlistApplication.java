@@ -1,9 +1,5 @@
 package com.todolist;
 
-import org.reflections.Reflections;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,7 +8,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

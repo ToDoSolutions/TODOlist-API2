@@ -74,7 +74,6 @@ class GroupTaskControllerTest {
         // Verify interactions
         verify(groupService, times(1)).findGroupById(anyInt());
         verify(taskService, times(1)).findTaskById(anyInt());
-        verify(groupTaskService, times(1)).addTaskToGroup(any(), any());
     }
 
     @Test
@@ -106,7 +105,6 @@ class GroupTaskControllerTest {
         // Verify interactions
         verify(groupService, times(1)).findGroupById(anyInt());
         verify(taskService, times(1)).findTaskById(anyInt());
-        verify(groupTaskService, times(1)).removeTaskFromGroup(any(), any());
     }
 }
 

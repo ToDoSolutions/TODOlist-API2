@@ -1,11 +1,10 @@
 package com.todolist.entity;
 
-import com.todolist.model.BaseEntity;
+import com.todolist.model.NamedEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.todolist.model.NamedEntity;
 
 import javax.persistence.Entity;
 

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -73,7 +74,10 @@ public class UserController {
                                                  @RequestParam(required = false) NumberFilter taskCompleted) {
         order.validateOrder(fieldsUser);
         List<User> users = userService.findAllUsers(order.getSort());
-        return users.stream().skip(offset).limit(limit).filter(user -> Objects.nonNull(user) &&
+        Stream<User> result = users.stream().skip(offset);
+        if (limit != -1)
+            result = result.limit(limit);
+        return result.filter(user -> Objects.nonNull(user) &&
                         Preconditions.isNullOrValid(name, n -> user.getName().equals(n)) &&
                         Preconditions.isNullOrValid(surname, s -> user.getSurname().equals(s)) &&
                         Preconditions.isNullOrValid(email, e -> user.getEmail().equals(e)) &&
@@ -128,7 +132,7 @@ public class UserController {
         User user = userService.findUserById(idUser);
         if (password == null || password.isEmpty())
             throw new BadRequestException("The password is required.");
-        if (!user.getPassword().equals(password))
+        if (!Objects.equals(user.getPassword(), password))
             throw new BadRequestException("The password is incorrect.");
         userService.deleteUser(user);
         ShowUser showUser = new ShowUser(user, userTaskService.getShowTasksFromUser(user));

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -59,7 +60,7 @@ public class TaskController {
     @GetMapping("/tasks")
     public List<Map<String, Object>> getAllTasks(@RequestParam(defaultValue = "0") @Min(value = 0, message = "The offset must be positive.") Integer offset,
                                                  @RequestParam(defaultValue = "-1") @Min(value = -1, message = "The limit must be positive.") Integer limit,
-                                                 @RequestParam(defaultValue = "+idTask") Order order,
+                                                 @RequestParam(defaultValue = "+id") Order order,
                                                  @RequestParam(defaultValue = ShowTask.ALL_ATTRIBUTES_STRING) String fieldsTask,
                                                  @RequestParam(required = false) String title,
                                                  @RequestParam(required = false) String description,
@@ -67,8 +68,13 @@ public class TaskController {
                                                  @RequestParam(required = false) NumberFilter priority,
                                                  @RequestParam(required = false) Difficulty difficulty) {
         order.validateOrder(fieldsTask);
+        System.out.println("asdsdasd");
         List<Task> tasks = taskService.findAllTasks(order.getSort());
-        return tasks.stream().skip(offset).limit(limit).filter(task -> Objects.nonNull(task) &&
+        Stream<Task> result = tasks.stream().skip(offset);
+        if (limit != -1)
+            result = result.limit(limit);
+        System.out.println("title: " + title);
+        return result.filter(task -> Objects.nonNull(task) &&
                         Preconditions.isNullOrValid(title, t -> task.getTitle().contains(t)) &&
                         Preconditions.isNullOrValid(priority, p -> p.isValid(task.getPriority())) &&
                         Preconditions.isNullOrValid(difficulty, d -> task.getDifficulty() == d) &&

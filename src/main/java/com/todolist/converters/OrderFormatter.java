@@ -12,6 +12,7 @@ public class OrderFormatter implements Formatter<Order> {
 
     @Override
     public Order parse(String text, Locale locale) {
+        System.out.println(text);
         String field = text.charAt(0) == '+' || text.charAt(0) == '-' ? text.substring(1) : text;
         return new Order(text.charAt(0), field);
     }

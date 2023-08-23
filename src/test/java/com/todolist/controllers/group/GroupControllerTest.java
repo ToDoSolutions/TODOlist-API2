@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(GroupController.class)
+@ComponentScan(basePackages = "com.todolist.converters")
 class GroupControllerTest {
 
     @Autowired
@@ -79,7 +81,7 @@ class GroupControllerTest {
         // Perform request and assertions
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/group")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\":\"Test Group\"}"))
+                .content("{\"name\":\"Test Group\",\"description\":\"Test Description\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         // Verify interactions
@@ -96,7 +98,7 @@ class GroupControllerTest {
         // Perform request and assertions
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/group")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"id\":1,\"name\":\"Updated Group\"}"))
+                .content("{\"id\":1,\"name\":\"Updated Group\",\"description\":\"Updated Description\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         // Verify interactions

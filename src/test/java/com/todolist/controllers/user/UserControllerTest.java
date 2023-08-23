@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(UserController.class)
+@ComponentScan(basePackages = "com.todolist.converters")
 class UserControllerTest {
 
     @Autowired
@@ -78,7 +80,7 @@ class UserControllerTest {
         // Perform request and assertions
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\":\"John\",\"email\":\"john@example.com\"}"))
+                .content("{\"name\":\"John\",\"email\":\"john@example.com\",\"password\":\"password\",\"username\":\"john\",\"surname\":\"John\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         // Verify interactions
@@ -89,13 +91,14 @@ class UserControllerTest {
     void testUpdateUser() throws Exception {
         // Configure mocks
         User user = new User();
+        user.setPassword("password");
         when(userService.findUserById(anyInt())).thenReturn(user);
         when(userService.saveUser(any())).thenReturn(user);
 
         // Perform request and assertions
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/user")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"id\":1,\"name\":\"Updated Name\"}")
+                .content("{\"id\":1,\"name\":\"Updated Name\",\"username\":\"Updated Username\",\"email\":\"example@example.com\",\"surname\":\"John\",\"password\":\"password\"}")
                 .header("Password", "password"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -108,6 +111,7 @@ class UserControllerTest {
     void testDeleteUser() throws Exception {
         // Configure mocks
         User user = new User();
+        user.setPassword("password");
         when(userService.findUserById(anyInt())).thenReturn(user);
 
         // Perform request and assertions

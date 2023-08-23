@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
@@ -48,5 +49,12 @@ public class CustomErrorHandler {
     public ResponseEntity<ExceptionResponse> handleServerException(ServerException exception, ServletWebRequest webRequest) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage(), webRequest.getRequest().getRequestURI(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MethodArgumentConversionNotSupportedException.class)
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentConversionNotSupportedException(MethodArgumentConversionNotSupportedException exception, ServletWebRequest webRequest) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDate.now(), exception.getMessage(), webRequest.getRequest().getRequestURI(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+        System.out.println(exceptionResponse);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 }
