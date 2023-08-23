@@ -109,7 +109,6 @@ public class PlanningService {
     }
 
     // Other -------------------------------------------------------
-
     private List<User> getEmployees(Map<String, List<Task>> timeTasks) {
         return timeTasks.values().stream()
                 .flatMap(List::stream)

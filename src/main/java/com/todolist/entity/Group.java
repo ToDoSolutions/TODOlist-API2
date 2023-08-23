@@ -18,7 +18,6 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SaveData(entityName = "group", fileName = "group.csv")
 public class Group extends NamedEntity {
 
     // Attributes -------------------------------------------------------------

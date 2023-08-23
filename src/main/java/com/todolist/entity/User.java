@@ -22,7 +22,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SaveData(entityName = "user", fileName = "user.csv")
 public class User extends NamedEntity {
 
     // Attributes -------------------------------------------------------------

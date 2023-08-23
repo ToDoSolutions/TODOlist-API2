@@ -1,5 +1,7 @@
 package com.todolist.repositories;
 
+import com.fadda.common.tuples.pair.Pair;
+import com.todolist.entity.Group;
 import com.todolist.entity.Task;
 import com.todolist.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,7 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,21 +1,41 @@
 package com.todolist.services.user;
 
+import com.fadda.common.tuples.pair.Pair;
 import com.todolist.entity.User;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.UserRepository;
+import com.todolist.services.BaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService extends BaseService<User> {
 
     // Repositories -----------------------------------------------------------
     private final UserRepository userRepository;
+
+    @PostConstruct
+    public void init() throws IOException {
+        super.init();
+    }
+
+    @Override
+    @Transactional
+    public void saveEntity(User entity) {
+        userRepository.save(entity);
+    }
+
+    @Override
+    protected Class<User> getEntityClass() {
+        return User.class;
+    }
 
     // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)

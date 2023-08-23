@@ -1,5 +1,6 @@
 package com.todolist.services.group;
 
+import com.fadda.common.tuples.pair.Pair;
 import com.todolist.dtos.ShowUser;
 import com.todolist.entity.Group;
 import com.todolist.entity.GroupUser;
@@ -7,16 +8,19 @@ import com.todolist.entity.User;
 import com.todolist.exceptions.BadRequestException;
 import com.todolist.exceptions.NotFoundException;
 import com.todolist.repositories.GroupUserRepository;
+import com.todolist.services.BaseService;
 import com.todolist.services.user.UserTaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class GroupUserService {
+public class GroupUserService extends BaseService<GroupUser> {
 
     // Services ---------------------------------------------------------------
     private final UserTaskService userTaskService;
@@ -24,12 +28,46 @@ public class GroupUserService {
     // Repositories -----------------------------------------------------------
     private final GroupUserRepository groupUserRepository;
 
+    @PostConstruct
+    @Transactional
+    public void init() throws IOException {
+        super.init();
+    }
+
+    @Override
+    protected void saveEntity(GroupUser entity) {
+        groupUserRepository.save(entity);
+    }
+
+    @Override
+    protected Class<GroupUser> getEntityClass() {
+        return GroupUser.class;
+    }
+
+    GroupUser parseEntity(String headers, String line) {
+        GroupUser groupUser = new GroupUser();
+        String[] arrayHeaders = headers.split(",");
+        String[] arrayValues = line.split(",");
+        for (int i = 0; i < arrayHeaders.length; i++) {
+            String header = arrayHeaders[i].trim();
+            String data = arrayValues[i].trim();
+            switch (header) {
+                case "id" -> groupUser.setId(Integer.parseInt(data));
+                case "id_user" -> groupUser.setIdUser(Integer.parseInt(data));
+                case "id_group" -> groupUser.setIdGroup(Integer.parseInt(data));
+                default -> throw new IllegalStateException("Invalid");
+            }
+        }
+
+        return groupUser;
+    }
+
+    // Finders ----------------------------------------------------------------
     @Transactional
     public List<ShowUser> getShowUsersFromGroup(Group group) {
         return getUsersFromGroup(group).stream().map(user -> new ShowUser(user, userTaskService.getShowTasksFromUser(user))).toList();
     }
 
-    // Finders ----------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<Group> findGroupsWithUser(User user) {
         List<Group> groups = groupUserRepository.findAllByIdUser(user.getId());
